@@ -2,8 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
-    // Redirect to login page if not logged in or not an admin
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor', 'dental_assistant'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -15,26 +14,44 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle update request
-if (isset($_POST['update'])) {
-    // Get form data from modal
+// Handle delete request
+if (isset($_POST['delete'])) {
+    // Get the appointment ID from the form
     $id = $_POST['id'];
-    $fname = mysqli_real_escape_string($con, $_POST['fname']);
-    $contact = mysqli_real_escape_string($con, $_POST['contact']);
-    $date = mysqli_real_escape_string($con, $_POST['date']);
-    $time = mysqli_real_escape_string($con, $_POST['time']);
-    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Prepare the update query
-    $update_query = "UPDATE appointments SET fname='$fname', contact='$contact', date='$date', time='$time', service_type='$service_type' WHERE id=$id";
+    // Retrieve the appointment details
+    $query = "SELECT * FROM appointments WHERE id = $id";
+    $result = mysqli_query($con, $query);
+    $appointment = mysqli_fetch_assoc($result);
 
-    // Execute the query
-    if (mysqli_query($con, $update_query)) {
-        // Redirect to the same page after updating
-        header("Location: admin_dashbaord.php");
-        exit();
+    if ($appointment) {
+        // Insert the deleted appointment data into the deleted_appointments table
+        $fname = $appointment['fname'];
+        $contact = $appointment['contact'];
+        $date = $appointment['date'];
+        $time = $appointment['time'];
+        $service_type = $appointment['service_type'];
+
+        $insert_query = "INSERT INTO deleted_appointments (fname, contact, date, time, service_type) 
+                         VALUES ('$fname', '$contact', '$date', '$time', '$service_type')";
+
+        // Execute the insert query
+        if (mysqli_query($con, $insert_query)) {
+            // Now delete the appointment from the appointments table
+            $delete_query = "DELETE FROM appointments WHERE id = $id";
+
+            if (mysqli_query($con, $delete_query)) {
+                // Redirect to the same page after deleting
+                header("Location: admin_dashboard.php");
+                exit();
+            } else {
+                echo "Error deleting record: " . mysqli_error($con);
+            }
+        } else {
+            echo "Error moving record to deleted appointments: " . mysqli_error($con);
+        }
     } else {
-        echo "Error updating record: " . mysqli_error($con);
+        echo "Appointment not found.";
     }
 }
 ?>
@@ -45,7 +62,7 @@ if (isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="admin_dashbaord.css">
+    <link rel="stylesheet" href="admin_dashboard.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <title>Admin Dashboard</title>

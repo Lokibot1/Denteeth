@@ -2,8 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
-    // Redirect to login page if not logged in or not an admin
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor', 'dental_assistant'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -177,14 +176,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
             ?>
             <div>
                 <table>
-                        <tr>
-                            <th>Name</th>
-                            <th>Contact</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Type Of Service</th>
-                            <th>Status</th>
-                        </tr>
+                    <tr>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Type Of Service</th>
+                        <th>Status</th>
+                    </tr>
                     <?php
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {

@@ -22,17 +22,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($stmt->num_rows > 0) {
         $stmt->bind_result($id, $stored_password, $role);
         $stmt->fetch();
-        
+
         // Check password
         if ($input_password == $stored_password) {
             $_SESSION['user_id'] = $id;
             $_SESSION['role'] = $role;
-            
+
             // Redirect based on role
-            if ($role == 'admin') {
+            if ($role == 'doctor') {
                 header("Location: DOCTOR/doctor_dashboard.php");
-            } else if ($role == 'receptionist') {
+            } else if ($role == 'dental_assistant') {
                 header("Location: DENTAL_ASSISTANT/dental_assistant_dashboard.php");
+            } else if ($role == "admin") {
+                header("Location: ADMIN/admin_dashboard.php");
             }
             exit();
         } else {
