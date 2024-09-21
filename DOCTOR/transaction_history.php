@@ -11,7 +11,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] != 'admin') {
 // Database connection
 include("../dbcon.php");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_SESSION['form_submitted'])) {
     // Prepare and bind
     $stmt = $con->prepare("INSERT INTO transaction_history (patient_name, contact_no, type_of_service, date_of_service, bill, change_amount, outstanding_balance) VALUES (?, ?, ?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssddd", $patient_name, $contact_no, $type_of_service, $date_of_service, $bill, $change_amount, $outstanding_balance);
@@ -27,12 +27,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute the query
     if ($stmt->execute()) {
+        // Set a flag in the session to prevent form resubmission
+        $_SESSION['form_submitted'] = true;
+
+        // Redirect to the same page to clear POST data
+        header("Location: " . $_SERVER['REQUEST_URI']);
+        exit();
     } else {
         echo "<p>Error: " . $stmt->error . "</p>";
     }
 
     // Close connections
     $stmt->close();
+}
+
+// Clear the form submitted flag after page reload
+if (isset($_SESSION['form_submitted'])) {
+    unset($_SESSION['form_submitted']);
 }
 ?>
 
