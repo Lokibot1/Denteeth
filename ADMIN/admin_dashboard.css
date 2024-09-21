@@ -27,11 +27,11 @@ label.logo {
 }
 
 .top {
-    margin-bottom: 300px;
+    margin-bottom: 20px;
     margin-left: 0%;
     margin-right: -12%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
 }
 
 .content-box {
@@ -40,7 +40,7 @@ label.logo {
 }
 
 .custom-sidebar .w3-bar-item {
-    margin-bottom: 25px;
+    margin-bottom: 17px;
     border-radius: 0px 30px 30px 0px;
     padding: 1000px;
     display: none;
@@ -58,6 +58,21 @@ label.logo {
     margin-right: 20px;
     margin-left: 10px;
     margin-top: 100px;
+    margin-bottom: 20px;
+}
+
+.down-box {
+    width: 270px;
+    height: 100px;
+    border-radius: 25px;
+    border: 2px solid #333;
+    padding: 10px;
+    font-size: 15px;
+    background-color: #f9f9f9;
+    display: inline-block;
+    margin-right: 20px;
+    margin-left: 10px;
+    margin-top: 0px;
     margin-bottom: 20px;
 }
 

@@ -78,19 +78,62 @@ if (isset($_POST['delete'])) {
             </form>
         </div>
         <div class="w3-sidebar w3-light-grey w3-bar-block custom-sidebar">
-            <a href="doctor_dashboard.php">
+            <a href="admin_dashboard.php">
                 <h3 class="w3-bar-item">ADMIN<br>DASHBOARD</h3>
             </a>
+            <a href="day.php" class="w3-bar-item w3-button">Pending Appointments</a>
+            <a href="day.php" class="w3-bar-item w3-button">Decline Appointments</a>
             <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
             <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
-            <a href="services.php" class="w3-bar-item w3-button">Services</a>
+            <a href="services.php" class="w3-bar-item w3-button">Manage Services</a>
+            <a href="day.php" class="w3-bar-item w3-button">Manage Users</a>
             <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
         </div>
     </nav>
     <!-- Main Content/Crud -->
     <div class="content-box">
         <div class="top">
+            <div class="round-box">
+                <p>PENDING APPOINTMENTS:</p>
+                <?php
+                // Query to count pending appointments
+                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
+                                FROM appointments 
+                                WHERE status = 'pending'";
+                $result_pending = mysqli_query($con, $sql_pending);
+
+                // Check for SQL errors
+                if (!$result_pending) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_pending = mysqli_fetch_assoc($result_pending);
+                $pending_appointments = $row_pending['total_pending_appointments'];
+
+                echo $pending_appointments ? $pending_appointments : 'No data available';
+                ?>
+            </div>
+            <div class="round-box">
+                <p>DECLINED APPOINTMENTS:</p>
+                <?php
+                // Query to count pending appointments
+                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
+                                FROM appointments 
+                                WHERE status = 'pending'";
+                $result_pending = mysqli_query($con, $sql_pending);
+
+                // Check for SQL errors
+                if (!$result_pending) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_pending = mysqli_fetch_assoc($result_pending);
+                $pending_appointments = $row_pending['total_pending_appointments'];
+
+                echo $pending_appointments ? $pending_appointments : 'No data available';
+                ?>
+            </div>
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
@@ -126,26 +169,6 @@ if (isset($_POST['delete'])) {
                 ?>
             </div>
             <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM appointments 
-                                WHERE status = 'pending'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                echo $pending_appointments ? $pending_appointments : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
                 <p>APPOINTMENT FOR THE WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
@@ -169,7 +192,7 @@ if (isset($_POST['delete'])) {
                 echo $appointments_for_week ? $appointments_for_week : 'No data available';
                 ?>
             </div>
-            <div class="round-box">
+            <div class="round-box down-box">
                 <p>FINISHED APPOINTMENTS:</p>
                 <?php
                 // Query to count finished appointments
@@ -187,6 +210,63 @@ if (isset($_POST['delete'])) {
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
+            <div class="round-box down-box">
+                <p>MANAGE SERVICES:</p>
+                <?php
+                // Query to count finished appointments
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $result_finished = mysqli_query($con, $sql_finished);
+
+                // Check for SQL errors
+                if (!$result_finished) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_finished = mysqli_fetch_assoc($result_finished);
+                $finished_appointments = $row_finished['total_finished_appointments'];
+
+                echo $finished_appointments ? $finished_appointments : 'No data available';
+                ?>
+            </div>
+            <div class="round-box down-box">
+                <p>MANAGE USERS:</p>
+                <?php
+                // Query to count finished appointments
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $result_finished = mysqli_query($con, $sql_finished);
+
+                // Check for SQL errors
+                if (!$result_finished) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_finished = mysqli_fetch_assoc($result_finished);
+                $finished_appointments = $row_finished['total_finished_appointments'];
+
+                echo $finished_appointments ? $finished_appointments : 'No data available';
+                ?>
+            </div>
+            <div class="round-box down-box">
+                <p>TRANSACTION HISTORY:</p>
+                <?php
+                // Query to count finished appointments
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $result_finished = mysqli_query($con, $sql_finished);
+
+                // Check for SQL errors
+                if (!$result_finished) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_finished = mysqli_fetch_assoc($result_finished);
+                $finished_appointments = $row_finished['total_finished_appointments'];
+
+                echo $finished_appointments ? $finished_appointments : 'No data available';
+                ?>
+            </div>
+        </div>
+
+        <div>
             <!-- HTML Table -->
             <div>
                 <table>
