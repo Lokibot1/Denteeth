@@ -210,60 +210,6 @@ if (isset($_POST['delete'])) {
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
-            <div class="round-box down-box">
-                <p>MANAGE SERVICES:</p>
-                <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
-                $result_finished = mysqli_query($con, $sql_finished);
-
-                // Check for SQL errors
-                if (!$result_finished) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
-
-                echo $finished_appointments ? $finished_appointments : 'No data available';
-                ?>
-            </div>
-            <div class="round-box down-box">
-                <p>MANAGE USERS:</p>
-                <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
-                $result_finished = mysqli_query($con, $sql_finished);
-
-                // Check for SQL errors
-                if (!$result_finished) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
-
-                echo $finished_appointments ? $finished_appointments : 'No data available';
-                ?>
-            </div>
-            <div class="round-box down-box">
-                <p>TRANSACTION HISTORY:</p>
-                <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
-                $result_finished = mysqli_query($con, $sql_finished);
-
-                // Check for SQL errors
-                if (!$result_finished) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
-
-                echo $finished_appointments ? $finished_appointments : 'No data available';
-                ?>
-            </div>
         </div>
 
         <div>
