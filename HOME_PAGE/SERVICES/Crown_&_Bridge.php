@@ -36,6 +36,35 @@ if ($result->num_rows > 0) {
   exit;
 }
 
+// Check if the form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
+  // Get form data from modal
+  $fname = mysqli_real_escape_string($con, $_POST['fname']);
+  $contact = mysqli_real_escape_string($con, $_POST['contact']);
+  $date = mysqli_real_escape_string($con, $_POST['date']);
+  $time = mysqli_real_escape_string($con, $_POST['time']);
+  $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
+
+  // Prepare the insert query
+  $insert_query = "INSERT INTO appointments (fname, contact, date, time, service_type) VALUES (?, ?, ?, ?, ?)";
+
+  $insert_stmt = $con->prepare($insert_query);
+  if (!$insert_stmt) {
+    echo "Error preparing insert statement: " . $con->error;
+    exit;
+  }
+
+  // Bind parameters and execute the insert query
+  $insert_stmt->bind_param("sssss", $fname, $contact, $date, $time, $service_type);
+  if ($insert_stmt->execute()) {
+    // Redirect to the same page after inserting
+    header("Location: ../Home_page.php");
+    exit();
+  } else {
+    echo "Error inserting record: " . $con->error;
+  }
+}
+
 $stmt->close();
 $con->close();
 ?>
@@ -83,7 +112,98 @@ $con->close();
         <br><br>
         - Complete dentures: PHP <?php echo $complete_price_min; ?> - PHP <?php echo $complete_price_max; ?>
       </h2>
-      <button class="button">BOOK APPOINTMENT NOW</button>
+      <!-- Button to open the modal -->
+      <button id="openModal" class="button">Open Booking Form</button>
+
+      <!-- The Modal -->
+      <div id="myModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <div class="form">
+            <form method="POST" action="">
+              <input type="hidden" name="id" id="modal-id">
+              <label for="fname">Name:</label>
+              <input type="text" name="fname" id="modal-fname" required><br>
+              <label for="contact">Contact:</label>
+              <input type="text" name="contact" id="modal-contact" required><br>
+              <label for="date">Date:</label>
+              <input type="date" name="date" id="modal-date" required><br>
+              <label for="time">Time:</label>
+              <input type="time" name="time" id="modal-time" required><br>
+              <label for="service_type">Type Of Service:</label>
+              <select name="service_type" id="modal-service_type" required>
+                <option value="">--Select Service Type--</option>
+                <option value="All Porcelain Veneers & Zirconia">All Porcelain Veneers & Zirconia</option>
+                <option value="Crown & Bridge">Crown & Bridge</option>
+                <option value="Dental Cleaning">Dental Cleaning</option>
+                <option value="Dental Implants">Dental Implants</option>
+                <option value="Dental Whitening">Dental Whitening</option>
+                <option value="Dentures">Dentures</option>
+                <option value="Extraction">Extraction</option>
+                <option value="Full Exam & X-Ray">Full Exam & X-Ray</option>
+                <option value="Orthodontic Braces">Orthodontic Braces</option>
+                <option value="Restoration">Restoration</option>
+                <option value="Root Canal Treatment">Root Canal Treatment</option>
+              </select><br>
+              <input type="submit" name="update" value="BOOK">
+            </form>
+            <script>
+              // Set min and max date for current week
+              window.onload = function () {
+                const today = new Date();
+                const dayOfWeek = today.getDay();
+
+                // Calculate the start (Monday) and end (Sunday) of the current week
+                const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
+                const firstDay = new Date(today.setDate(today.getDate() + mondayOffset)); // Start of the week (Monday)
+                const lastDay = new Date(firstDay);
+                lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
+
+                // Set min and max for the date input
+                document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
+                document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
+              };
+
+              // Format date as YYYY-MM-DD
+              function formatDate(date) {
+                const year = date.getFullYear();
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+              }
+            </script>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        // Get the modal
+        var modal = document.getElementById("myModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("openModal");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal
+        btn.onclick = function () {
+          modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function () {
+          modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function (event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+      </script>
+
     </div>
   </div>
 </body>

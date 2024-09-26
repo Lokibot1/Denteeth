@@ -188,7 +188,7 @@ if (isset($_POST['update'])) {
     <div id="crvs-container">
       <div class="img-box">
         <a href="SERVICES/Orthodontic_Braces.php">
-        <div class="img-wrapper">
+          <div class="img-wrapper">
             <p>
               <?php echo htmlspecialchars($bracesData ? $bracesData['service_name'] : 'Orthodontic Braces'); ?>
             </p>
@@ -363,7 +363,7 @@ if (isset($_POST['update'])) {
           <option value="Restoration">Restoration</option>
           <option value="Root Canal Treatment">Root Canal Treatment</option>
         </select><br>
-        <input type="submit" name="update" value="Save">
+        <input type="submit" name="update" value="BOOK">
       </form>
       <script>
         // Set min and max date for current week
