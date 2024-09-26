@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-// Check if the user is logged in and is an admin
+// Check if the user is logged in and has the required role
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor', 'dental_assistant'])) {
     header("Location: ../login.php");
     exit();
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $partial_price_max = $_POST['partial_price_max'];
     $complete_price_min = $_POST['complete_price_min'];
     $complete_price_max = $_POST['complete_price_max'];
-    $service_name = $_POST['service_name'] ?? ''; // This will retrieve the service name from the hidden input
+    $service_name = $_POST['service_name'] ?? ''; // Retrieve service name
 
     if (empty($service_name)) {
         echo "Service name is required.";
@@ -28,12 +28,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Handle image upload
-    $target_dir = "C:/xampp/htdocs/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/"; // Absolute path to the target directory
+    $target_dir = "C:/xampp/htdocs/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/";
     $target_file = $target_dir . basename($_FILES["service_image"]["name"]);
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-    // Check if image file is an actual image or fake image
+    // Check if the file is an actual image
     $check = getimagesize($_FILES["service_image"]["tmp_name"]);
     if ($check !== false) {
         $uploadOk = 1;
@@ -42,19 +42,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $uploadOk = 0;
     }
 
-    // Check file size
-    if ($_FILES["service_image"]["size"] > 500000) { // Limit to 500KB
+    // Check file size (limit 500KB)
+    if ($_FILES["service_image"]["size"] > 500000) {
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
     }
 
-    // Allow certain file formats
-    if (!in_array($imageFileType, ['jpg', 'png', 'jpeg', 'gif'])) {
+    // Allow only certain file formats
+    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
         echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
         $uploadOk = 0;
     }
 
-    // Check if $uploadOk is set to 0 by an error
     if ($uploadOk == 0) {
         echo "Sorry, your file was not uploaded.";
     } else {
@@ -63,19 +62,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             mkdir($target_dir, 0777, true);
         }
 
+        // Move the uploaded file
         if (move_uploaded_file($_FILES["service_image"]["tmp_name"], $target_file)) {
-            // If the image is uploaded successfully, retrieve service name
-            $service_name = $_POST['service_name']; // Retrieve service name after image upload
-
-            // Prepare and bind with switched parameters
-            $stmt = $con->prepare("INSERT INTO services (service_name, service_image, service_description, partial_price_min, partial_price_max, complete_price_min, complete_price_max) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssdddd", $target_file, $service_name, $description, $partial_price_min, $partial_price_max, $complete_price_min, $complete_price_max);
+            // Prepare and bind an update statement
+            $stmt = $con->prepare("UPDATE services SET service_image = ?, service_description = ?, partial_price_min = ?, partial_price_max = ?, complete_price_min = ?, complete_price_max = ? WHERE service_name = ?");
+            $stmt->bind_param("ssdddss", $target_file, $description, $partial_price_min, $partial_price_max, $complete_price_min, $complete_price_max, $service_name);
 
             // Execute the statement
             if ($stmt->execute()) {
-                // Redirect to the same page to prevent resubmission
+                // Redirect to prevent form resubmission
                 header("Location: services.php");
-                exit(); // Important to call exit after redirect
+                exit();
             } else {
                 echo "Error: " . $stmt->error;
             }
@@ -87,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Close connection
+// Close the connection
 $con->close();
 ?>
 
@@ -225,23 +222,24 @@ $con->close();
             <h1>Services</h1>
             <div id="crvs-container">
                 <!-- Img-box and Modal for Orthodontic Braces -->
-                <div class="img-box" id="openModalBtnBraces">
+                <div class="img-box" id="openModalBtnOrthodonticBraces">
                     <div class="img-wrapper">
                         <p>ORTHODONTIC BRACES</p>
                         <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
                     </div>
                 </div>
-                <div id="serviceModalBraces" class="modal">
+                <div id="serviceModalOrthodonticBraces" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
                         <h2>Edit Orthodontic Braces</h2>
-                        <form id="serviceFormBraces" method="POST" action="services.php" enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" id="service_name_braces">
-
+                        <form id="serviceFormOrthodonticBraces" method="POST" action="services.php"
+                            enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Orthodontic Braces">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
-                            <input type="file" name="service_image" id="imageInputBraces" accept="image/*" required
-                                onchange="previewImage(event, 'imagePreviewBraces')"><br>
-                            <img id="imagePreviewBraces" src="" alt="Image Preview"
+                            <input type="file" name="service_image" id="imageInputOrthodonticBraces" accept="image/*"
+                                required onchange="previewImage(event, 'imagePreviewOrthodonticBraces')"><br>
+                            <img id="imagePreviewOrthodonticBraces" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
@@ -254,24 +252,23 @@ $con->close();
                             <button type="submit">Save Changes</button>
                         </form>
                         <script>
-                            var modalBraces = document.getElementById("serviceModalBraces");
-                            var btnBraces = document.getElementById("openModalBtnBraces");
-                            var spanBraces = document.getElementsByClassName("close")[0];
+                            var modalOrthodonticBraces = document.getElementById("serviceModalOrthodonticBraces");
+                            var btnOrthodonticBraces = document.getElementById("openModalBtnOrthodonticBraces");
+                            var spanOrthodonticBraces = document.getElementsByClassName("close")[0];
 
-                            btnBraces.onclick = function () {
-                                document.getElementById("service_name_braces").value = "Orthodontic Braces"; 
-                                modalBraces.style.display = "block";
+                            btnOrthodonticBraces.onclick = function () {
+                                modalOrthodonticBraces.style.display = "block";
                             }
 
-                            spanBraces.onclick = function () {
-                                resetModal('serviceFormBraces', 'imagePreviewBraces');
-                                modalBraces.style.display = "none";
+                            spanOrthodonticBraces.onclick = function () {
+                                resetModal('serviceFormOrthodonticBraces', 'imagePreviewOrthodonticBraces');
+                                modalOrthodonticBraces.style.display = "none";
                             }
 
                             window.onclick = function (event) {
-                                if (event.target == modalBraces) {
-                                    resetModal('serviceFormBraces', 'imagePreviewBraces');
-                                    modalBraces.style.display = "none";
+                                if (event.target == modalOrthodonticBraces) {
+                                    resetModal('serviceFormOrthodonticBraces', 'imagePreviewOrthodonticBraces');
+                                    modalOrthodonticBraces.style.display = "none";
                                 }
                             }
                         </script>
@@ -289,8 +286,10 @@ $con->close();
                     <div class="modal-content">
                         <span class="close">&times;</span>
                         <h2>Edit Dental Cleaning</h2>
-                        <form id="serviceFormCleaning" method="POST" action="services.php" enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" id="service_name_dental_cleaning">
+                        <form id="serviceFormCleaning" method="POST" action="services.php"
+                            enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Dental Cleaning">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputCleaning" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewCleaning')"><br>
@@ -312,7 +311,6 @@ $con->close();
                             var spanCleaning = document.getElementsByClassName("close")[1];
 
                             btnCleaning.onclick = function () {
-                                document.getElementById("service_name_dental_cleaning").value = "Dental Cleaning";
                                 modalCleaning.style.display = "block";
                             }
 
@@ -344,6 +342,8 @@ $con->close();
                         <h2>Edit Dental Whitening</h2>
                         <form id="serviceFormWhitening" method="POST" action="services.php"
                             enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Whitening">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputWhitening" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewWhitening')"><br>
@@ -396,6 +396,8 @@ $con->close();
                         <h2>Edit Dental Implants</h2>
                         <form id="serviceFormImplants" method="POST" action="services.php"
                             enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Dental Implants">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputImplants" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewImplants')"><br>
@@ -448,6 +450,8 @@ $con->close();
                         <h2>Edit Restoration</h2>
                         <form id="serviceFormRestoration" method="POST" action="services.php"
                             enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Restoration">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputRestoration" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewRestoration')"><br>
@@ -500,6 +504,8 @@ $con->close();
                         <h2>Edit Extraction</h2>
                         <form id="serviceFormExtraction" method="POST" action="services.php"
                             enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Extraction">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputExtraction" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewExtraction')"><br>
@@ -551,6 +557,8 @@ $con->close();
                         <span class="close">&times;</span>
                         <h2>Edit All Porcelain Veneers & Zirconia</h2>
                         <form id="serviceFormVeneers" method="POST" action="services.php" enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="All Porcelain Veneers & Zirconia">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputVeneers" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewVeneers')"><br>
@@ -602,6 +610,8 @@ $con->close();
                         <span class="close">&times;</span>
                         <h2>Edit Full Exam & X-Ray</h2>
                         <form id="serviceFormExam" method="POST" action="services.php" enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Full Exam & X-Ray">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputExam" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewExam')"><br>
@@ -654,6 +664,8 @@ $con->close();
                         <h2>Edit Root Canal Treatment</h2>
                         <form id="serviceFormRootCanal" method="POST" action="services.php"
                             enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Root Canal Treatment">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputRootCanal" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewRootCanal')"><br>
@@ -706,6 +718,8 @@ $con->close();
                         <h2>Edit Dentures</h2>
                         <form id="serviceFormDentures" method="POST" action="services.php"
                             enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Dentures">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputDentures" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewDentures')"><br>
@@ -758,6 +772,8 @@ $con->close();
                         <h2>Edit Crown & Bridge</h2>
                         <form id="serviceFormCrownBridge" method="POST" action="services.php"
                             enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" value="Crown & Bridge">
+                            <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputCrownBridge" accept="image/*" required
                                 onchange="previewImage(event, 'imagePreviewCrownBridge')"><br>

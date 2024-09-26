@@ -7,12 +7,17 @@ if ($con->connect_error) {
   die("Connection failed: " . $con->connect_error);
 }
 
-// Service name to fetch (can be passed dynamically via GET/POST in a real application)
-$service_name = 'Crown & Bridge';
+// Fetch the service name from GET or POST (sanitize the input)
+$service_name = isset($_GET['service_name']) ? htmlspecialchars($_GET['service_name']) : 'Crown & Bridge';
 
 // Prepare the SQL query to fetch the service by name
 $sql = "SELECT * FROM services WHERE service_name = ?";
 $stmt = $con->prepare($sql);
+if (!$stmt) {
+  echo "Error preparing statement: " . $con->error;
+  exit;
+}
+
 $stmt->bind_param("s", $service_name);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -25,14 +30,16 @@ if ($result->num_rows > 0) {
   $partial_price_max = number_format($row['partial_price_max'], 2);
   $complete_price_min = number_format($row['complete_price_min'], 2);
   $complete_price_max = number_format($row['complete_price_max'], 2);
-  $service_image = $row['service_image']; // Fetch the image filename
+  $service_image = !empty($row['service_image']) ? basename($row['service_image']) : 'default.jpg'; // Use default if image not found
 } else {
   echo "Service not found.";
   exit;
 }
+
 $stmt->close();
 $con->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -59,8 +66,9 @@ $con->close();
   </nav>
   <div class="img-container">
     <!-- Display the dynamically fetched image -->
-    <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($service_image); ?>"
-      alt="<?php echo htmlspecialchars($service_name); ?>">
+    <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars(basename($service_image)); ?>"
+      alt="<?php echo htmlspecialchars($service_name); ?>"
+      onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
   </div>
 
   <div class="container">
@@ -77,7 +85,6 @@ $con->close();
       </h2>
       <button class="button">BOOK APPOINTMENT NOW</button>
     </div>
-
   </div>
 </body>
 
