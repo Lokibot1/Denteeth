@@ -231,7 +231,20 @@ if (isset($_POST['update'])) {
                         <label for="time">Time:</label>
                         <input type="time" name="time" id="modal-time" required><br>
                         <label for="service_type">Type Of Service:</label>
-                        <input type="text" name="service_type" id="modal-service_type" required><br>
+                        <select name="service_type" id="modal-service_type" required>
+                            <option value="">--Select Service Type--</option>
+                            <option value="All Porcelain Veneers & Zirconia">All Porcelain Veneers & Zirconia</option>
+                            <option value="Crown & Bridge">Crown & Bridge</option>
+                            <option value="Dental Cleaning">Dental Cleaning</option>
+                            <option value="Dental Implants">Dental Implants</option>
+                            <option value="Dental Whitening">Dental Whitening</option>
+                            <option value="Dentures">Dentures</option>
+                            <option value="Extraction">Extraction</option>
+                            <option value="Full Exam & X-Ray">Full Exam & X-Ray</option>
+                            <option value="Orthodontic Braces">Orthodontic Braces</option>
+                            <option value="Restoration">Restoration</option>
+                            <option value="Root Canal Treatment">Root Canal Treatment</option>
+                        </select><br>
                         <input type="submit" name="update" value="Save">
                     </form>
                 </div>

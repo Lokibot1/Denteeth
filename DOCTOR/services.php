@@ -14,6 +14,47 @@ if ($con->connect_error) {
     die("Connection failed: " . $con->connect_error);
 }
 
+function fetchService($con, $service_name)
+{
+    $sql = "SELECT * FROM services WHERE service_name = ?";
+    $stmt = $con->prepare($sql);
+
+    if (!$stmt) {
+        echo "Error preparing statement: " . $con->error;
+        return null; // Return null on failure
+    }
+
+    // Bind parameter
+    $stmt->bind_param("s", $service_name);
+
+    // Execute the statement
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+
+        // Check if there are results
+        if ($result->num_rows > 0) {
+            return $result->fetch_assoc(); // Return the fetched data
+        } else {
+            return null; // No results found
+        }
+    } else {
+        echo "Error executing statement: " . $stmt->error;
+        return null; // Return null on execution failure
+    }
+}
+
+$veneersData = fetchService($con, 'All Porcelain Veneers & Zirconia');
+$crownBridgeData = fetchService($con, 'Crown & Bridge');
+$cleaningData = fetchService($con, 'Dental Cleaning');
+$implantsData = fetchService($con, 'Dental Implants');
+$whiteningData = fetchService($con, 'Dental Whitening');
+$dentureData = fetchService($con, 'Dentures');
+$extractionData = fetchService($con, 'Extraction');
+$examData = fetchService($con, 'Full Exam & X-Ray');
+$bracesData = fetchService($con, 'Orthodontic Braces');
+$restorationData = fetchService($con, 'Restoration');
+$rootData = fetchService($con, 'Root Canal Treatment');
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = $_POST['service_description'];
     $partial_price_min = $_POST['partial_price_min'];
@@ -224,8 +265,12 @@ $con->close();
                 <!-- Img-box and Modal for Orthodontic Braces -->
                 <div class="img-box" id="openModalBtnOrthodonticBraces">
                     <div class="img-wrapper">
-                        <p>ORTHODONTIC BRACES</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p>
+                            <?php echo htmlspecialchars($bracesData ? $bracesData['service_name'] : 'Orthodontic Braces'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($bracesData ? basename($bracesData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($bracesData ? $bracesData['service_name'] : 'Orthodontic Braces'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalOrthodonticBraces" class="modal">
@@ -278,8 +323,12 @@ $con->close();
                 <!-- Img-box and Modal for Dental Cleaning -->
                 <div class="img-box" id="openModalBtnCleaning">
                     <div class="img-wrapper">
-                        <p>DENTAL CLEANING</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p>
+                            <?php echo htmlspecialchars($cleaningData ? $cleaningData['service_name'] : 'Dental Cleaning'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($cleaningData ? basename($cleaningData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($cleaningData ? $cleaningData['service_name'] : 'Dental Cleaning'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalCleaning" class="modal">
@@ -332,8 +381,12 @@ $con->close();
                 <!-- Img-box and Modal for Dental Whitening -->
                 <div class="img-box" id="openModalBtnWhitening">
                     <div class="img-wrapper">
-                        <p>DENTAL WHITENING</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p>
+                            <?php echo htmlspecialchars($whiteningData ? $whiteningData['service_name'] : 'Dental Whitening'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($whiteningData ? basename($whiteningData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($whiteningData ? $whiteningData['service_name'] : 'Dental Whitening'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalWhitening" class="modal">
@@ -386,8 +439,12 @@ $con->close();
                 <!-- Img-box and Modal for Dental Implants -->
                 <div class="img-box" id="openModalBtnImplants">
                     <div class="img-wrapper">
-                        <p>DENTAL IMPLANTS</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p>
+                            <?php echo htmlspecialchars($implantsData ? $implantsData['service_name'] : 'Dental Implants'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($implantsData ? basename($implantsData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($implantsData ? $implantsData['service_name'] : 'Dental Implants'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalImplants" class="modal">
@@ -440,8 +497,12 @@ $con->close();
                 <!-- Img-box and Modal for Restoration -->
                 <div class="img-box" id="openModalBtnRestoration">
                     <div class="img-wrapper">
-                        <p>RESTORATION</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p>
+                            <?php echo htmlspecialchars($restorationData ? $restorationData['service_name'] : 'Restoration'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($restorationData ? basename($restorationData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($restorationData ? $restorationData['service_name'] : 'Restoration'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalRestoration" class="modal">
@@ -490,12 +551,14 @@ $con->close();
                         </script>
                     </div>
                 </div>
-
-                <!-- Img-box and Modal for Extraction -->
                 <div class="img-box" id="openModalBtnExtraction">
                     <div class="img-wrapper">
-                        <p>EXTRACTION</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p>
+                            <?php echo htmlspecialchars($extractionData ? $extractionData['service_name'] : 'Extraction'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($extractionData ? basename($extractionData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($extractionData ? $extractionData['service_name'] : 'Extraction'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalExtraction" class="modal">
@@ -544,12 +607,14 @@ $con->close();
                         </script>
                     </div>
                 </div>
-
-                <!-- Img-box and Modal for All Porcelain Veneers & Zirconia -->
                 <div class="img-box" id="openModalBtnVeneers">
                     <div class="img-wrapper">
-                        <p>ALL PORCELAIN VENEERS & ZIRCONIA</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p>
+                            <?php echo htmlspecialchars($veneersData ? $veneersData['service_name'] : 'All Porcelain Veneers & Zirconia'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($veneersData ? basename($veneersData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($veneersData ? $veneersData['service_name'] : 'All Porcelain Veneers & Zirconia'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalVeneers" class="modal">
@@ -597,12 +662,14 @@ $con->close();
                         </script>
                     </div>
                 </div>
-
-                <!-- Img-box and Modal for Full Exam & X-Ray -->
                 <div class="img-box" id="openModalBtnExam">
                     <div class="img-wrapper">
-                        <p>FULL EXAM & X-RAY</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p>
+                            <?php echo htmlspecialchars($examData ? $examData['service_name'] : 'Full Exam & X-Ray'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($examData ? basename($examData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($examData ? $examData['service_name'] : 'Full Exam & X-Ray'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalExam" class="modal">
@@ -650,12 +717,13 @@ $con->close();
                         </script>
                     </div>
                 </div>
-
-                <!-- Img-box and Modal for Root Canal Treatment -->
                 <div class="img-box" id="openModalBtnRootCanal">
                     <div class="img-wrapper">
-                        <p>ROOT CANAL TREATMENT</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p><?php echo htmlspecialchars($rootData ? $rootData['service_name'] : 'Root Canal Treatment'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($rootData ? basename($rootData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($rootData ? $rootData['service_name'] : 'Root Canal Treatment'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalRootCanal" class="modal">
@@ -704,12 +772,13 @@ $con->close();
                         </script>
                     </div>
                 </div>
-
-                <!-- Img-box and Modal for Dentures -->
                 <div class="img-box" id="openModalBtnDentures">
                     <div class="img-wrapper">
-                        <p>DENTURES</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p><?php echo htmlspecialchars($dentureData ? $dentureData['service_name'] : 'Dentures'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($dentureData ? basename($dentureData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($dentureData ? $dentureData['service_name'] : 'Dentures'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalDentures" class="modal">
@@ -758,12 +827,13 @@ $con->close();
                         </script>
                     </div>
                 </div>
-
-                <!-- Img-box and Modal for Crown & Bridge -->
                 <div class="img-box" id="openModalBtnCrownBridge">
                     <div class="img-wrapper">
-                        <p>CROWN & BRIDGE</p>
-                        <img src="https://i.pinimg.com/736x/d5/cb/a4/d5cba4e860f88132e33a6875af1f2eee.jpg" alt="">
+                        <p><?php echo htmlspecialchars($crownBridgeData ? $crownBridgeData['service_name'] : 'Crown & Bridge'); ?>
+                        </p>
+                        <img src="/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/<?php echo htmlspecialchars($crownBridgeData ? basename($crownBridgeData['service_image']) : 'default.jpg'); ?>"
+                            alt="<?php echo htmlspecialchars($crownBridgeData ? $crownBridgeData['service_name'] : 'Crown & Bridge'); ?>"
+                            onerror="this.src='/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/default.jpg';">
                     </div>
                 </div>
                 <div id="serviceModalCrownBridge" class="modal">
