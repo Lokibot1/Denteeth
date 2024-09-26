@@ -63,10 +63,10 @@ if (isset($_POST['update'])) {
             <a href="dental_assistant_dashboard.php">
                 <h3 class="w3-bar-item">DENTAL ASSISTANT<br>DASHBOARD</h3>
             </a>
-            <a href=".php" class="w3-bar-item w3-button">Pending Appointments</a>
+            <a href="pending.php" class="w3-bar-item w3-button">Pending Appointments</a>
             <a href="day.php" class="w3-bar-item w3-button">Appointment for the Day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href=".php" class="w3-bar-item w3-button">Declined Appointment</a>
+            <a href="declined.php" class="w3-bar-item w3-button">Declined Appointment</a>
             <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
         </div>
     </nav>
@@ -178,6 +178,7 @@ if (isset($_POST['update'])) {
                         <th>Date</th>
                         <th>Time</th>
                         <th>Type Of Service</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                     <?php
@@ -191,28 +192,20 @@ if (isset($_POST['update'])) {
                     <td>{$row['date']}</td>
                     <td>{$row['time']}</td>
                     <td>{$row['service_type']}</td>
+                    <td>{$row['status']}</td>
                     <td>
-                        <button type='button' onclick='openModal({$row['id']}, \"{$row['fname']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_type']}\")'>Edit</button>
+                        <button type='button' onclick='openModal({$row['id']}, \"{$row['fname']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_type']}\", \"{$row['status']}\")'>Edit</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\">
-                        </form>";
-
-                            // Only display the 'Finish' button if the status is not 'finished'
-                            if ($row['status'] != 'finished') {
-                                echo "<form method='POST' action='' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='finish' value='Finish'>
-                      </form>";
-                            }
-
-                            echo "</td></tr>";
+                        </form>
+                    </td>
+                </tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No records found</td></tr>";
+                        echo "<tr><td colspan='7'>No records found</td></tr>";
                     }
                     ?>
-
                 </table>
             </div>
 
@@ -232,6 +225,13 @@ if (isset($_POST['update'])) {
                         <input type="time" name="time" id="modal-time" required><br>
                         <label for="service_type">Type Of Service:</label>
                         <input type="text" name="service_type" id="modal-service_type" required><br>
+                        <label for="status">Status:</label>
+                        <select name="status" id="modal-status" required>
+                            <option value="pending">Pending</option>
+                            <option value="accepted">Accepted</option>
+                            <option value="declined">Declined</option>
+                            <option value="finished">Finished</option>
+                        </select><br>
                         <input type="submit" name="update" value="Save">
                     </form>
                 </div>
@@ -239,13 +239,14 @@ if (isset($_POST['update'])) {
 
             <script>
                 // Open the modal and populate it with data
-                function openModal(id, fname, contact, date, time, service_type) {
+                function openModal(id, fname, contact, date, time, service_type, status) {
                     document.getElementById('modal-id').value = id;
                     document.getElementById('modal-fname').value = fname;
                     document.getElementById('modal-contact').value = contact;
                     document.getElementById('modal-date').value = date;
                     document.getElementById('modal-time').value = time;
                     document.getElementById('modal-service_type').value = service_type;
+                    document.getElementById('modal-status').value = status; // Set the status in the modal
 
                     // Restrict date to current week, starting from Monday
                     const today = new Date();

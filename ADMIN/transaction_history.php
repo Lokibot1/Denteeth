@@ -71,14 +71,17 @@ if (isset($_SESSION['form_submitted'])) {
             </form>
         </div>
         <div class="w3-sidebar w3-light-grey w3-bar-block custom-sidebar">
-            <a href="dental_assistant_dashboard.php">
-                <h3 class="w3-bar-item">DENTAL ASSISTANT<br>DASHBOARD</h3>
+            <a href="admin_dashboard.php">
+                <h3 class="w3-bar-item">ADMIN<br>DASHBOARD</h3>
             </a>
-            <a href=".php" class="w3-bar-item w3-button">Pending Appointments</a>
-            <a href="day.php" class="w3-bar-item w3-button">Appointment for the Day</a>
+            <a href="day.php" class="w3-bar-item w3-button">Pending Appointments</a>
+            <a href="day.php" class="w3-bar-item w3-button">Decline Appointments</a>
+            <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href=".php" class="w3-bar-item w3-button">Declined Appointment</a>
-            <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
+            <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
+            <a href="services.php" class="w3-bar-item w3-button">Services</a>
+            <a href="day.php" class="w3-bar-item w3-button">Manage Users</a>
+            <a href="transaction_history.php" class="w3-bar-item w3-button active">Transaction History</a>
         </div>
     </nav>
     <!-- Main Content/Crud -->

@@ -71,10 +71,10 @@ if (isset($_SESSION['form_submitted'])) {
             <a href="dental_assistant_dashboard.php">
                 <h3 class="w3-bar-item">DENTAL ASSISTANT<br>DASHBOARD</h3>
             </a>
-            <a href=".php" class="w3-bar-item w3-button">Pending Appointments</a>
+            <a href="pending.php" class="w3-bar-item w3-button">Pending Appointments</a>
             <a href="day.php" class="w3-bar-item w3-button">Appointment for the Day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href=".php" class="w3-bar-item w3-button">Declined Appointment</a>
+            <a href="declined.php" class="w3-bar-item w3-button">Declined Appointment</a>
             <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
         </div>
     </nav>

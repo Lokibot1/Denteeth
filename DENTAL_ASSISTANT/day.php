@@ -30,7 +30,7 @@ if (isset($_POST['update'])) {
     // Execute the query
     if (mysqli_query($con, $update_query)) {
         // Redirect to the same page after updating
-        header("Location: dental_assistant_dashboard.php");
+        header("Location: day.php");
         exit();
     } else {
         echo "Error updating record: " . mysqli_error($con);
@@ -63,10 +63,10 @@ if (isset($_POST['update'])) {
             <a href="dental_assistant_dashboard.php">
                 <h3 class="w3-bar-item">DENTAL ASSISTANT<br>DASHBOARD</h3>
             </a>
-            <a href=".php" class="w3-bar-item w3-button">Pending Appointments</a>
+            <a href="pending.php" class="w3-bar-item w3-button">Pending Appointments</a>
             <a href="day.php" class="w3-bar-item w3-button active">Appointment for the Day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href=".php" class="w3-bar-item w3-button">Declined Appointment</a>
+            <a href="declined.php" class="w3-bar-item w3-button">Declined Appointment</a>
             <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
         </div>
     </nav>
@@ -178,9 +178,8 @@ if (isset($_POST['update'])) {
             $start_of_week = date('Y-m-d', strtotime('monday this week'));
             $end_of_week = date('Y-m-d', strtotime('sunday this week'));
 
-            // Fetch only this week's appointments
-            $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'");
-            $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) = '$today'");
+            // Fetch only today's appointments
+            $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) = '$today' AND status ='accepted'");
             // Loop through each appointment record
             ?>
             <div>

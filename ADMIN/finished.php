@@ -66,7 +66,7 @@ if (isset($_POST['update'])) {
             <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
             <a href="finished.php" class="w3-bar-item w3-button active">Finished Appointments</a>
-            <a href="services.php" class="w3-bar-item w3-button">Manage Services</a>
+            <a href="services.php" class="w3-bar-item w3-button">Services</a>
             <a href="day.php" class="w3-bar-item w3-button">Manage Users</a>
             <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
         </div>
