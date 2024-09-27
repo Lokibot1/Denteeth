@@ -46,7 +46,6 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
     <div class="container">
         <div class="armand">
             <form class="login-form" action="" method="post">
-                <h1 class="login-header"> Sign Up</h1>
                 <input type="text" name="fname" placeholder="First Name" required>
                 <input type="text" name="lname" placeholder="Last Name" required>
                 <select name="usertype" aria-placeholder="Type of User">

@@ -1,3 +1,3 @@
 <?php
-   $con = mysqli_connect("localhost", "dental", "dental123", "dental");
+   $con = mysqli_connect("localhost", "root", "", "dental");
 ?>
