@@ -67,7 +67,6 @@ if (isset($_POST['update'])) {
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
             <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
             <a href="services.php" class="w3-bar-item w3-button">Services</a>
-            <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
         </div>
     </nav>
     <!-- Main Content/Crud -->
@@ -181,7 +180,7 @@ if (isset($_POST['update'])) {
                         <th>Actions</th>
                     </tr>
                     <?php
-                    $result = mysqli_query($con, "SELECT * FROM appointments");
+                    $result = mysqli_query($con, "SELECT * FROM appointments WHERE status = 'accepted'");
 
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {

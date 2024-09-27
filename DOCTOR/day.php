@@ -67,7 +67,6 @@ if (isset($_POST['update'])) {
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
             <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
             <a href="services.php" class="w3-bar-item w3-button">Services</a>
-            <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
         </div>
     </nav>
     <!-- Main Content/Crud -->
@@ -178,9 +177,8 @@ if (isset($_POST['update'])) {
             $start_of_week = date('Y-m-d', strtotime('monday this week'));
             $end_of_week = date('Y-m-d', strtotime('sunday this week'));
 
-            // Fetch only this week's appointments
-            $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'");
-            $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) = '$today'");
+            // Fetch only today's appointments
+            $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) = '$today' AND status = 'accepted'");
             // Loop through each appointment record
             ?>
             <div>

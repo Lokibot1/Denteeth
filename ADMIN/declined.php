@@ -14,23 +14,38 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle update request
-if (isset($_POST['update'])) {
-    // Get form data from modal
+// Handle update request for appointment status
+if (isset($_POST['action'])) {
     $id = $_POST['id'];
-    $fname = mysqli_real_escape_string($con, $_POST['fname']);
-    $contact = mysqli_real_escape_string($con, $_POST['contact']);
-    $date = mysqli_real_escape_string($con, $_POST['date']);
-    $time = mysqli_real_escape_string($con, $_POST['time']);
-    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
+    $action = $_POST['action'];
 
-    // Prepare the update query
-    $update_query = "UPDATE appointments SET fname='$fname', contact='$contact', date='$date', time='$time', service_type='$service_type' WHERE id=$id";
+    // Prepare the query based on the action
+    if ($action === 'Restore') {
+        // Update the status of the appointment to 'pending'
+        $update_query = "UPDATE appointments SET status='pending' WHERE id=$id";
+    } else if ($action === 'Delete') {
+        // Fetch the appointment data to insert into deleted_appointments
+        $fetch_query = "SELECT * FROM appointments WHERE id=$id";
+        $result = mysqli_query($con, $fetch_query);
+        if ($result && mysqli_num_rows($result) > 0) {
+            $appointment = mysqli_fetch_assoc($result);
 
-    // Execute the query
-    if (mysqli_query($con, $update_query)) {
+            // Insert into deleted_appointments
+            $insert_query = "INSERT INTO deleted_appointments (fname, contact, date, time, service_type, status)
+                             VALUES ('{$appointment['fname']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['service_type']}', 'deleted')";
+            mysqli_query($con, $insert_query);
+        }
+        // Delete the appointment from appointments table
+        $delete_query = "DELETE FROM appointments WHERE id=$id";
+    }
+
+    // Execute the appropriate query
+    if (
+        isset($update_query) && mysqli_query($con, $update_query) ||
+        isset($delete_query) && mysqli_query($con, $delete_query)
+    ) {
         // Redirect to the same page after updating
-        header("Location: admin_dashboard.php");
+        header("Location: declined.php"); // Corrected line
         exit();
     } else {
         echo "Error updating record: " . mysqli_error($con);
@@ -47,7 +62,7 @@ if (isset($_POST['update'])) {
     <link rel="stylesheet" href="admin_dashboard.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <title>Admin Dashboard</title>
+    <title>dental Assistant Dashboard</title>
 </head>
 
 <body>
@@ -64,9 +79,9 @@ if (isset($_POST['update'])) {
                 <h3 class="w3-bar-item">ADMIN<br>DASHBOARD</h3>
             </a>
             <a href="pending.php" class="w3-bar-item w3-button">Pending Appointments</a>
-            <a href="declined.php" class="w3-bar-item w3-button">Decline Appointments</a>
+            <a href="declined.php" class="w3-bar-item w3-button active">Decline Appointments</a>
             <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
-            <a href="week.php" class="w3-bar-item w3-button active">Appointment for the week</a>
+            <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
             <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
             <a href="services.php" class="w3-bar-item w3-button">Services</a>
             <a href="day.php" class="w3-bar-item w3-button">Manage Users</a>
@@ -193,6 +208,7 @@ if (isset($_POST['update'])) {
                 ?>
             </div>
         </div>
+        <div>
         <!-- HTML Table -->
         <?php
         // Set the default time zone to Hong Kong
@@ -202,8 +218,8 @@ if (isset($_POST['update'])) {
         $start_of_week = date('Y-m-d', strtotime('monday this week'));
         $end_of_week = date('Y-m-d', strtotime('sunday this week'));
 
-        // Fetch only this week's appointments
-        $result = mysqli_query($con, "SELECT * FROM appointments WHERE status = 'accepted' AND DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'");
+        // Fetch only pending appointments
+        $result = mysqli_query($con, "SELECT * FROM appointments WHERE status = 'declined'");
 
         // Loop through each appointment record
         ?>
@@ -221,128 +237,31 @@ if (isset($_POST['update'])) {
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>
-                <td>{$row['fname']}</td>
-                <td>{$row['contact']}</td>
-                <td>{$row['date']}</td>
-                <td>{$row['time']}</td>
-                <td>{$row['service_type']}</td>
-                <td>
-                    <button type='button' onclick='openModal({$row['id']}, \"{$row['fname']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_type']}\")'>Edit</button>
-                    <form method='POST' action='' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\">
-                    </form>";
-
-                        // Only show the 'Finish' button if the status is not 'finished'
-                        if ($row['status'] != 'finished') {
-                            echo "<form method='POST' action='' style='display:inline;'>
-                    <input type='hidden' name='id' value='{$row['id']}'>
-                    <input type='submit' name='finish' value='Finish'>
-                    </form>";
-                        }
-
-                        echo "</td>
-            </tr>";
+                    <td>{$row['fname']}</td>
+                    <td>{$row['contact']}</td>
+                    <td>{$row['date']}</td>
+                    <td>{$row['time']}</td>
+                    <td>{$row['service_type']}</td>
+                    <td>
+                        <form method='POST' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <button type='submit' name='action' value='Restore'>Restore</button>
+                        </form>
+                        <form method='POST' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <button type='submit' name='action' value='Delete'>Delete</button>
+                        </form>
+                    </td>
+                </tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='6'>No records found</td></tr>";
+                    echo "<tr><td colspan='6'>No pending appointments found</td></tr>";
                 }
 
                 mysqli_close($con);
                 ?>
             </table>
         </div>
-
-        <!-- Edit Modal -->
-        <div id="editModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <form method="POST" action="">
-                    <input type="hidden" name="id" id="modal-id">
-                    <label for="fname">Name:</label>
-                    <input type="text" name="fname" id="modal-fname" required><br>
-                    <label for="contact">Contact:</label>
-                    <input type="text" name="contact" id="modal-contact" required><br>
-                    <label for="date">Date:</label>
-                    <input type="date" name="date" id="modal-date" required><br>
-                    <label for="time">Time:</label>
-                    <input type="time" name="time" id="modal-time" required><br>
-                    <label for="service_type">Type Of Service:</label>
-                    <select name="service_type" id="modal-service_type" required>
-                        <option value="">--Select Service Type--</option>
-                        <option value="All Porcelain Veneers & Zirconia">All Porcelain Veneers & Zirconia</option>
-                        <option value="Crown & Bridge">Crown & Bridge</option>
-                        <option value="Dental Cleaning">Dental Cleaning</option>
-                        <option value="Dental Implants">Dental Implants</option>
-                        <option value="Dental Whitening">Dental Whitening</option>
-                        <option value="Dentures">Dentures</option>
-                        <option value="Extraction">Extraction</option>
-                        <option value="Full Exam & X-Ray">Full Exam & X-Ray</option>
-                        <option value="Orthodontic Braces">Orthodontic Braces</option>
-                        <option value="Restoration">Restoration</option>
-                        <option value="Root Canal Treatment">Root Canal Treatment</option>
-                    </select><br>
-                    <input type="submit" name="update" value="Save">
-                </form>
-            </div>
-        </div>
-
-        <script>
-            // Open the modal and populate it with data
-            function openModal(id, fname, contact, date, time, service_type) {
-                document.getElementById('modal-id').value = id;
-                document.getElementById('modal-fname').value = fname;
-                document.getElementById('modal-contact').value = contact;
-                document.getElementById('modal-date').value = date;
-                document.getElementById('modal-time').value = time;
-                document.getElementById('modal-service_type').value = service_type;
-
-                // Restrict date to current week, starting from Monday
-                const today = new Date();
-                const dayOfWeek = today.getDay();
-                const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
-                const firstDay = new Date(today.setDate(today.getDate() + mondayOffset)); // Start of the week (Monday)
-                const lastDay = new Date(firstDay);
-                lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
-
-                const currentDate = new Date(); // Current date for comparison
-
-                // Disable past dates within the current week
-                document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
-                document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
-
-                // If the date has already passed, disable it
-                if (new Date(date) < currentDate) {
-                    document.getElementById('modal-date').classList.add('disabled-date');
-                    document.getElementById('modal-date').setAttribute('disabled', true); // Make unselectable
-                } else {
-                    document.getElementById('modal-date').classList.remove('disabled-date');
-                    document.getElementById('modal-date').removeAttribute('disabled'); // Make selectable
-                }
-
-                document.getElementById('editModal').style.display = 'block';
-            }
-
-            // Close the modal
-            function closeModal() {
-                document.getElementById('editModal').style.display = 'none';
-            }
-
-            // Format date as YYYY-MM-DD
-            function formatDate(date) {
-                const year = date.getFullYear();
-                const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                const day = date.getDate().toString().padStart(2, '0');
-                return `${year}-${month}-${day}`;
-            }
-
-            // Close modal when clicking outside of it
-            window.onclick = function (event) {
-                if (event.target == document.getElementById('editModal')) {
-                    closeModal();
-                }
-            }
-        </script>
     </div>
     </div>
 </body>

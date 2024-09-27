@@ -158,7 +158,6 @@ $con->close();
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
             <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
             <a href="services.php" class="w3-bar-item w3-button active">Services</a>
-            <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
         </div>
     </nav>
     <!-- Main Content/Crud -->

@@ -63,8 +63,8 @@ if (isset($_POST['update'])) {
             <a href="admin_dashboard.php">
                 <h3 class="w3-bar-item">ADMIN<br>DASHBOARD</h3>
             </a>
-            <a href="day.php" class="w3-bar-item w3-button">Pending Appointments</a>
-            <a href="day.php" class="w3-bar-item w3-button">Decline Appointments</a>
+            <a href="pending.php" class="w3-bar-item w3-button">Pending Appointments</a>
+            <a href="declined.php" class="w3-bar-item w3-button">Decline Appointments</a>
             <a href="day.php" class="w3-bar-item w3-button active">Appointment for the day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
             <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
@@ -202,9 +202,8 @@ if (isset($_POST['update'])) {
         $start_of_week = date('Y-m-d', strtotime('monday this week'));
         $end_of_week = date('Y-m-d', strtotime('sunday this week'));
 
-        // Fetch only this week's appointments
-        $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'");
-        $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) = '$today'");
+        // Fetch only this today's appointments
+        $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) = '$today' AND status = 'accepted'");
         // Loop through each appointment record
         ?>
         <div>

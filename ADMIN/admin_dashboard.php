@@ -81,8 +81,8 @@ if (isset($_POST['delete'])) {
             <a href="admin_dashboard.php">
                 <h3 class="w3-bar-item">ADMIN<br>DASHBOARD</h3>
             </a>
-            <a href="day.php" class="w3-bar-item w3-button">Pending Appointments</a>
-            <a href="day.php" class="w3-bar-item w3-button">Decline Appointments</a>
+            <a href="pending.php" class="w3-bar-item w3-button">Pending Appointments</a>
+            <a href="declined.php" class="w3-bar-item w3-button">Decline Appointments</a>
             <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
             <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
