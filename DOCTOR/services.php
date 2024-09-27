@@ -182,7 +182,7 @@ $con->close();
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM appointments 
-                              WHERE DATE(date) = '$today'";
+                              WHERE status = 'accepted' AND DATE(date) = '$today'";
 
                 $result_today = mysqli_query($con, $sql_today);
 
@@ -198,26 +198,6 @@ $con->close();
                 ?>
             </div>
             <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM appointments 
-                                WHERE status = 'pending'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                echo $pending_appointments ? $pending_appointments : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
                 <p>APPOINTMENT FOR THE WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
@@ -227,7 +207,7 @@ $con->close();
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
                              FROM appointments 
-                             WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
+                             WHERE status = 'accepted' AND DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
