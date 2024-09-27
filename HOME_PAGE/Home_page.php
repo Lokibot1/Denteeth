@@ -95,15 +95,17 @@ if (isset($_POST['update'])) {
   <nav>
     <a href="#Homepage">
       <div class="logo">
-        <img src="img/logo.png">
+        <h1>EHM Dental Clinic</h1>
       </div>
     </a>
 
     <ul>
-      <li><a href="#Services">Services</a></li>
-      <li><a href="#FaQ's"> FaQ's</a></li>
-      <li><a href="#Appointment">Appointment</a></li>
-      <li><a href="../login.php">Log In</a></li>
+        <li><a href="#Homepage">Home</a></li>
+        <li><a href="#Services">Services</a></li>
+        <li><a href="#About_Us"> About Us</a></li>
+        <li><a href="#Contact_Us"> Contact Us</a></li>
+        <li><a href="#Appointment">Book Appointment</a></li>
+        <li><a href="../login.php">Log In</a></li>
     </ul>
   </nav>
   <section id="Homepage">
@@ -131,7 +133,7 @@ if (isset($_POST['update'])) {
         </div>
       </div>
     </center>
-    <h1 id="hdr-txt1">WHY US?</h1>
+    <h1 id="hdr-txt1">WHY EHM?</h1>
     <div id="container">
       <div>
         <i class="fa-regular fa-file my-icon"></i>
@@ -173,6 +175,9 @@ if (isset($_POST['update'])) {
     <div id="side-img">
       <img src="https://i.pinimg.com/564x/76/a5/5e/76a55e28f41b42a5ed3b0c3356f90e9e.jpg" alt="mirror">
       <p>
+      <span>SMILE KALABERMBERM ESKALABERM CLYVIX</span>
+      <br>
+      <br>
         Lorem ipsum dolor sit amet, consectetur adipiscing elit,
         sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
         Ut enim ad minim veniam, quis nostrud exercitation ullamco
@@ -182,6 +187,49 @@ if (isset($_POST['update'])) {
         mollit anim id est laborum.
       </p>
     </div>
+  </section>
+  <section id="Services">
+  <h1>ABOUT US</h1>
+<div class="abt-img-right">
+    <img src="img/abt-img1.png" alt="About Image 1">
+    <p>
+        <span>SMILE KALABERMBERM ESKALABERM CLYVIX</span>
+        <br>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
+        ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
+        in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+    </p>
+</div>
+
+<div class="abt-img-left">
+    <img src="img/abt-img2.png" alt="About Image 2">
+    <p>
+        <span>SMILE KALABERMBERM ESKALABERM CLYVIX</span>
+        <br>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
+        ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
+        in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+    </p>
+</div>
+
+<div class="abt-img-right">
+    <img src="img/abt-img3.png" alt="About Image 3">
+    <p>
+        <span>SMILE KALABERMBERM ESKALABERM CLYVIX</span>
+        <br>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
+        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
+        ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
+        in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
+        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
+        deserunt mollit anim id est laborum.
+    </p>
+</div>
   </section>
   <section id="Services">
     <h1>Services</h1>
@@ -391,8 +439,10 @@ if (isset($_POST['update'])) {
         }
       </script>
     </div>
-
-    <div class="icon">
+  </section>
+  <section id="ContactUs">
+    <h1>Contact Us</h1>
+  <div class="icon">
       <a href="#Homepage">
         <i class="fa-solid fa-angle-up" style="color: #ffffff;"></i>
       </a>
