@@ -31,7 +31,7 @@ if (isset($_POST['action'])) {
             $appointment = mysqli_fetch_assoc($result);
 
             // Insert into deleted_appointments
-            $insert_query = "INSERT INTO deleted_appointments (fname, contact, date, time, service_type, status)
+            $insert_query = "INSERT INTO appointments_bin (fname, contact, date, time, service_type, status)
                              VALUES ('{$appointment['fname']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['service_type']}', 'deleted')";
             mysqli_query($con, $insert_query);
         }
