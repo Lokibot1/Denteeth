@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and has the required role
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor', 'dental_assistant'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin'])) {
     header("Location: ../login.php");
     exit();
 }
