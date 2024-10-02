@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor', 'dental_assistant'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -34,6 +34,51 @@ if (isset($_POST['update'])) {
         exit();
     } else {
         echo "Error updating record: " . mysqli_error($con);
+    }
+}
+
+if (isset($_POST['finish'])) {
+    // Get the appointment ID from the form
+    $id = $_POST['id'];
+
+    // Prepare the query to update the status to 'finished'
+    $update_query = "UPDATE appointments SET status='finished' WHERE id=$id";
+
+    // Execute the query
+    if (mysqli_query($con, $update_query)) {
+        // Redirect back to the dashboard or the page you're currently on
+        header("Location: doctor_dashboard.php");
+        exit();
+    } else {
+        echo "Error updating status: " . mysqli_error($con);
+    }
+}
+
+if (isset($_POST['delete'])) {
+    $id = $_POST['id'];
+
+    // Fetch the appointment data to insert into appointments_bin
+    $fetch_query = "SELECT * FROM appointments WHERE id=$id";
+    $result = mysqli_query($con, $fetch_query);
+    if ($result && mysqli_num_rows($result) > 0) {
+        $appointment = mysqli_fetch_assoc($result);
+
+        // Insert into appointments_bin
+        $insert_query = "INSERT INTO appointments_bin (fname, contact, date, time, service_type, status)
+                         VALUES ('{$appointment['fname']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['service_type']}', 'deleted')";
+        mysqli_query($con, $insert_query);
+    }
+
+    // Delete the appointment from appointments table
+    $delete_query = "DELETE FROM appointments WHERE id=$id";
+
+    // Execute the delete query
+    if (mysqli_query($con, $delete_query)) {
+        // Redirect back to the dashboard or the page you're currently on
+        header("Location: doctor_dashboard.php");
+        exit();
+    } else {
+        echo "Error deleting record: " . mysqli_error($con);
     }
 }
 ?>
