@@ -81,7 +81,7 @@ if (isset($_POST['update'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="Home_page.css">
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -149,14 +149,13 @@ if (isset($_POST['update'])) {
       </div>
       <div>
         <i class="fa-solid fa-tooth my-icon"></i>
+        <br>
+        <br>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          Ut enim ad minim veniam, quis nostrud exercitation ullamco
-          laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-          in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.
+        At EHM Dental Clinic, we believe that “Life is fair with dental care”. 
+        With our expert doctor and compassionate dental assistant, we make your dental health 
+        our top priority. We are committed to provide you with personalized attention to  patients 
+        ensuring that you leave with the confidence of a brighter smile.
         </p>
       </div>
       <div>
@@ -175,21 +174,17 @@ if (isset($_POST['update'])) {
     <div id="side-img">
       <img src="https://i.pinimg.com/564x/76/a5/5e/76a55e28f41b42a5ed3b0c3356f90e9e.jpg" alt="mirror">
       <p>
-      <span>SMILE KALABERMBERM ESKALABERM CLYVIX</span>
+      <span>We value the quality of our Dental Works</span>
       <br>
       <br>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco
-        laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-        in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-        mollit anim id est laborum.
+      At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that 
+      every treatment is done with precision, using the latest technology to give you the best results. 
+      Ensuring that you leave with a brighter and healthier smile.
       </p>
     </div>
   </section>
-  <section id="Services">
-  <h1>ABOUT US</h1>
+  <section id="About_Us">
+    <h1 class="About_Us">About Us</h1>
 <div class="abt-img-right">
     <img src="img/abt-img1.png" alt="About Image 1">
     <p>
@@ -225,9 +220,7 @@ if (isset($_POST['update'])) {
         sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
         Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
         ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
-        in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia 
-        deserunt mollit anim id est laborum.
+        in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
     </p>
 </div>
   </section>
@@ -440,13 +433,15 @@ if (isset($_POST['update'])) {
       </script>
     </div>
   </section>
-  <section id="ContactUs">
+  <section id="Contact_Us">
+    <div class="ContactUs">
     <h1>Contact Us</h1>
   <div class="icon">
       <a href="#Homepage">
         <i class="fa-solid fa-angle-up" style="color: #ffffff;"></i>
       </a>
     </div>
+  </div>
   </section>
 </body>
 

@@ -156,27 +156,21 @@ nav a:hover {
 #side-img p {
     width: 700px;
     padding: 100px 70px;
-    font-size: 20px;
+    font-size: 890px;
     text-align: justify;
     float: right;
-    color: black;
-    line-height: 30px;
+    color: rgba(165, 6, 6, 0.74);
+    line-height: 3%;
 }
 
 /*About Us*/
-#About_Us {
-    margin-bottom: 25px;
-}
-
-#About_Us h1 {
-    color: #ede1d2;
-    background-color: #6a6f4c;
+.About_Us {
+    color: #fff;
+    background-color: #0A2C16;
     text-align: center;
     font-size: 70px;
-    margin-bottom: 25px;
-    padding: 20px;
+    margin-bottom: 15px;
 }
-
 .abt-img-left img {
     padding: 0px 50px;
     width: 600px;
@@ -345,7 +339,7 @@ input[type="submit"]:hover {
     background-color: #6a6f4c;
 }
 /*Contact Us*/
-#ContactUs{
+.Contact_Us{
     background-color: linear-gradient(#010D05, #0A2C16);
 
 }
