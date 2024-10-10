@@ -135,34 +135,46 @@ $con->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="services.css">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="doc.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
     <title>Doctor Dashboard</title>
 </head>
-
 <body>
-    <!-- Navigation/Sidebar -->
-    <nav>
-        <div class="logo-container">
-            <label class="logo">Denteeth</label>
-            <form method="POST" action="../logout.php">
+    <!--Nav/Side Bar-->
+<nav>
+    <a href="Home_page.php">
+      <div class="logo">
+        <h1><span>EHM</span>  Dental Clinic</h1>
+      </div>
+    </a>
+    <form method="POST" action="../logout.php">
                 <button type="submit" class="logout-button">Logout</button>
             </form>
-        </div>
-        <div class="w3-sidebar w3-light-grey w3-bar-block custom-sidebar">
-            <a href="doctor_dashboard.php">
-                <h3 class="w3-bar-item">DOCTOR<br>DASHBOARD</h3>
-            </a>
-            <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
-            <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
-            <a href="services.php" class="w3-bar-item w3-button active">Services</a>
-        </div>
-    </nav>
-    <!-- Main Content/Crud -->
-    <div class="content-box">
-        <div class="top">
+    →
+    </a>
+  </nav>
+    <div>
+      <aside class="sidebar">
+        <ul>
+            <br>
+            <a href="doctor_dashboard.php"><h3>DOCTOR <br>DASHBOARD</h3></a>
+            <br>
+            <br>
+            <hr>
+            <br>
+            <li><a href="day.php">Appointment for the day</a></li>
+            <li><a href="week.php">Appointment for the week</a></li>
+            <li><a href="finished.php">Finished Appointments</a></li>
+            <li><a href="services.php">Services</a></li>
+        </ul>
+        </aside>
+    </div>
+    <div class="top">
+        <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
@@ -239,6 +251,7 @@ $con->close();
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
+        </div>
             <h1>Services</h1>
             <div id="crvs-container">
                 <!-- Img-box and Modal for Orthodontic Braces -->
@@ -255,7 +268,7 @@ $con->close();
                 <div id="serviceModalOrthodonticBraces" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Orthodontic Braces</h2>
+                        <h1>Edit Orthodontic Braces</h1><br>
                         <form id="serviceFormOrthodonticBraces" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Orthodontic Braces">
@@ -313,7 +326,7 @@ $con->close();
                 <div id="serviceModalCleaning" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Dental Cleaning</h2>
+                        <h1>Edit Dental Cleaning</h1><br>
                         <form id="serviceFormCleaning" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Dental Cleaning">
@@ -371,7 +384,7 @@ $con->close();
                 <div id="serviceModalWhitening" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Dental Whitening</h2>
+                        <h1>Edit Dental Whitening</h1><br>
                         <form id="serviceFormWhitening" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Whitening">
@@ -429,7 +442,7 @@ $con->close();
                 <div id="serviceModalImplants" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Dental Implants</h2>
+                        <h1>Edit Dental Implants</h1><br>
                         <form id="serviceFormImplants" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Dental Implants">
@@ -487,7 +500,7 @@ $con->close();
                 <div id="serviceModalRestoration" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Restoration</h2>
+                        <h1>Edit Restoration</h1><br>
                         <form id="serviceFormRestoration" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Restoration">
@@ -543,7 +556,7 @@ $con->close();
                 <div id="serviceModalExtraction" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Extraction</h2>
+                        <h1>Edit Extraction</h1><br>
                         <form id="serviceFormExtraction" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Extraction">
@@ -599,7 +612,7 @@ $con->close();
                 <div id="serviceModalVeneers" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit All Porcelain Veneers & Zirconia</h2>
+                        <h1>Edit All Porcelain Veneers & Zirconia</h1><br>
                         <form id="serviceFormVeneers" method="POST" action="services.php" enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="All Porcelain Veneers & Zirconia">
                             <!-- Add this hidden input -->
@@ -654,7 +667,7 @@ $con->close();
                 <div id="serviceModalExam" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Full Exam & X-Ray</h2>
+                        <h1>Edit Full Exam & X-Ray</h1><br>
                         <form id="serviceFormExam" method="POST" action="services.php" enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Full Exam & X-Ray">
                             <!-- Add this hidden input -->
@@ -708,7 +721,7 @@ $con->close();
                 <div id="serviceModalRootCanal" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Root Canal Treatment</h2>
+                        <h1>Edit Root Canal Treatment</h1><br>
                         <form id="serviceFormRootCanal" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Root Canal Treatment">
@@ -763,7 +776,7 @@ $con->close();
                 <div id="serviceModalDentures" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Dentures</h2>
+                        <h1>Edit Dentures</h1><br>
                         <form id="serviceFormDentures" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Dentures">
@@ -818,7 +831,7 @@ $con->close();
                 <div id="serviceModalCrownBridge" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Crown & Bridge</h2>
+                        <h1>Edit Crown & Bridge</h1><br>
                         <form id="serviceFormCrownBridge" method="POST" action="services.php"
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" value="Crown & Bridge">
@@ -896,8 +909,6 @@ $con->close();
                     </script>
                 </div>
             </div>
-
-        </div>
     </div>
 </body>
 

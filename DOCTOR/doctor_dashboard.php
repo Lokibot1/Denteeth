@@ -89,34 +89,47 @@ if (isset($_POST['delete'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="doctor_dashboard.css">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="doc.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
     <title>Doctor Dashboard</title>
 </head>
-
 <body>
-    <!-- Navigation/Sidebar -->
-    <nav>
-        <div class="logo-container">
-            <label class="logo">Denteeth</label>
-            <form method="POST" action="../logout.php">
+    <!--Nav/Side Bar-->
+<nav>
+    <a href="Home_page.php">
+      <div class="logo">
+        <h1><span>EHM</span>  Dental Clinic</h1>
+      </div>
+    </a>
+    <form method="POST" action="../logout.php">
                 <button type="submit" class="logout-button">Logout</button>
             </form>
-        </div>
-        <div class="w3-sidebar w3-light-grey w3-bar-block custom-sidebar">
-            <a href="doctor_dashboard.php">
-                <h3 class="w3-bar-item">DOCTOR<br>DASHBOARD</h3>
-            </a>
-            <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
-            <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
-            <a href="services.php" class="w3-bar-item w3-button">Services</a>
-        </div>
-    </nav>
+    →
+    </a>
+  </nav>
+    <div>
+      <aside class="sidebar">
+        <ul>
+            <br>
+            <a href="doctor_dashboard.php"><h3>DOCTOR <br>DASHBOARD</h3></a>
+            <br>
+            <br>
+            <hr>
+            <br>
+            <li><a href="day.php">Appointment for the day</a></li>
+            <li><a href="week.php">Appointment for the week</a></li>
+            <li><a href="finished.php">Finished Appointments</a></li>
+            <li><a href="services.php">Services</a></li>
+        </ul>
+        </aside>
+    </div>
     <!-- Main Content/Crud -->
-    <div class="content-box">
-        <div class="top">
+    <div class="top">
+        <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
@@ -193,18 +206,19 @@ if (isset($_POST['delete'])) {
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
-            <!-- HTML Table -->
-            <div>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Type Of Service</th>
-                        <th>Actions</th>
-                    </tr>
-                    <?php
+        </div>
+    <!-- HTML Table -->
+        <table>
+            <center>
+            <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Type Of Service</th>
+                <th>Actions</th>
+            </tr>
+                <?php
                     $result = mysqli_query($con, "SELECT * FROM appointments WHERE status = 'accepted'");
 
                     if (mysqli_num_rows($result) > 0) {
@@ -216,35 +230,38 @@ if (isset($_POST['delete'])) {
                     <td>{$row['time']}</td>
                     <td>{$row['service_type']}</td>
                     <td>
-                        <button type='button' onclick='openModal({$row['id']}, \"{$row['fname']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_type']}\")'>Edit</button>
+                        <button type='button' onclick='openModal({$row['id']}, \"{$row['fname']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_type']}\")'
+                        style='background-color:blue; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>Edit</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\">
+                            <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\" 
+                            style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
                         </form>";
 
-                            // Only display the 'Finish' button if the status is not 'finished'
-                            if ($row['status'] != 'finished') {
-                                echo "<form method='POST' action='' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='finish' value='Finish'>
-                      </form>";
-                            }
+                    // Only display the 'Finish' button if the status is not 'finished'
+                    if ($row['status'] != 'finished') {
+                            echo "<form method='POST' action='' style='display:inline;'>
+                                    <input type='hidden' name='id' value='{$row['id']}'>
+                                    <input type='submit' name='finish' value='Finish' 
+                                    style='background-color:green; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                </form>";
+                         }                            
 
                             echo "</td></tr>";
                         }
                     } else {
                         echo "<tr><td colspan='6'>No records found</td></tr>";
                     }
-                    ?>
-
-                </table>
-            </div>
-
-            <!-- Edit Modal -->
-            <div id="editModal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
+            
+            ?>
+            </center>
+         </table>
+    <!-- Edit Modal -->
+        <div id="editModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
                     <form method="POST" action="">
+                    <h1>EDIT DELAILS</h1><br>
                         <input type="hidden" name="id" id="modal-id">
                         <label for="fname">Name:</label>
                         <input type="text" name="fname" id="modal-fname" required><br>
@@ -271,67 +288,62 @@ if (isset($_POST['delete'])) {
                         </select><br>
                         <input type="submit" name="update" value="Save">
                     </form>
-                </div>
             </div>
-
-            <script>
-                // Open the modal and populate it with data
-                function openModal(id, fname, contact, date, time, service_type) {
-                    document.getElementById('modal-id').value = id;
-                    document.getElementById('modal-fname').value = fname;
-                    document.getElementById('modal-contact').value = contact;
-                    document.getElementById('modal-date').value = date;
-                    document.getElementById('modal-time').value = time;
-                    document.getElementById('modal-service_type').value = service_type;
-
-                    // Restrict date to current week, starting from Monday
-                    const today = new Date();
-                    const dayOfWeek = today.getDay();
-                    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
-                    const firstDay = new Date(today.setDate(today.getDate() + mondayOffset)); // Start of the week (Monday)
-                    const lastDay = new Date(firstDay);
-                    lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
-
-                    const currentDate = new Date(); // Current date for comparison
-
-                    // Disable past dates within the current week
-                    document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
-                    document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
-
-                    // If the date has already passed, disable it
-                    if (new Date(date) < currentDate) {
-                        document.getElementById('modal-date').classList.add('disabled-date');
-                        document.getElementById('modal-date').setAttribute('disabled', true); // Make unselectable
-                    } else {
-                        document.getElementById('modal-date').classList.remove('disabled-date');
-                        document.getElementById('modal-date').removeAttribute('disabled'); // Make selectable
-                    }
-
-                    document.getElementById('editModal').style.display = 'block';
-                }
-
-                // Close the modal
-                function closeModal() {
-                    document.getElementById('editModal').style.display = 'none';
-                }
-
-                // Format date as YYYY-MM-DD
-                function formatDate(date) {
-                    const year = date.getFullYear();
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const day = date.getDate().toString().padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-
-                // Close modal when clicking outside of it
-                window.onclick = function (event) {
-                    if (event.target == document.getElementById('editModal')) {
-                        closeModal();
-                    }
-                }
-            </script>
         </div>
-    </div>
+    <script>
+    // Open the modal and populate it with data
+        function openModal(id, fname, contact, date, time, service_type) {
+            document.getElementById('modal-id').value = id;
+            document.getElementById('modal-fname').value = fname;
+            document.getElementById('modal-contact').value = contact;
+            document.getElementById('modal-date').value = date;
+            document.getElementById('modal-time').value = time;
+            document.getElementById('modal-service_type').value = service_type;
+
+    // Restrict date to current week, starting from Monday
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
+            const firstDay = new Date(today.setDate(today.getDate() + mondayOffset)); // Start of the week (Monday)
+            const lastDay = new Date(firstDay);
+            lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
+    // Current date for comparison
+            const currentDate = new Date();
+    // Disable past dates within the current week
+            document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
+            document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
+    // If the date has already passed, disable it
+        if (new Date(date) < currentDate) {
+            document.getElementById('modal-date').classList.add('disabled-date');
+            document.getElementById('modal-date').setAttribute('disabled', true); // Make unselectable
+        } else {
+            document.getElementById('modal-date').classList.remove('disabled-date');
+            document.getElementById('modal-date').removeAttribute('disabled'); // Make selectable
+        }
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+    // Close the modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+    // Format date as YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+    // Close modal when clicking outside of it
+        window.onclick = function (event) {
+            if (event.target == document.getElementById('editModal')) {
+                 closeModal();
+            }
+        }
+    </script>
+        
+ </div>
 </body>
 
 </html>
