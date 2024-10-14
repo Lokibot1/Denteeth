@@ -59,7 +59,7 @@ nav a:hover {
     border-radius: 50px 50px;
 }
 
-/*home paga*/
+/*home page*/
 .img-area {
     background-image: url(img/bg_img.png);
     background-size: cover;
@@ -69,7 +69,6 @@ nav a:hover {
 }
 
 #s-bx {
-    position: absolute;
     color: #ffff;
     background-color: #000000a8;
     text-align: center;
@@ -155,28 +154,22 @@ nav a:hover {
 
 #side-img p {
     width: 700px;
-    padding: 100px 70px;
+    padding: 50px;
     font-size: 20px;
     text-align: justify;
     float: right;
-    color: black;
-    line-height: 30px;
+    color: rgba(0, 0, 0, 0.74);
+    line-height: 50px;
 }
 
 /*About Us*/
-#About_Us {
-    margin-bottom: 25px;
-}
-
-#About_Us h1 {
-    color: #ede1d2;
-    background-color: #6a6f4c;
+.About_Us {
+    color: #fff;
+    background-color: #0A2C16;
     text-align: center;
     font-size: 70px;
-    margin-bottom: 25px;
-    padding: 20px;
+    margin-bottom: 15px;
 }
-
 .abt-img-left img {
     padding: 0px 50px;
     width: 600px;
@@ -185,26 +178,26 @@ nav a:hover {
 
 .abt-img-left p {
     width: 500px;
-    padding: 50px;
+    padding: 50px 70px;
     font-size: 20px;
     text-align: justify;
     float: left;
-    color: black;
+    color: rgba(0, 0, 0, 0.74);
     line-height: 30px;
 }
 .abt-img-right img {
-    padding: 0px 50px;
+    padding: 0px 70px;
     width: 550px;
     height: 350px;
 }
 
 .abt-img-right p {
     width: 500px;
-    padding: 20px 90px;
+    padding:  50px 70px;
     font-size: 20px;
     text-align: justify;
     float: right;
-    color: black;
+    color: rgba(0, 0, 0, 0.74);
     line-height: 30px;
 }
 
@@ -238,7 +231,6 @@ span{
 .img-box {
     border-radius: 20px 20px;
     margin: 30px auto;
-    border-radius: 20px 20px;
     transition: background-color 0.3s ease-in-out, transform 0.3s ease-in-out;
 }
 
@@ -345,7 +337,7 @@ input[type="submit"]:hover {
     background-color: #6a6f4c;
 }
 /*Contact Us*/
-#ContactUs{
+.ContactUs{
     background-color: linear-gradient(#010D05, #0A2C16);
 
 }
