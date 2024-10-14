@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -18,17 +18,26 @@ if (!$con) {
 if (isset($_POST['update'])) {
     // Get form data from modal
     $id = $_POST['id'];
-    $fname = mysqli_real_escape_string($con, $_POST['fname']);
+    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
+    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
+    $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
     $contact = mysqli_real_escape_string($con, $_POST['contact']);
-    $date = mysqli_real_escape_string($con, $_POST['date']);
-    $time = mysqli_real_escape_string($con, $_POST['time']);
+    $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
+    $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Prepare the update query
-    $update_query = "UPDATE appointments SET fname='$fname', contact='$contact', date='$date', time='$time', service_type='$service_type' WHERE id=$id";
+    // Update query for tbl_patient
+    $update_patient_query = "UPDATE tbl_patient 
+                             SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
+                             WHERE id=$id";
 
-    // Execute the query
-    if (mysqli_query($con, $update_query)) {
+    // Update query for tbl_appointments
+    $update_appointment_query = "UPDATE tbl_appointments 
+                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', service_type='$service_type' 
+                                 WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
+
+    // Execute both queries
+    if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
         // Redirect to the same page after updating
         header("Location: doctor_dashboard.php");
         exit();
@@ -37,50 +46,76 @@ if (isset($_POST['update'])) {
     }
 }
 
+
 if (isset($_POST['finish'])) {
+    // Check if the connection exists
+    if (!$con) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
     // Get the appointment ID from the form
     $id = $_POST['id'];
 
-    // Prepare the query to update the status to 'finished'
-    $update_query = "UPDATE appointments SET status='finished' WHERE id=$id";
+    // Prepare the query to update the status to 'finished' using a prepared statement
+    $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
+    $status = 4; // Assuming '4' represents finished
+    $stmt->bind_param("ii", $status, $id);
 
     // Execute the query
-    if (mysqli_query($con, $update_query)) {
-        // Redirect back to the dashboard or the page you're currently on
+    if ($stmt->execute()) {
+        // Redirect back to the dashboard
         header("Location: doctor_dashboard.php");
         exit();
     } else {
-        echo "Error updating status: " . mysqli_error($con);
+        echo "Error updating status: " . $stmt->error;
     }
+
+    $stmt->close();
 }
 
-if (isset($_POST['delete'])) {
+if (isset($_POST['declined'])) {
+    // Check if the connection exists
+    if (!$con) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
     $id = $_POST['id'];
 
     // Fetch the appointment data to insert into appointments_bin
-    $fetch_query = "SELECT * FROM appointments WHERE id=$id";
-    $result = mysqli_query($con, $fetch_query);
-    if ($result && mysqli_num_rows($result) > 0) {
-        $appointment = mysqli_fetch_assoc($result);
+    $stmt = $con->prepare("SELECT * FROM tbl_appointments WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows > 0) {
+        $appointment = $result->fetch_assoc();
 
         // Insert into appointments_bin
-        $insert_query = "INSERT INTO appointments_bin (fname, contact, date, time, service_type, status)
-                         VALUES ('{$appointment['fname']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['service_type']}', 'deleted')";
-        mysqli_query($con, $insert_query);
+        $insert_stmt = $con->prepare("INSERT INTO tbl_appointments_bin (name, contact, date, time, modified_date, modified_time, service_type, status)
+                                      VALUES (?, ?, ?, ?, ?, ?)");
+        $status = '2';
+        $insert_stmt->bind_param("ssssss", $appointment['name'], $appointment['contact'], $appointment['date'], $appointment['time'], $appointment['modified_date'], $appointment['modified_time'], $appointment['service_type'], $status);
+        $insert_stmt->execute();
+        $insert_stmt->close();
     }
 
-    // Delete the appointment from appointments table
-    $delete_query = "DELETE FROM appointments WHERE id=$id";
+    // Delete the appointment from the appointments table
+    $delete_stmt = $con->prepare("DELETE FROM tbl_appointments WHERE id=?");
+    $delete_stmt->bind_param("i", $id);
 
     // Execute the delete query
-    if (mysqli_query($con, $delete_query)) {
-        // Redirect back to the dashboard or the page you're currently on
+    if ($delete_stmt->execute()) {
+        // Redirect back to the dashboard
         header("Location: doctor_dashboard.php");
         exit();
     } else {
-        echo "Error deleting record: " . mysqli_error($con);
+        echo "Error deleting record: " . $delete_stmt->error;
     }
+
+    $stmt->close();
+    $delete_stmt->close();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -135,8 +170,10 @@ if (isset($_POST['delete'])) {
 
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM appointments 
-                              WHERE status = 'accepted' AND DATE(date) = '$today'";
+                              FROM tbl_appointments 
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
+
+
 
                 $result_today = mysqli_query($con, $sql_today);
 
@@ -160,8 +197,11 @@ if (isset($_POST['delete'])) {
 
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                             FROM appointments 
-                             WHERE status = 'accepted' AND DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
+                 FROM tbl_appointments 
+                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 AND status = '3'";
+
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
@@ -179,7 +219,7 @@ if (isset($_POST['delete'])) {
                 <p>FINISHED APPOINTMENTS:</p>
                 <?php
                 // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
                 $result_finished = mysqli_query($con, $sql_finished);
 
                 // Check for SQL errors
@@ -205,38 +245,53 @@ if (isset($_POST['delete'])) {
                         <th>Actions</th>
                     </tr>
                     <?php
-                    $result = mysqli_query($con, "SELECT * FROM appointments WHERE status = 'accepted'");
+                    // SQL query with JOIN to fetch the service type and full name from tbl_patient
+                    $query = "SELECT a.*, 
+                 s.service_type AS service_name, 
+                 p.first_name, p.middle_name, p.last_name
+          FROM tbl_appointments a
+          JOIN tbl_service_type s ON a.service_type = s.id
+          JOIN tbl_patient p ON a.id = p.id  -- Make sure you're joining using patient_id
+          WHERE a.status = '3'";
+
+                    $result = mysqli_query($con, $query);
 
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>
-                    <td>{$row['fname']}</td>
-                    <td>{$row['contact']}</td>
-                    <td>{$row['date']}</td>
-                    <td>{$row['time']}</td>
-                    <td>{$row['service_type']}</td>
-                    <td>
-                        <button type='button' onclick='openModal({$row['id']}, \"{$row['fname']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_type']}\")'>Edit</button>
-                        <form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\">
-                        </form>";
+                            // Check if modified_date and modified_time are empty
+                            $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
+                            $timeToDisplay = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
 
-                            // Only display the 'Finish' button if the status is not 'finished'
+                            // Format time to HH:MM AM/PM
+                            $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+
+                            echo "<tr>
+    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>  <!-- Display full name -->
+    <td>{$row['contact']}</td>
+    <td>{$dateToDisplay}</td>
+    <td>{$timeToDisplayFormatted}</td>
+    <td>{$row['service_name']}</td>
+    <td>
+        <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")'>Edit</button>
+        <form method='POST' action='' style='display:inline;'>
+            <input type='hidden' name='id' value='{$row['id']}'>
+            <input type='submit' name='declined' value='Declined' onclick=\"return confirm('Are you sure you want to delete this record?');\">
+        </form>";
+
                             if ($row['status'] != 'finished') {
                                 echo "<form method='POST' action='' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='finish' value='Finish'>
-                      </form>";
+            <input type='hidden' name='id' value='{$row['id']}'>
+            <input type='submit' name='finish' value='Finish'>
+          </form>";
                             }
 
                             echo "</td></tr>";
+
                         }
                     } else {
                         echo "<tr><td colspan='6'>No records found</td></tr>";
                     }
                     ?>
-
                 </table>
             </div>
 
@@ -246,29 +301,44 @@ if (isset($_POST['delete'])) {
                     <span class="close" onclick="closeModal()">&times;</span>
                     <form method="POST" action="">
                         <input type="hidden" name="id" id="modal-id">
-                        <label for="fname">Name:</label>
-                        <input type="text" name="fname" id="modal-fname" required><br>
+                        <br>
+                        <label for="modal-first-name">First Name:</label>
+                        <input type="text" name="first_name" id="modal-first-name" required>
+                        <br>
+                        <label for="modal-last-name">Last Name:</label>
+                        <input type="text" name="last_name" id="modal-last-name" required>
+                        <br>
+                        <label for="modal-middle-name">Middle Name:</label>
+                        <input type="text" name="middle_name" id="modal-middle-name" required>
+                        <br>
                         <label for="contact">Contact:</label>
-                        <input type="text" name="contact" id="modal-contact" required><br>
+                        <input type="text" name="contact" id="modal-contact" required>
+                        <br>
                         <label for="date">Date:</label>
-                        <input type="date" name="date" id="modal-date" required><br>
-                        <label for="time">Time:</label>
-                        <input type="time" name="time" id="modal-time" required><br>
+                        <input type="date" name="modified_date" id="modal-modified_date" required>
+                        <br>
+                        <p>
+                            <label for="time">Time:</label>
+                            <input type="time" name="modified_time" id="modal-modified_time" min="09:00" max="18:00"
+                                required>
+                            CLINIC HOURS 9:00 AM TO 6:00 PM
+                        </p>
                         <label for="service_type">Type Of Service:</label>
                         <select name="service_type" id="modal-service_type" required>
                             <option value="">--Select Service Type--</option>
-                            <option value="All Porcelain Veneers & Zirconia">All Porcelain Veneers & Zirconia</option>
-                            <option value="Crown & Bridge">Crown & Bridge</option>
-                            <option value="Dental Cleaning">Dental Cleaning</option>
-                            <option value="Dental Implants">Dental Implants</option>
-                            <option value="Dental Whitening">Dental Whitening</option>
-                            <option value="Dentures">Dentures</option>
-                            <option value="Extraction">Extraction</option>
-                            <option value="Full Exam & X-Ray">Full Exam & X-Ray</option>
-                            <option value="Orthodontic Braces">Orthodontic Braces</option>
-                            <option value="Restoration">Restoration</option>
-                            <option value="Root Canal Treatment">Root Canal Treatment</option>
-                        </select><br>
+                            <option value="1">All Porcelain Veneers & Zirconia</option>
+                            <option value="2">Crown & Bridge</option>
+                            <option value="3">Dental Cleaning</option>
+                            <option value="4">Dental Implants</option>
+                            <option value="5">Dental Whitening</option>
+                            <option value="6">Dentures</option>
+                            <option value="7">Extraction</option>
+                            <option value="8">Full Exam & X-Ray</option>
+                            <option value="9">Orthodontic Braces</option>
+                            <option value="10">Restoration</option>
+                            <option value="11">Root Canal Treatment</option>
+                        </select>
+                        <br>
                         <input type="submit" name="update" value="Save">
                     </form>
                 </div>
@@ -276,15 +346,18 @@ if (isset($_POST['delete'])) {
 
             <script>
                 // Open the modal and populate it with data
-                function openModal(id, fname, contact, date, time, service_type) {
+                function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
+                    // Populate modal fields with the received values
                     document.getElementById('modal-id').value = id;
-                    document.getElementById('modal-fname').value = fname;
+                    document.getElementById('modal-first-name').value = first_name;
+                    document.getElementById('modal-middle-name').value = middle_name;
+                    document.getElementById('modal-last-name').value = last_name;
                     document.getElementById('modal-contact').value = contact;
-                    document.getElementById('modal-date').value = date;
-                    document.getElementById('modal-time').value = time;
+                    document.getElementById('modal-modified_date').value = modified_date;
+                    document.getElementById('modal-modified_time').value = modified_time;
                     document.getElementById('modal-service_type').value = service_type;
 
-                    // Restrict date to current week, starting from Monday
+                    // Restrict date to the current week, starting from Monday
                     const today = new Date();
                     const dayOfWeek = today.getDay();
                     const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
@@ -292,21 +365,15 @@ if (isset($_POST['delete'])) {
                     const lastDay = new Date(firstDay);
                     lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
 
-                    const currentDate = new Date(); // Current date for comparison
-
                     // Disable past dates within the current week
-                    document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
-                    document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
+                    document.getElementById('modal-modified_date').setAttribute('min', formatDate(firstDay));
+                    document.getElementById('modal-modified_date').setAttribute('max', formatDate(lastDay));
 
-                    // If the date has already passed, disable it
-                    if (new Date(date) < currentDate) {
-                        document.getElementById('modal-date').classList.add('disabled-date');
-                        document.getElementById('modal-date').setAttribute('disabled', true); // Make unselectable
-                    } else {
-                        document.getElementById('modal-date').classList.remove('disabled-date');
-                        document.getElementById('modal-date').removeAttribute('disabled'); // Make selectable
-                    }
+                    // Set time input limits
+                    document.getElementById('modal-modified_time').setAttribute('min', '09:00');
+                    document.getElementById('modal-modified_time').setAttribute('max', '18:00');
 
+                    // Show the modal
                     document.getElementById('editModal').style.display = 'block';
                 }
 

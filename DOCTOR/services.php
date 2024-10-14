@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and has the required role
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -16,7 +16,7 @@ if ($con->connect_error) {
 
 function fetchService($con, $service_name)
 {
-    $sql = "SELECT * FROM services WHERE service_name = ?";
+    $sql = "SELECT * FROM tbl_services WHERE service_name = ?";
     $stmt = $con->prepare($sql);
 
     if (!$stmt) {
@@ -181,8 +181,10 @@ $con->close();
 
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM appointments 
-                              WHERE status = 'accepted' AND DATE(date) = '$today'";
+                              FROM tbl_appointments 
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
+
+
 
                 $result_today = mysqli_query($con, $sql_today);
 
@@ -206,8 +208,11 @@ $con->close();
 
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                             FROM appointments 
-                             WHERE status = 'accepted' AND DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
+                 FROM tbl_appointments 
+                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 AND status = '3'";
+
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
@@ -225,7 +230,7 @@ $con->close();
                 <p>FINISHED APPOINTMENTS:</p>
                 <?php
                 // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
                 $result_finished = mysqli_query($con, $sql_finished);
 
                 // Check for SQL errors

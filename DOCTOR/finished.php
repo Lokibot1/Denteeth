@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -59,8 +59,10 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doct
 
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM appointments 
-                              WHERE status = 'accepted' AND DATE(date) = '$today'";
+                              FROM tbl_appointments 
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
+
+
 
                 $result_today = mysqli_query($con, $sql_today);
 
@@ -84,8 +86,11 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doct
 
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                             FROM appointments 
-                             WHERE status = 'accepted' AND DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
+                 FROM tbl_appointments 
+                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 AND status = '3'";
+
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
@@ -103,7 +108,7 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doct
                 <p>FINISHED APPOINTMENTS:</p>
                 <?php
                 // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
                 $result_finished = mysqli_query($con, $sql_finished);
 
                 // Check for SQL errors
@@ -118,41 +123,6 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doct
                 ?>
             </div>
             <!-- HTML Table -->
-            <?php
-            // Set the default time zone to Hong Kong
-            date_default_timezone_set('Asia/Hong_Kong');
-
-            // Get the start and end date of the current week
-            $start_of_week = date('Y-m-d', strtotime('monday this week'));
-            $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-            // Fetch only this week's appointments
-            $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'");
-
-            // Loop through each appointment record
-            ?>
-            <?php
-            // Set the default time zone to Hong Kong
-            date_default_timezone_set('Asia/Hong_Kong');
-
-            // Get the start and end date of the current week
-            $start_of_week = date('Y-m-d', strtotime('monday this week'));
-            $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-            // Fetch only finished appointments for this week
-            $result = mysqli_query($con, "SELECT * FROM appointments WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' AND status = 'finished'");
-
-            // Loop through each appointment record
-            ?>
-            <?php
-            // Set the default time zone to Hong Kong
-            date_default_timezone_set('Asia/Hong_Kong');
-
-            // Fetch only finished appointments
-            $result = mysqli_query($con, "SELECT * FROM appointments WHERE status = 'finished'");
-
-            // Loop through each appointment record
-            ?>
             <div>
                 <table>
                     <tr>
@@ -164,22 +134,41 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doct
                         <th>Status</th>
                     </tr>
                     <?php
+                    // SQL query with JOIN to fetch the service type and full name from tbl_patient
+                    $query = "SELECT a.*, 
+                     s.service_type AS service_name, 
+                     p.first_name, p.middle_name, p.last_name,
+                     t.status  -- Assuming status name is stored in tbl_status
+                  FROM tbl_appointments a
+                  JOIN tbl_service_type s ON a.service_type = s.id
+                  JOIN tbl_patient p ON a.id = p.id  -- Ensure you're joining using id
+                  JOIN tbl_status t ON a.status = t.id
+                  WHERE (DATE(a.date) BETWEEN '$start_of_week' AND '$end_of_week'  
+                         OR DATE(a.modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                    AND a.status = '4'"; // Filter by finished status (4)
+                    
+                    $result = mysqli_query($con, $query);
+
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
+                            // Check if modified_date and modified_time are empty
+                            $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
+                            $timeToDisplay = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
+
+                            // Format time to HH:MM AM/PM
+                            $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+
                             echo "<tr>
-                <td>{$row['fname']}</td>
-                <td>{$row['contact']}</td>
-                <td>{$row['date']}</td>
-                <td>{$row['time']}</td>
-                <td>{$row['service_type']}</td>
-                <td>{$row['status']}</td>
-            </tr>";
+                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>  <!-- Display full name -->
+                        <td>{$row['contact']}</td>
+                        <td>{$dateToDisplay}</td>
+                        <td>{$timeToDisplayFormatted}</td>
+                        <td>{$row['service_name']}</td>
+                        <td>{$row['status']}</td></tr>"; // Display status name instead of status id
                         }
                     } else {
                         echo "<tr><td colspan='6'>No records found</td></tr>";
                     }
-
-                    mysqli_close($con);
                     ?>
                 </table>
             </div>

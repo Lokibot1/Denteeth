@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input_password = $_POST['password'];
 
     // Prepare and execute SQL statement
-    $stmt = $con->prepare("SELECT id, password, role FROM users WHERE username = ?");
+    $stmt = $con->prepare("SELECT id, password, role FROM tbl_users WHERE username = ?");
     $stmt->bind_param("s", $input_username);
     $stmt->execute();
     $stmt->store_result();
@@ -29,11 +29,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['role'] = $role;
 
             // Redirect based on role
-            if ($role == 'doctor') {
+            if ($role == '2') {
                 header("Location: DOCTOR/doctor_dashboard.php");
-            } else if ($role == 'dental_assistant') {
+            } else if ($role == '3') {
                 header("Location: DENTAL_ASSISTANT/dental_assistant_dashboard.php");
-            } else if ($role == "admin") {
+            } else if ($role == "1") {
                 header("Location: ADMIN/admin_dashboard.php");
             }
             exit();
