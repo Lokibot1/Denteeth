@@ -24,7 +24,6 @@ if (isset($_POST['update'])) {
     $contact = mysqli_real_escape_string($con, $_POST['contact']);
     $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
-    $modified_by = mysqli_real_escape_string($con, $_POST['modified_by']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
     // Update query for tbl_patient
@@ -34,7 +33,7 @@ if (isset($_POST['update'])) {
 
     // Update query for tbl_appointments
     $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '$modified_by', service_type='$service_type' 
+                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '2', service_type='$service_type' 
                                  WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
 
     // Execute both queries
@@ -303,7 +302,6 @@ if (isset($_POST['declined'])) {
                     <span class="close" onclick="closeModal()">&times;</span>
                     <form method="POST" action="">
                         <input type="hidden" name="id" id="modal-id">
-                        <input type="hidden" name="modified_by" id="modal-modified_by" value="2">
                         <br>
                         <label for="modal-first-name">First Name:</label>
                         <input type="text" name="first_name" id="modal-first-name" required>

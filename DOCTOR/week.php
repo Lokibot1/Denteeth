@@ -33,7 +33,7 @@ if (isset($_POST['update'])) {
 
     // Update query for tbl_appointments
     $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', service_type='$service_type' 
+                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '2', service_type='$service_type' 
                                  WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
 
     // Execute both queries
