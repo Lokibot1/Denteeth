@@ -69,6 +69,7 @@ nav a:hover {
 }
 
 #s-bx {
+    position: absolute;
     color: #ffff;
     background-color: #000000a8;
     text-align: center;
@@ -77,14 +78,16 @@ nav a:hover {
     height: 100%;
     border-radius: 5px 5px;
 }
-#s-bx2{
+
+#s-bx2 {
     position: relative;
     top: 25%;
     color: #22AA54;
 }
+
 #s-bx2 h1 {
     font-size: 120px;
-    
+
 }
 
 #s-bx h3 {
@@ -170,6 +173,7 @@ nav a:hover {
     font-size: 70px;
     margin-bottom: 15px;
 }
+
 .abt-img-left img {
     padding: 0px 50px;
     width: 600px;
@@ -185,6 +189,7 @@ nav a:hover {
     color: rgba(0, 0, 0, 0.74);
     line-height: 30px;
 }
+
 .abt-img-right img {
     padding: 0px 70px;
     width: 550px;
@@ -193,7 +198,7 @@ nav a:hover {
 
 .abt-img-right p {
     width: 500px;
-    padding:  50px 70px;
+    padding: 50px 70px;
     font-size: 20px;
     text-align: justify;
     float: right;
@@ -201,9 +206,10 @@ nav a:hover {
     line-height: 30px;
 }
 
-span{
+span {
     font-weight: 800;
 }
+
 /*Services*/
 #Services {
     position: start;
@@ -336,11 +342,13 @@ input[type="submit"] {
 input[type="submit"]:hover {
     background-color: #6a6f4c;
 }
+
 /*Contact Us*/
-.ContactUs{
+.ContactUs {
     background-color: linear-gradient(#010D05, #0A2C16);
 
 }
+
 /*ButtonUp*/
 .icon {
     display: flex;
