@@ -136,7 +136,7 @@ if (isset($_POST['declined'])) {
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <a href="Home_page.php">
+        <a href="../HOME_PAGE/Home_page.php">
             <div class="logo">
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>

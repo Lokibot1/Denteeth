@@ -92,7 +92,6 @@ hr{
     margin-top: 50px;
     word-wrap: break-word;
     overflow-wrap: break-word;
-    display: flex;
     justify-content: space-between;  
 }
 
@@ -105,8 +104,12 @@ hr{
     font-size: 15px;
     font-weight: bold;
     text-align: center;
+    display: inline-block;
     background-color: #CFD1F4; 
-    margin: 5%;
+    margin-right: 20px;
+    margin-left: 10px;
+    margin-top: 100px;
+    margin-bottom: 20px;
 }
 
 li.active a {

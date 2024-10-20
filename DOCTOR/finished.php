@@ -6,7 +6,118 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
     header("Location: ../login.php");
     exit();
 }
+
+include("../dbcon.php");
+
+// Check database connection
+if (!$con) {
+    die("Connection failed: " . mysqli_connect_error());
+}
+
+// Handle update request
+if (isset($_POST['update'])) {
+    // Get form data from modal
+    $id = $_POST['id'];
+    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
+    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
+    $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
+    $contact = mysqli_real_escape_string($con, $_POST['contact']);
+    $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
+    $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
+    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
+
+    // Update query for tbl_patient
+    $update_patient_query = "UPDATE tbl_patient 
+                             SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
+                             WHERE id=$id";
+
+    // Update query for tbl_appointments
+    $update_appointment_query = "UPDATE tbl_appointments 
+                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '2', service_type='$service_type' 
+                                 WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
+
+    // Execute both queries
+    if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+        // Redirect to the same page after updating
+        header("Location: doctor_dashboard.php");
+        exit();
+    } else {
+        echo "Error updating record: " . mysqli_error($con);
+    }
+}
+
+
+if (isset($_POST['finish'])) {
+    // Check if the connection exists
+    if (!$con) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    // Get the appointment ID from the form
+    $id = $_POST['id'];
+
+    // Prepare the query to update the status to 'finished' using a prepared statement
+    $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
+    $status = 4; // Assuming '4' represents finished
+    $stmt->bind_param("ii", $status, $id);
+
+    // Execute the query
+    if ($stmt->execute()) {
+        // Redirect back to the dashboard
+        header("Location: doctor_dashboard.php");
+        exit();
+    } else {
+        echo "Error updating status: " . $stmt->error;
+    }
+
+    $stmt->close();
+}
+
+if (isset($_POST['declined'])) {
+    // Check if the connection exists
+    if (!$con) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    $id = $_POST['id'];
+
+    // Fetch the appointment data to insert into appointments_bin
+    $stmt = $con->prepare("SELECT * FROM tbl_appointments WHERE id=?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result && $result->num_rows > 0) {
+        $appointment = $result->fetch_assoc();
+
+        // Insert into appointments_bin
+        $insert_stmt = $con->prepare("INSERT INTO tbl_appointments_bin (name, contact, date, time, modified_date, modified_time, service_type, status)
+                                      VALUES (?, ?, ?, ?, ?, ?)");
+        $status = '2';
+        $insert_stmt->bind_param("ssssss", $appointment['name'], $appointment['contact'], $appointment['date'], $appointment['time'], $appointment['modified_date'], $appointment['modified_time'], $appointment['service_type'], $status);
+        $insert_stmt->execute();
+        $insert_stmt->close();
+    }
+
+    // Delete the appointment from the appointments table
+    $delete_stmt = $con->prepare("DELETE FROM tbl_appointments WHERE id=?");
+    $delete_stmt->bind_param("i", $id);
+
+    // Execute the delete query
+    if ($delete_stmt->execute()) {
+        // Redirect back to the dashboard
+        header("Location: doctor_dashboard.php");
+        exit();
+    } else {
+        echo "Error deleting record: " . $delete_stmt->error;
+    }
+
+    $stmt->close();
+    $delete_stmt->close();
+}
+
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,33 +125,48 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="doctor_dashboard.css">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <title>Doctor Dashboard</title>
 </head>
 
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <div class="logo-container">
-            <label class="logo">Denteeth</label>
-            <form method="POST" action="../logout.php">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-        <div class="w3-sidebar w3-light-grey w3-bar-block custom-sidebar">
-            <a href="doctor_dashboard.php">
-                <h3 class="w3-bar-item">DOCTOR<br>DASHBOARD</h3>
-            </a>
-            <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
-            <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href="finished.php" class="w3-bar-item w3-button active">Finished Appointments</a>
-            <a href="services.php" class="w3-bar-item w3-button">Services</a>
-        </div>
+        <a href="../HOME_PAGE/Home_page.php">
+            <div class="logo">
+                <h1><span>EHM</span> Dental Clinic</h1>
+            </div>
+        </a>
+        <form method="POST" action="../logout.php">
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
+        </a>
     </nav>
+    <div>
+        <aside class="sidebar">
+            <ul>
+                <br>
+                <a href="doctor_dashboard.php">
+                    <h3>DOCTOR <br>DASHBOARD</h3>
+                </a>
+                <br>
+                <br>
+                <hr>
+                <br>
+                <li><a href="day.php">Appointment for the day</a></li>
+                <li><a href="week.php">Appointment for the week</a></li>
+                <li class="active"><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="services.php">Services</a></li>
+            </ul>
+        </aside>
+    </div>
     <!-- Main Content/Crud -->
-    <div class="content-box">
-        <div class="top">
+    <div class="top">
+        <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
@@ -123,8 +249,8 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
                 ?>
             </div>
             <!-- HTML Table -->
-            <div>
-                <table>
+            <table>
+                <center>
                     <tr>
                         <th>Name</th>
                         <th>Contact</th>
@@ -170,10 +296,8 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
                         echo "<tr><td colspan='6'>No records found</td></tr>";
                     }
                     ?>
-                </table>
-            </div>
-        </div>
-    </div>
+                </center>
+            </table>
 </body>
 
 </html>
