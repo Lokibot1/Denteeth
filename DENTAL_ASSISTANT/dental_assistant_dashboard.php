@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin', 'doctor', 'dental_assistant'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -73,229 +73,267 @@ if (isset($_POST['update'])) {
     <!-- Main Content/Crud -->
     <div class="content-box">
         <div class="top">
-            <div class="round-box">
-                <p>APPOINTMENT TODAY:</p>
-                <?php
-                include("../dbcon.php");
-
-                // Set the default time zone to Hong Kong
-                date_default_timezone_set('Asia/Hong_Kong');
-
-                // Check database connection
-                if (!$con) {
-                    die("Connection failed: " . mysqli_connect_error());
-                }
-
-                // Get current date
-                $today = date('Y-m-d');
-
-                // Query to count appointments for today
-                $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM appointments 
-                              WHERE DATE(date) = '$today'";
-
-                $result_today = mysqli_query($con, $sql_today);
-
-                // Check for SQL errors
-                if (!$result_today) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_today = mysqli_fetch_assoc($result_today);
-                $appointments_today = $row_today['total_appointments_today'];
-
-                echo $appointments_today ? $appointments_today : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM appointments 
-                                WHERE status = 'pending'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                echo $pending_appointments ? $pending_appointments : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
-                <p>APPOINTMENT FOR THE WEEK:</p>
-                <?php
-                // Get the start and end date of the current week
-                $start_of_week = date('Y-m-d', strtotime('monday this week'));
-                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-                // Query to count appointments for the current week
-                $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                             FROM appointments 
-                             WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
-                $result_week = mysqli_query($con, $sql_week);
-
-                // Check for SQL errors
-                if (!$result_week) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_week = mysqli_fetch_assoc($result_week);
-                $appointments_for_week = $row_week['total_appointments_week'];
-
-                echo $appointments_for_week ? $appointments_for_week : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
-                <p>FINISHED APPOINTMENTS:</p>
-                <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
-                $result_finished = mysqli_query($con, $sql_finished);
-
-                // Check for SQL errors
-                if (!$result_finished) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
-
-                echo $finished_appointments ? $finished_appointments : 'No data available';
-                ?>
-            </div>
-            <!-- HTML Table -->
-            <div>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Type Of Service</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
+            <div class="top">
+                <div class="round-box">
+                    <p>APPOINTMENT TODAY:</p>
                     <?php
-                    $result = mysqli_query($con, "SELECT * FROM appointments");
+                    include("../dbcon.php");
 
-                    if (mysqli_num_rows($result) > 0) {
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>
-                    <td>{$row['fname']}</td>
+                    // Set the default time zone to Hong Kong
+                    date_default_timezone_set('Asia/Hong_Kong');
+
+                    // Check database connection
+                    if (!$con) {
+                        die("Connection failed: " . mysqli_connect_error());
+                    }
+
+                    // Get current date
+                    $today = date('Y-m-d');
+
+                    // Query to count appointments for today
+                    $sql_today = "SELECT COUNT(*) as total_appointments_today 
+                              FROM tbl_appointments 
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
+
+
+
+                    $result_today = mysqli_query($con, $sql_today);
+
+                    // Check for SQL errors
+                    if (!$result_today) {
+                        die("Query failed: " . mysqli_error($con));
+                    }
+
+                    $row_today = mysqli_fetch_assoc($result_today);
+                    $appointments_today = $row_today['total_appointments_today'];
+
+                    echo $appointments_today ? $appointments_today : 'No data available';
+                    ?>
+                </div>
+                <div class="round-box">
+                    <p>PENDING APPOINTMENTS:</p>
+                    <?php
+                    // Query to count pending appointments
+                    $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
+                                FROM tbl_appointments 
+                                WHERE status = '1'";
+                    $result_pending = mysqli_query($con, $sql_pending);
+
+                    // Check for SQL errors
+                    if (!$result_pending) {
+                        die("Query failed: " . mysqli_error($con));
+                    }
+
+                    $row_pending = mysqli_fetch_assoc($result_pending);
+                    $pending_appointments = $row_pending['total_pending_appointments'];
+
+                    echo $pending_appointments ? $pending_appointments : 'No data available';
+                    ?>
+                </div>
+                <div class="round-box">
+                    <p>APPOINTMENT FOR THE WEEK:</p>
+                    <?php
+                    // Get the start and end date of the current week
+                    $start_of_week = date('Y-m-d', strtotime('monday this week'));
+                    $end_of_week = date('Y-m-d', strtotime('sunday this week'));
+
+                    // Query to count appointments for the current week
+                    $sql_week = "SELECT COUNT(*) as total_appointments_week 
+                 FROM tbl_appointments 
+                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 AND status = '3'";
+
+                    $result_week = mysqli_query($con, $sql_week);
+
+                    // Check for SQL errors
+                    if (!$result_week) {
+                        die("Query failed: " . mysqli_error($con));
+                    }
+
+                    $row_week = mysqli_fetch_assoc($result_week);
+                    $appointments_for_week = $row_week['total_appointments_week'];
+
+                    echo $appointments_for_week ? $appointments_for_week : 'No data available';
+                    ?>
+                </div>
+
+                <div class="round-box">
+                    <p>FINISHED APPOINTMENTS:</p>
+                    <?php
+                    // Query to count finished appointments
+                    $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
+                    $result_finished = mysqli_query($con, $sql_finished);
+
+                    // Check for SQL errors
+                    if (!$result_finished) {
+                        die("Query failed: " . mysqli_error($con));
+                    }
+
+                    $row_finished = mysqli_fetch_assoc($result_finished);
+                    $finished_appointments = $row_finished['total_finished_appointments'];
+
+                    echo $finished_appointments ? $finished_appointments : 'No data available';
+                    ?>
+                </div>
+                <!-- HTML Table -->
+                <div>
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Type Of Service</th>
+                            <th>Actions</th>
+                        </tr>
+                        <?php
+                        // SQL query with JOIN to fetch the service type and full name from tbl_patient
+                        $query = "SELECT a.*, 
+                     s.service_type AS service_name, 
+                     p.first_name, p.middle_name, p.last_name
+                  FROM tbl_appointments a
+                  JOIN tbl_service_type s ON a.service_type = s.id
+                  JOIN tbl_patient p ON a.id = p.id  -- Ensure you're joining using patient_id
+                  WHERE (DATE(a.date) = '$today' OR DATE(a.modified_date) = '$today') AND a.status = '1'"; // Filter by today's date and accepted status
+                        
+                        $result = mysqli_query($con, $query);
+
+                        if (mysqli_num_rows($result) > 0) {
+                            while ($row = mysqli_fetch_assoc($result)) {
+                                // Check if modified_date and modified_time are empty
+                                $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
+                                $timeToDisplay = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
+
+                                // Format time to HH:MM AM/PM
+                                $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+
+                                echo "<tr>
+                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>  <!-- Display full name -->
                     <td>{$row['contact']}</td>
-                    <td>{$row['date']}</td>
-                    <td>{$row['time']}</td>
-                    <td>{$row['service_type']}</td>
-                    <td>{$row['status']}</td>
+                    <td>{$dateToDisplay}</td>
+                    <td>{$timeToDisplayFormatted}</td>
+                    <td>{$row['service_name']}</td>
                     <td>
-                        <button type='button' onclick='openModal({$row['id']}, \"{$row['fname']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_type']}\", \"{$row['status']}\")'>Edit</button>
+                        <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")'>Edit</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\">
-                        </form>
-                    </td>
-                </tr>";
+                            <input type='submit' name='declined' value='Declined' onclick=\"return confirm('Are you sure you want to remove this record?');\">
+                        </form>";
+                                echo "</td></tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='6'>No records found</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='7'>No records found</td></tr>";
-                    }
-                    ?>
-                </table>
-            </div>
-
-            <!-- Edit Modal -->
-            <div id="editModal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <form method="POST" action="">
-                        <input type="hidden" name="id" id="modal-id">
-                        <label for="fname">Name:</label>
-                        <input type="text" name="fname" id="modal-fname" required><br>
-                        <label for="contact">Contact:</label>
-                        <input type="text" name="contact" id="modal-contact" required><br>
-                        <label for="date">Date:</label>
-                        <input type="date" name="date" id="modal-date" required><br>
-                        <label for="time">Time:</label>
-                        <input type="time" name="time" id="modal-time" required><br>
-                        <label for="service_type">Type Of Service:</label>
-                        <input type="text" name="service_type" id="modal-service_type" required><br>
-                        <label for="status">Status:</label>
-                        <select name="status" id="modal-status" required>
-                            <option value="pending">Pending</option>
-                            <option value="accepted">Accepted</option>
-                            <option value="declined">Declined</option>
-                            <option value="finished">Finished</option>
-                        </select><br>
-                        <input type="submit" name="update" value="Save">
-                    </form>
+                        ?>
+                    </table>
                 </div>
+
+
+                <!-- Edit Modal -->
+                <div id="editModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close" onclick="closeModal()">&times;</span>
+                        <form method="POST" action="">
+                            <input type="hidden" name="id" id="modal-id">
+                            <br>
+                            <label for="modal-first-name">First Name:</label>
+                            <input type="text" name="first_name" id="modal-first-name" required>
+                            <br>
+                            <label for="modal-last-name">Last Name:</label>
+                            <input type="text" name="last_name" id="modal-last-name" required>
+                            <br>
+                            <label for="modal-middle-name">Middle Name:</label>
+                            <input type="text" name="middle_name" id="modal-middle-name" required>
+                            <br>
+                            <label for="contact">Contact:</label>
+                            <input type="text" name="contact" id="modal-contact" required>
+                            <br>
+                            <label for="date">Date:</label>
+                            <input type="date" name="modified_date" id="modal-modified_date" required>
+                            <br>
+                            <p>
+                                <label for="time">Time:</label>
+                                <input type="time" name="modified_time" id="modal-modified_time" min="09:00" max="18:00"
+                                    required>
+                                CLINIC HOURS 9:00 AM TO 6:00 PM
+                            </p>
+                            <label for="service_type">Type Of Service:</label>
+                            <select name="service_type" id="modal-service_type" required>
+                                <option value="">--Select Service Type--</option>
+                                <option value="1">All Porcelain Veneers & Zirconia</option>
+                                <option value="2">Crown & Bridge</option>
+                                <option value="3">Dental Cleaning</option>
+                                <option value="4">Dental Implants</option>
+                                <option value="5">Dental Whitening</option>
+                                <option value="6">Dentures</option>
+                                <option value="7">Extraction</option>
+                                <option value="8">Full Exam & X-Ray</option>
+                                <option value="9">Orthodontic Braces</option>
+                                <option value="10">Restoration</option>
+                                <option value="11">Root Canal Treatment</option>
+                            </select>
+                            <br>
+                            <input type="submit" name="update" value="Save">
+                        </form>
+                    </div>
+                </div>
+
+                <script>
+                    // Open the modal and populate it with data
+                    function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
+                        // Populate modal fields with the received values
+                        document.getElementById('modal-id').value = id;
+                        document.getElementById('modal-first-name').value = first_name;
+                        document.getElementById('modal-middle-name').value = middle_name;
+                        document.getElementById('modal-last-name').value = last_name;
+                        document.getElementById('modal-contact').value = contact;
+                        document.getElementById('modal-modified_date').value = modified_date;
+                        document.getElementById('modal-modified_time').value = modified_time;
+                        document.getElementById('modal-service_type').value = service_type;
+
+                        // Restrict date to the current week, starting from Monday
+                        const today = new Date();
+                        const dayOfWeek = today.getDay();
+                        const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
+                        const firstDay = new Date(today.setDate(today.getDate() + mondayOffset)); // Start of the week (Monday)
+                        const lastDay = new Date(firstDay);
+                        lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
+
+                        // Disable past dates within the current week
+                        document.getElementById('modal-modified_date').setAttribute('min', formatDate(firstDay));
+                        document.getElementById('modal-modified_date').setAttribute('max', formatDate(lastDay));
+
+                        // Set time input limits
+                        document.getElementById('modal-modified_time').setAttribute('min', '09:00');
+                        document.getElementById('modal-modified_time').setAttribute('max', '18:00');
+
+                        // Show the modal
+                        document.getElementById('editModal').style.display = 'block';
+                    }
+
+                    // Close the modal
+                    function closeModal() {
+                        document.getElementById('editModal').style.display = 'none';
+                    }
+
+                    // Format date as YYYY-MM-DD
+                    function formatDate(date) {
+                        const year = date.getFullYear();
+                        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                        const day = date.getDate().toString().padStart(2, '0');
+                        return `${year}-${month}-${day}`;
+                    }
+
+                    // Close modal when clicking outside of it
+                    window.onclick = function (event) {
+                        if (event.target == document.getElementById('editModal')) {
+                            closeModal();
+                        }
+                    }
+                </script>
             </div>
-
-            <script>
-                // Open the modal and populate it with data
-                function openModal(id, fname, contact, date, time, service_type, status) {
-                    document.getElementById('modal-id').value = id;
-                    document.getElementById('modal-fname').value = fname;
-                    document.getElementById('modal-contact').value = contact;
-                    document.getElementById('modal-date').value = date;
-                    document.getElementById('modal-time').value = time;
-                    document.getElementById('modal-service_type').value = service_type;
-                    document.getElementById('modal-status').value = status; // Set the status in the modal
-
-                    // Restrict date to current week, starting from Monday
-                    const today = new Date();
-                    const dayOfWeek = today.getDay();
-                    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
-                    const firstDay = new Date(today.setDate(today.getDate() + mondayOffset)); // Start of the week (Monday)
-                    const lastDay = new Date(firstDay);
-                    lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
-
-                    const currentDate = new Date(); // Current date for comparison
-
-                    // Disable past dates within the current week
-                    document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
-                    document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
-
-                    // If the date has already passed, disable it
-                    if (new Date(date) < currentDate) {
-                        document.getElementById('modal-date').classList.add('disabled-date');
-                        document.getElementById('modal-date').setAttribute('disabled', true); // Make unselectable
-                    } else {
-                        document.getElementById('modal-date').classList.remove('disabled-date');
-                        document.getElementById('modal-date').removeAttribute('disabled'); // Make selectable
-                    }
-
-                    document.getElementById('editModal').style.display = 'block';
-                }
-
-                // Close the modal
-                function closeModal() {
-                    document.getElementById('editModal').style.display = 'none';
-                }
-
-                // Format date as YYYY-MM-DD
-                function formatDate(date) {
-                    const year = date.getFullYear();
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const day = date.getDate().toString().padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-
-                // Close modal when clicking outside of it
-                window.onclick = function (event) {
-                    if (event.target == document.getElementById('editModal')) {
-                        closeModal();
-                    }
-                }
-            </script>
         </div>
-    </div>
 </body>
 
 </html>

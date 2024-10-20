@@ -11,7 +11,7 @@ if (!$con) {
 // Prepare the SQL query to fetch the service by name
 function fetchService($con, $service_name)
 {
-  $sql = "SELECT * FROM services WHERE service_name = ?";
+  $sql = "SELECT * FROM tbl_services WHERE service_name = ?";
   $stmt = $con->prepare($sql);
 
   if (!$stmt) {

@@ -2,52 +2,21 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
     header("Location: ../login.php");
     exit();
 }
-
-include("../dbcon.php");
-
-// Check database connection
-if (!$con) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-// Handle update request for appointment status
-if (isset($_POST['action'])) {
-    $id = $_POST['id'];
-    $action = $_POST['action'];
-
-    // Prepare the update query based on the action
-    if ($action === 'accept') {
-        $update_query = "UPDATE appointments SET status='accepted' WHERE id=$id";
-    } else if ($action === 'decline') {
-        $update_query = "UPDATE appointments SET status='declined' WHERE id=$id";
-    }
-
-    // Execute the query
-    if (mysqli_query($con, $update_query)) {
-        // Redirect to the same page after updating
-        header("Location: pending.php"); // Corrected line
-        exit();
-    } else {
-        echo "Error updating record: " . mysqli_error($con);
-    }
-}
 ?>
-
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant_dashboard.css">
+    <link rel="stylesheet" href="doctor_dashboard.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
-    <title>dental Assistant Dashboard</title>
+    <title>Doctor Dashboard</title>
 </head>
 
 <body>
@@ -60,14 +29,13 @@ if (isset($_POST['action'])) {
             </form>
         </div>
         <div class="w3-sidebar w3-light-grey w3-bar-block custom-sidebar">
-            <a href="dental_assistant_dashboard.php">
-                <h3 class="w3-bar-item">DENTAL ASSISTANT<br>DASHBOARD</h3>
+            <a href="doctor_dashboard.php">
+                <h3 class="w3-bar-item">DOCTOR<br>DASHBOARD</h3>
             </a>
-            <a href="pending.php" class="w3-bar-item w3-button active">Pending Appointments</a>
-            <a href="day.php" class="w3-bar-item w3-button">Appointment for the Day</a>
+            <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
             <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href="declined.php" class="w3-bar-item w3-button">Declined Appointment</a>
-            <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
+            <a href="finished.php" class="w3-bar-item w3-button active">Finished Appointments</a>
+            <a href="services.php" class="w3-bar-item w3-button">Services</a>
         </div>
     </nav>
     <!-- Main Content/Crud -->
@@ -92,7 +60,9 @@ if (isset($_POST['action'])) {
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
-                              WHERE DATE(date) = '$today'";
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
+
+
 
                 $result_today = mysqli_query($con, $sql_today);
 
@@ -108,26 +78,6 @@ if (isset($_POST['action'])) {
                 ?>
             </div>
             <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM appointments 
-                                WHERE status = 'pending'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                echo $pending_appointments ? $pending_appointments : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
                 <p>APPOINTMENT FOR THE WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
@@ -136,8 +86,11 @@ if (isset($_POST['action'])) {
 
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                             FROM appointments 
-                             WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
+                 FROM tbl_appointments 
+                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 AND status = '3'";
+
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
@@ -155,7 +108,7 @@ if (isset($_POST['action'])) {
                 <p>FINISHED APPOINTMENTS:</p>
                 <?php
                 // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
                 $result_finished = mysqli_query($con, $sql_finished);
 
                 // Check for SQL errors
@@ -170,19 +123,6 @@ if (isset($_POST['action'])) {
                 ?>
             </div>
             <!-- HTML Table -->
-            <?php
-            // Set the default time zone to Hong Kong
-            date_default_timezone_set('Asia/Hong_Kong');
-
-            // Get the start and end date of the current week
-            $start_of_week = date('Y-m-d', strtotime('monday this week'));
-            $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-            // Fetch only pending appointments
-            $result = mysqli_query($con, "SELECT * FROM appointments WHERE status = 'pending'");
-
-            // Loop through each appointment record
-            ?>
             <div>
                 <table>
                     <tr>
@@ -191,34 +131,44 @@ if (isset($_POST['action'])) {
                         <th>Date</th>
                         <th>Time</th>
                         <th>Type Of Service</th>
-                        <th>Actions</th>
+                        <th>Status</th>
                     </tr>
                     <?php
+                    // SQL query with JOIN to fetch the service type and full name from tbl_patient
+                    $query = "SELECT a.*, 
+                     s.service_type AS service_name, 
+                     p.first_name, p.middle_name, p.last_name,
+                     t.status  -- Assuming status name is stored in tbl_status
+                  FROM tbl_appointments a
+                  JOIN tbl_service_type s ON a.service_type = s.id
+                  JOIN tbl_patient p ON a.id = p.id  -- Ensure you're joining using id
+                  JOIN tbl_status t ON a.status = t.id
+                  WHERE (DATE(a.date) BETWEEN '$start_of_week' AND '$end_of_week'  
+                         OR DATE(a.modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                    AND a.status = '4'"; // Filter by finished status (4)
+                    
+                    $result = mysqli_query($con, $query);
+
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
+                            // Check if modified_date and modified_time are empty
+                            $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
+                            $timeToDisplay = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
+
+                            // Format time to HH:MM AM/PM
+                            $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+
                             echo "<tr>
-                    <td>{$row['fname']}</td>
-                    <td>{$row['contact']}</td>
-                    <td>{$row['date']}</td>
-                    <td>{$row['time']}</td>
-                    <td>{$row['service_type']}</td>
-                    <td>
-                        <form method='POST' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <button type='submit' name='action' value='accept'>Accept</button>
-                        </form>
-                        <form method='POST' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <button type='submit' name='action' value='decline'>Decline</button>
-                        </form>
-                    </td>
-                </tr>";
+                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>  <!-- Display full name -->
+                        <td>{$row['contact']}</td>
+                        <td>{$dateToDisplay}</td>
+                        <td>{$timeToDisplayFormatted}</td>
+                        <td>{$row['service_name']}</td>
+                        <td>{$row['status']}</td></tr>"; // Display status name instead of status id
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No pending appointments found</td></tr>";
+                        echo "<tr><td colspan='6'>No records found</td></tr>";
                     }
-
-                    mysqli_close($con);
                     ?>
                 </table>
             </div>
