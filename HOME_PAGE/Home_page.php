@@ -82,11 +82,18 @@ if (isset($_POST['update'])) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="Home_page.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
-    rel="stylesheet">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<!-- Montserrat and Meddon -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&family=Meddon&display=swap" rel="stylesheet">
+
+
   <title>Denteeth</title>
 
 </head>
@@ -113,10 +120,18 @@ if (isset($_POST['update'])) {
       <div class="img-area">
 
         <div id="s-bx">
+          <div class="s-img">
+            <img src="img/logo.png" alt="">
+          </div>
           <h1>EHM</h1>
-          <h3>Dental Clinic</h3>
+          <h2>Dental Clinic
+            <br>
+            ┈┈┈┈┈┈
+            <br>
+            Laboratory
+          </h2>
           <br>
-          <h2>Life's fair with Dental Care</h2>
+          <h3>Life's fair with Dental Care</h3>
           <br>
           <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit,
@@ -184,7 +199,7 @@ if (isset($_POST['update'])) {
     </div>
   </section>
   <section id="About_Us">
-    <h1 class="About_Us">About Us</h1>
+    <h1 class="About_Us">ABOUT US</h1>
 <div class="abt-img-right">
     <img src="img/abt-img1.png" alt="About Image 1">
     <p>
@@ -225,7 +240,7 @@ if (isset($_POST['update'])) {
 </div>
   </section>
   <section id="Services">
-    <h1>Services</h1>
+    <h1>SERVICES</h1>
     <div id="crvs-container">
       <div class="img-box">
         <a href="SERVICES/Orthodontic_Braces.php">
@@ -435,14 +450,42 @@ if (isset($_POST['update'])) {
   </section>
   <section id="Contact_Us">
     <div class="ContactUs">
-    <h1>Contact Us</h1>
-  <div class="icon">
-      <a href="#Homepage">
-        <i class="fa-solid fa-angle-up" style="color: #ffffff;"></i>
-      </a>
+        <center>
+            <h1>CONTACT US</h1> 
+            <p>dasdasdasdasd</p>
+            <div class="fb_container">
+                <div class="fb">
+                    <h3>YOU CAN FOLLOW US ON</h3>
+                    <span class="fb-span">FACEBOOK</span>
+                    <div class="fb-img-area">
+                        <a href="">
+                            <img src="img/fb.png" alt="Facebook Logo">
+                        </a>
+                        <h3>EHM Dental Clinic</h3>
+                    </div>
+                </div>
+                <div class="fb2">
+                    <h3>YOU CAN ALSO CONTACT US ON:</h3>
+                    <div class="icon">
+                        <i class="fa-solid fa-mobile"></i>
+                        <p>Mobile No.: 09088975285</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fa-solid fa-phone"></i>
+                        <p>Telephone No.: 87030319</p>
+                    </div>
+                </div>
+            </div>
+        </center>
     </div>
-  </div>
-  </section>
+</section>
+
+<div class="btnup">
+    <a href="#Homepage">
+        <i class="fa-solid fa-angle-up"></i>
+    </a>
+</div>
+
 </body>
 
 </html>

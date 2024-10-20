@@ -71,7 +71,7 @@ nav a:hover {
 #s-bx {
     position: absolute;
     color: #ffff;
-    background-color: #000000a8;
+    background-color: #000000cf;
     text-align: center;
     position: relative;
     width: 100%;
@@ -79,33 +79,51 @@ nav a:hover {
     border-radius: 5px 5px;
 }
 
-#s-bx2 {
-    position: relative;
-    top: 25%;
+#s-bx h1 {
+    position: absolute;
+    top: 29%;
+    left: 33%;
+    font-size: 150px;
     color: #22AA54;
+    text-shadow: 0px 10px 15px #000000;
 }
-
-#s-bx2 h1 {
-    font-size: 120px;
-
-}
-
-#s-bx h3 {
-    background-color: #6a6f4c;
+#s-bx h2 {
+    position: absolute;
+    top: 35%;
+    left: 60%;
     font-size: 50px;
-    border-radius: 5px 5px;
+    line-height: 40px;
+    color: #22AA54;
+    text-shadow: 0px 7px 6px #000000;
+}
+#s-bx h3 {
+    position: absolute;
+    top: 53%;
+    left: 25%;
+    font-family: "Meddon", cursive;
+    font-size: 40px;
+    color: #22AA54;
+    text-shadow: 5px 5px 5px #000000;
 }
 
 #s-bx p {
+    position: absolute;
+    top: 67%;
+    left: 20%;
     text-align: justify;
-    padding: 0px 15px;
+    width: 60%;
 }
 
 #s-txt4 {
-    color: #b64046;
+    position: absolute;
+    top: 85%;
+    right: 45%;
+    color: #F9F2B4;
     font-size: 30px;
-    background-color: #ffff;
-    border: 5px solid #b64046;
+    padding: 10px 10px;
+    background-color: #AE8260;
+    border: 1px solid #3c2d21;
+    border-radius: 50px;
     transition: transform 0.5s, background-color 0.5s, color 0.5s;
 }
 
@@ -113,7 +131,12 @@ nav a:hover {
     color: #ffff;
     background-color: #b64046;
 }
-
+.s-img img{
+    position: absolute;
+    top: 6%;
+    right: 60%;
+    width: 400px;
+}
 #hdr-txt1 {
     color: #35503F;
     padding: 15px 0px;
@@ -343,28 +366,101 @@ input[type="submit"]:hover {
     background-color: #6a6f4c;
 }
 
-/*Contact Us*/
+/* Contact Us */
 .ContactUs {
-    background-color: linear-gradient(#010D05, #0A2C16);
-
+    background: linear-gradient(#0A2C16, #010D05);
+    text-align: center;
+    padding: 40px 0; 
 }
 
-/*ButtonUp*/
-.icon {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 100px;
+.ContactUs h1 {
+    color: #fff;
+    font-size: 70px;
     margin-bottom: 20px;
 }
 
-.icon a {
+.fb_container {
+    display: flex;
+    justify-content: space-between;  
+    align-items: flex-start;        
+    margin-top: 20px;                       
+}
+
+.fb, .fb2 {
+    width: 50%;
+}
+
+.fb {
+    border-right: 5px solid #FF9F00;
+}
+
+.fb h3, .fb2 h3 {
+    font-size: 25px;
+    color: #FF9F00;
+    margin-bottom: 10px;
+}
+
+.fb-span {
+    font-size: 60px;
+    font-weight: bold;
+    color: #00A0FF;
+}
+
+.fb-img-area img {
+    margin-top: 30px;
+    width: 50%;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+.icon {
+    display: flex;
+    align-items: center; 
+    margin-left: 90px;
+    margin-top: 80px; 
+}
+
+.icon i {
+    color: #fff;
+    font-size: 90px;
+    margin-right: 20px;
+    text-shadow: -5px 5px 15px #FF9F00;
+}
+
+.icon p {
+    margin: 0;
+    font-size: 30px;
+    color: #fff;  
+}
+
+/* Button Up */
+.btnup {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #0A2C16;
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.3);
+    transition: box-shadow 0.3s ease, transform 0.3s ease; 
+}
+
+.btnup a {
     text-align: center;
     display: inline-block;
 }
 
-.icon i {
-    font-size: 100px;
+.btnup i {
+    font-size: 40px;
     color: #ffffff;
+}
+
+/* Hover effect */
+.btnup:hover {
+    box-shadow: 0px 5px 15px #FF9F00; 
+    transform: scale(1.5); 
+}
+
+.btnup:hover i {
+    color: #FF9F00;  /* Change icon color on hover */
 }
