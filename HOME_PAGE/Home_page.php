@@ -81,7 +81,7 @@ if (isset($_POST['update'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="Home_page.css">
+  <link rel="stylesheet" href="home_page.css">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -97,7 +97,6 @@ if (isset($_POST['update'])) {
   <title>Denteeth</title>
 
 </head>
-
 <body>
   <nav>
     <a href="#Homepage">
@@ -105,7 +104,7 @@ if (isset($_POST['update'])) {
         <h1>EHM Dental Clinic</h1>
       </div>
     </a>
-
+    <div class="hamburger">&#9776;</div>
     <ul>
         <li><a href="#Homepage">Home</a></li>
         <li><a href="#Services">Services</a></li>
@@ -114,7 +113,33 @@ if (isset($_POST['update'])) {
         <li><a href="#Appointment">Book Appointment</a></li>
         <li><a href="../login.php">Log In</a></li>
     </ul>
-  </nav>
+</nav>
+
+<div class="sidebar" id="sidebar">
+    <div class="close-btn" id="close-btn">&times;</div>
+    <ul>
+        <li><a href="#Homepage">Home</a></li>
+        <li><a href="#Services">Services</a></li>
+        <li><a href="#About_Us"> About Us</a></li>
+        <li><a href="#Contact_Us"> Contact Us</a></li>
+        <li><a href="#Appointment">Book Appointment</a></li>
+        <li><a href="../login.php">Log In</a></li>
+    </ul>
+</div>
+<script>
+        // JavaScript for Sidebar Toggle
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const closeBtn = document.getElementById('close-btn');
+
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+    </script>
   <section id="Homepage">
     <center>
       <div class="img-area">
@@ -134,17 +159,16 @@ if (isset($_POST['update'])) {
           <h3>Life's fair with Dental Care</h3>
           <br>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco
-            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-            in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-            mollit anim id est laborum.
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          Ut enim ad minim veniam, quis nostrud exercitation ullamco
+          laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+          in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+          mollit anim id est laborum.
           </p>
           <br>
-          <!--lagyan mu shadow yung box mu para halatang clickable-->
-          <a href="" id="s-txt4">SMILE NOW!</a>
+          <a href="#Appointment  " id="s-txt4">SMILE NOW!</a>
         </div>
       </div>
     </center>
@@ -187,57 +211,70 @@ if (isset($_POST['update'])) {
       </div>
     </div>
     <div id="side-img">
-      <img src="https://i.pinimg.com/564x/76/a5/5e/76a55e28f41b42a5ed3b0c3356f90e9e.jpg" alt="mirror">
-      <p>
+      <div>
+        <img src="img/s-img.png" alt="mirror">
+      </div>
+      <br>
+      <br>
+      <div class="s-txt">
       <span>We value the quality of our Dental Works</span>
-      <br>
-      <br>
-      At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that 
+        <p>
+        At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that 
       every treatment is done with precision, using the latest technology to give you the best results. 
       Ensuring that you leave with a brighter and healthier smile.
       </p>
+      </div>
     </div>
   </section>
   <section id="About_Us">
     <h1 class="About_Us">ABOUT US</h1>
-<div class="abt-img-right">
-    <img src="img/abt-img1.png" alt="About Image 1">
-    <p>
-        <span>SMILE KALABERMBERM ESKALABERM CLYVIX</span>
-        <br>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
-        ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
-        in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-    </p>
+    <div id="abt-right">
+      <div>
+        <img src="img/abt-img1.png" alt="mirror">
+      </div>
+      <br>
+      <br>
+      <div class="abtr-txt">
+      <span>We value the quality of our Dental Works</span>
+        <p>
+        At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that 
+      every treatment is done with precision, using the latest technology to give you the best results. 
+      Ensuring that you leave with a brighter and healthier smile.
+      </p>
+      </div>
+    </div>
+
+<div id="abt-left">
+  <div>
+    <img src="img/abt-img1.png" alt="mirror">
+  </div>
+    <br>
+    <br>
+  <div class="abtl-txt">
+    <span>We value the quality of our Dental Works</span>
+      <p>
+      At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that 
+      every treatment is done with precision, using the latest technology to give you the best results. 
+      Ensuring that you leave with a brighter and healthier smile.
+      </p>
+  </div>
 </div>
 
-<div class="abt-img-left">
-    <img src="img/abt-img2.png" alt="About Image 2">
-    <p>
-        <span>SMILE KALABERMBERM ESKALABERM CLYVIX</span>
-        <br>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
-        ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
-        in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-    </p>
-</div>
-
-<div class="abt-img-right">
-    <img src="img/abt-img3.png" alt="About Image 3">
-    <p>
-        <span>SMILE KALABERMBERM ESKALABERM CLYVIX</span>
-        <br>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, 
-        sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi 
-        ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit 
-        in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-    </p>
-</div>
+<div id="abt-right">
+      <div>
+        <img src="img/abt-img1.png" alt="mirror">
+      </div>
+      <br>
+      <br>
+      <div class="abtr-txt2">
+      <span>We value the quality of our Dental Works</span>
+        <p>
+        At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that 
+      every treatment is done with precision, using the latest technology to give you the best results. 
+      Ensuring that you leave with a brighter and healthier smile.
+      </p>
+      </div>
+    </div>
   </section>
   <section id="Services">
     <h1>SERVICES</h1>
@@ -386,20 +423,25 @@ if (isset($_POST['update'])) {
     </div>
   </section>
   <section id="Appointment">
-    <h1>BOOK AN ANPPOINTMENT NOW</h1>
-    <div class="loc">
-      <a
-        href="https://www.google.com/maps/place/QCU+-+San+Bartolome+Campus/@14.6999026,121.034423,3a,90y,307.65h,88.67t/data=!3m7!1e1!3m5!1s0wGbRKA75Zhha9AQHKnn3g!2e0!6shttps:%2F%2Fstreetviewpixels-pa.googleapis.com%2Fv1%2Fthumbnail%3Fpanoid%3D0wGbRKA75Zhha9AQHKnn3g%26cb_client%3Dsearch.gws-prod.gps%26w%3D211%26h%3D120%26yaw%3D304.3857%26pitch%3D0%26thumbfov%3D100!7i16384!8i8192!4m14!1m7!3m6!1s0x3397b16d7441f9a9:0x7e6f18165aacf9a1!2sQCU+-+San+Bartolome+Campus!8m2!3d14.6999881!4d121.0342928!16s%2Fg%2F11vjl8qr66!3m5!1s0x3397b16d7441f9a9:0x7e6f18165aacf9a1!8m2!3d14.6999881!4d121.0342928!16s%2Fg%2F11vjl8qr66?entry=ttu&g_ep=EgoyMDI0MDkxMC4wIKXMDSoASAFQAw%3D%3D">
-        <img src="https://i.pinimg.com/564x/0b/8a/78/0b8a788dfe83416efe517e3ef089dea9.jpg" alt="map">
-      </a>
-    </div>
-    <div class="form">
-      <form method="POST" action="">
-        <input type="hidden" name="id" id="modal-id">
-        <label for="fname">Name:</label>
-        <input type="text" name="fname" id="modal-fname" required><br>
-        <label for="contact">Contact:</label>
-        <input type="text" name="contact" id="modal-contact" required><br>
+    <div class="Appointment">
+        <center>
+            <div class="apt-container">
+                <div class="loc">
+                    <div class="loc-img">
+                        <a href="">
+                            <img src="img/loc.png" alt="Facebook Logo">
+                        </a>
+                        <h3>Our Location</h3>
+                    </div>
+                </div>
+                <div class="form-cont">
+                    <h3>BOOK AN APPOINTMENT HERE</h3>
+                    <div class="form">
+              <form method="POST" action="">
+              <label for="fname">Name:</label>
+              <input type="text" name="fname" id="modal-fname" placeholder="Enter your name" required><br>
+              <label for="contact">Contact:</label>
+        <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number" required><br>
         <label for="date">Date:</label>
         <input type="date" name="date" id="modal-date" required><br>
         <label for="time">Time:</label>
@@ -446,8 +488,12 @@ if (isset($_POST['update'])) {
           return `${year}-${month}-${day}`;
         }
       </script>
+                </div>
+            </div>
+        </center>
     </div>
-  </section>
+</section>
+
   <section id="Contact_Us">
     <div class="ContactUs">
         <center>
