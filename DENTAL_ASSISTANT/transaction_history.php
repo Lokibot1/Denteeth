@@ -79,8 +79,8 @@ if (isset($_SESSION['form_submitted'])) {
         </div>
     </nav>
     <!-- Main Content/Crud -->
-    <div class="content-box">
-        <div class="top">
+    <div class="top">
+        <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
@@ -99,8 +99,10 @@ if (isset($_SESSION['form_submitted'])) {
 
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM appointments 
-                              WHERE DATE(date) = '$today'";
+                              FROM tbl_appointments 
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '1'";
+
+
 
                 $result_today = mysqli_query($con, $sql_today);
 
@@ -120,8 +122,8 @@ if (isset($_SESSION['form_submitted'])) {
                 <?php
                 // Query to count pending appointments
                 $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM appointments 
-                                WHERE status = 'pending'";
+                                FROM tbl_appointments 
+                                WHERE status = '1'";
                 $result_pending = mysqli_query($con, $sql_pending);
 
                 // Check for SQL errors
@@ -144,8 +146,11 @@ if (isset($_SESSION['form_submitted'])) {
 
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                             FROM appointments 
-                             WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
+                 FROM tbl_appointments 
+                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 AND status = '1'";
+
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
@@ -160,10 +165,10 @@ if (isset($_SESSION['form_submitted'])) {
                 ?>
             </div>
             <div class="round-box">
-                <p>FINISHED APPOINTMENTS:</p>
+                <p>DECLINED APPOINTMENTS:</p>
                 <?php
                 // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '2'";
                 $result_finished = mysqli_query($con, $sql_finished);
 
                 // Check for SQL errors
@@ -228,14 +233,14 @@ if (isset($_SESSION['form_submitted'])) {
             </tr>
             <?php
             // Fetch and display transaction history
-            $sql = "SELECT * FROM transaction_history";
+            $sql = "SELECT * FROM tbl_transaction_history";
             $result = mysqli_query($con, $sql);
 
             while ($row = mysqli_fetch_assoc($result)) {
                 echo "<tr>
-                        <td>{$row['patient_name']}</td>
-                        <td>{$row['contact_no']}</td>
-                        <td>{$row['type_of_service']}</td>
+                        <td>{$row['name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td>{$row['service_type']}</td>
                         <td>{$row['date_of_service']}</td>
                         <td>{$row['bill']}</td>
                         <td>{$row['change_amount']}</td>

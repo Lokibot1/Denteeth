@@ -248,20 +248,24 @@ if (isset($_POST['declined'])) {
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
-            <!-- HTML Table -->
-            <table>
-                <center>
-                    <tr>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Type Of Service</th>
-                        <th>Status</th>
-                    </tr>
-                    <?php
-                    // SQL query with JOIN to fetch the service type and full name from tbl_patient
-                    $query = "SELECT a.*, 
+            <?php
+            // Set the number of results per page
+            $resultsPerPage = 15;
+
+            // Get the current page number from query parameters, default to 1
+            $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+
+            // Calculate the starting row for the SQL query
+            $startRow = ($currentPage - 1) * $resultsPerPage;
+
+            // SQL query to count total records
+            $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '4'";
+            $countResult = mysqli_query($con, $countQuery);
+            $totalCount = mysqli_fetch_assoc($countResult)['total'];
+            $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
+            
+            // SQL query with JOIN to fetch the limited number of records with OFFSET
+            $query = "SELECT a.*, 
                      s.service_type AS service_name, 
                      p.first_name, p.middle_name, p.last_name,
                      t.status  -- Assuming status name is stored in tbl_status
@@ -271,33 +275,63 @@ if (isset($_POST['declined'])) {
                   JOIN tbl_status t ON a.status = t.id
                   WHERE (DATE(a.date) BETWEEN '$start_of_week' AND '$end_of_week'  
                          OR DATE(a.modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
-                    AND a.status = '4'"; // Filter by finished status (4)
-                    
-                    $result = mysqli_query($con, $query);
+                    AND a.status = '4'
+          LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
+            
+            $result = mysqli_query($con, $query);
+            ?>
 
-                    if (mysqli_num_rows($result) > 0) {
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            // Check if modified_date and modified_time are empty
-                            $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
-                            $timeToDisplay = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
+            <!-- HTML Table -->
 
-                            // Format time to HH:MM AM/PM
-                            $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+            <div class="pagination-container">
+                <?php if ($currentPage > 1): ?>
+                    <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
+                        < </a>
+                        <?php endif; ?>
 
-                            echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>  <!-- Display full name -->
+                        <?php if ($currentPage < $totalPages): ?>
+                            <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn"> > </a>
+                        <?php endif; ?>
+
+                        <?php if ($totalCount > 15): ?>
+                        <?php endif; ?>
+            </div>
+        </div>
+        <!-- Table -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Type Of Service</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        // Prepare data for display
+                        $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
+                        $timeToDisplay = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
+                        $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+
+                        echo "<tr>
+                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
                         <td>{$dateToDisplay}</td>
                         <td>{$timeToDisplayFormatted}</td>
                         <td>{$row['service_name']}</td>
                         <td>{$row['status']}</td></tr>"; // Display status name instead of status id
-                        }
-                    } else {
-                        echo "<tr><td colspan='6'>No records found</td></tr>";
                     }
-                    ?>
-                </center>
-            </table>
+                } else {
+                    echo "<tr><td colspan='6'>No records found</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
 </body>
 
 </html>
