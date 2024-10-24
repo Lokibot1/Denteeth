@@ -135,34 +135,49 @@ $con->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="services.css">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="doctor_dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <title>Doctor Dashboard</title>
 </head>
 
 <body>
-    <!-- Navigation/Sidebar -->
-    <nav>
-        <div class="logo-container">
-            <label class="logo">Denteeth</label>
-            <form method="POST" action="../logout.php">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-        <div class="w3-sidebar w3-light-grey w3-bar-block custom-sidebar">
-            <a href="doctor_dashboard.php">
-                <h3 class="w3-bar-item">DOCTOR<br>DASHBOARD</h3>
-            </a>
-            <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
-            <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
-            <a href="services.php" class="w3-bar-item w3-button active">Services</a>
-        </div>
+   <!-- Navigation/Sidebar -->
+   <nav>
+        <a href="../HOME_PAGE/Home_page.php">
+            <div class="logo">
+                <h1><span>EHM</span> Dental Clinic</h1>
+            </div>
+        </a>
+        <form method="POST" action="../logout.php">
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
+        </a>
     </nav>
+    <div>
+        <aside class="sidebar">
+            <ul>
+                <br>
+                <a class="active" href="doctor_dashboard.php">
+                    <h3>DOCTOR <br>DASHBOARD</h3>
+                </a>
+                <br>
+                <br>
+                <hr>
+                <br>
+                <li><a href="day.php">Appointment for the day</a></li>
+                <li><a href="week.php">Appointment for the week</a></li>
+                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="services.php">Services</a></li>
+            </ul>
+        </aside>
+</div>
     <!-- Main Content/Crud -->
-    <div class="content-box">
-        <div class="top">
+    <div class="top">
+        <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php

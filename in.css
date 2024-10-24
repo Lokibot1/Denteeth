@@ -1,0 +1,190 @@
+* {
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+body {
+    background-color: #0A2C16;
+    font-family: "Montserrat", sans-serif;
+}
+
+nav {
+    height: 80px;
+    width: 100%;
+    background-color: #000;
+    position: fixed;
+    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    border-bottom: 1px solid #fff;
+    z-index: 1000;
+}
+
+nav .logo {
+    color: #22AA54;
+    transition: transform 0.3s ease-in-out;
+}
+
+nav .logo:hover {
+    transform: scale(1.1);
+}
+
+nav #back {
+    color: #fff;
+    font-size: 50px;
+    transition: transform 0.3s ease-in-out;
+}
+
+nav #back:hover {
+    transform: scale(1.1);
+    color: #ffe600;
+}
+
+.login, .signup {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 100px; 
+    height: calc(100vh - 150px);
+}
+
+.form {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.form h1 {
+    color: #FF9F00;
+    font-size: 64px;
+    margin-bottom: 50px;
+}
+
+.form input[type="text"],
+.form input[type="password"],
+.form select {
+    width: 500px;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    font-size: 16px;
+}
+
+button[type="submit"],
+.form input[type="submit"] {
+    height: 64px;
+    width: 150px;
+    background-color: #FF9F00;
+    font-size: 20px;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover,
+.form input[type="submit"]:hover {
+    background-color: #ffe600;
+}
+
+.gtlogin {
+    color: #FF9F00;         
+    text-decoration: none;   
+    background-color: transparent;
+    border: none;          
+    padding: 10px 20px;     
+    cursor: pointer;        
+    font-size: 16px;      
+    transition: background-color 0.3s ease; 
+}
+
+.gtlogin:hover {
+    color: rgb(255, 255, 255);
+}
+
+#s-bx {
+    background-image: url(HOME_PAGE/img/file\ \(4\).png);
+    background-size: cover;
+    background-position: center;
+    text-align: center;
+    width: 50%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    right: 0;
+}
+
+.s-img img {
+    position: absolute;
+    top: 20%;
+    left: 5%;
+    width: 400px;
+}
+
+#s-bx h1 {
+    position: absolute;
+    top: 25%;
+    left: 45%;
+    font-size: 150px;
+    color: #22AA54;
+    text-shadow: 0 2px 2px #000;
+}
+
+#s-bx h2 {
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    font-size: 40px;
+    line-height: 40px;
+    color: #22AA54;
+    text-shadow: 0 2px 2px #000;
+}
+
+#s-bx h3 {
+    position: absolute;
+    top: 63%;
+    left: 15%;
+    font-family: "Meddon", cursive;
+    font-size: 35px;
+    color: #22AA54;
+    text-shadow: 0 2px 1px #000;
+}
+
+@media screen and (max-width: 768px) {
+    .login {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .login .form, #s-bx {
+        width: 90%;
+        margin-bottom: 20px;
+    }
+
+    #s-bx h1 {
+        font-size: 40px;
+    }
+
+    #s-bx h2 {
+        font-size: 24px;
+    }
+
+    #s-bx h3 {
+        font-size: 18px;
+    }
+
+    .login .form input[type="text"],
+    .login .form input[type="password"] {
+        width: 90%;
+    }
+}

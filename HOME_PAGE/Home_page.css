@@ -44,7 +44,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 15px 20px;
-    background-color: #007BFF;
+    background-color: #6a6f4c   ;
     color: white;
     font-size: 20px;
     font-weight: bold;
@@ -85,12 +85,12 @@ body {
 }
 
 .accept-btn {
-    background-color: #28a745;
+    background-color: #6a6f4c;
     color: white;
 }
 
 .accept-btn:hover {
-    background-color: #218838;
+    background-color: #00ff37;
 }
 
 /* Decline button style */
@@ -100,7 +100,7 @@ body {
 }
 
 .decline-btn:hover {
-    background-color: #c82333;
+    background-color: #ff0019;
 }
 
 /* Scrollbar styling */

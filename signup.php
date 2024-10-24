@@ -37,33 +37,70 @@ if($_SERVER['REQUEST_METHOD'] == "POST")
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="signup.css">
-    <title>LifeLine</title>
-    <div class="img-area"></div>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="in.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+    integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Meddon&display=swap"
+    rel="stylesheet">
+
+<title>Login</title>
 </head>
 
 <body>
-    <div class="container">
-        <div class="armand">
+<nav>
+    <a href="Home_page.php">
+      <div class="logo">
+        <h1>EHM Dental Clinic</h1>
+      </div>
+    </a>
+    <a id="back" href="../login.php">
+    →
+    </a>
+</nav>
+
+<center>
+  <div class="signup">
+    <div class="form">
+        <h1>Add User</h1>
             <form class="login-form" action="" method="post">
                 <input type="text" name="fname" placeholder="First Name" required>
-                <input type="text" name="lname" placeholder="Last Name" required>
+                <input type="text" name="lname" placeholder="Last Name" required><br>
                 <select name="usertype" aria-placeholder="Type of User">
+                    <option value="NONE">--SELECT--</option>
                     <option value="Admin">Admin</option>
-                    <option value="User">User</option>
-                </select>
-                <input type="text" name="contact" placeholder="Contact" required>
-                <input type="text" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
-                <input type="submit" value="Sign up">
+                    <option value="Doctor">Doctor</option>
+                    <option value="DentalAssistant">Dental Assistant</option>
+                </select><br>
+                <input type="text" name="email" placeholder="Email" required><br>
+                <input type="password" name="password" placeholder="Password" required><br>
+                <input type="submit" value="Add User">
             </form>
-        </div>
-    </div>
-    <div>
+            <div>
         <a href="login.php">
-            <button>Go to Login</button>
+            <button class="gtlogin">Go to Login</button>
         </a>
     </div>
+        </div>
+    </div>
+    <div id="s-bx">
+      <div class="blk">
+        <div class="s-img">
+            <img src="HOME_PAGE/img/logo.png" alt="Logo">
+        </div>
+        <h1>EHM</h1>
+        <h2>Dental Clinic<br> ┈┈┈┈┈┈ <br> Laboratory</h2>
+        <h3>Life's fair with Dental Care</h3>
+    </div>
+    </div>
+  </div>
+
 </body>
 
 </html>

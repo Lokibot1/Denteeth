@@ -66,15 +66,22 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['username'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="in.css">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
     rel="stylesheet">
-    <title>Login</title>
-</head>
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Meddon&display=swap"
+    rel="stylesheet">
 
+<title>Login</title>
+
+</head>
 <body>
 <nav>
     <a href="Home_page.php">
@@ -85,38 +92,33 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['username'])) {
     <a id="back" href="../login.php">
     →
     </a>
-  </nav>
-  <center>
-  <div class="login">
-<div class="form">
-    <h1>LOG IN</h1>
-    <form action="login.php" method="POST">
-        <label for="username"></label>
-        <input type="text" id="username" name="username" placeholder="Username" required><br><br>
-        <label for="password"></label>
-        <input type="password" id="password" name="password" placeholder="Password" value="<?php echo htmlspecialchars($show_password); ?>"
-            required><br><br>
-        <button type="submit">SIGN IN</button>
-    </form>
-</div>
-<div class="simg-area">
-    <div class="slogo">
-    </div>
-    <div class="cntnt">
-        <h1>EHM</h1>
-        <h3>
-            Dental Clinic
-            <br>
-            <hr>
-            Laboratory
-        </h3>
-        <h2>
-            Life's Fair with Dental Care
-        </h2>
-        </div>
-    </div>
-</div>
-</center>
-</body>
+</nav>
 
+<center>
+  <div class="login">
+    <div class="form">
+        <h1>LOG IN</h1>
+        <form action="login.php" method="POST">
+            <label for="username"></label>
+            <input type="text" id="username" name="username" placeholder="Username" required><br><br>
+            <label for="password"></label>
+            <input type="password" id="password" name="password" placeholder="Password" required><br><br>
+            <button type="submit">SIGN IN</button>
+        </form>
+    </div>
+
+    <div id="s-bx">
+      <div class="blk">
+        <div class="s-img">
+            <img src="HOME_PAGE/img/logo.png" alt="Logo">
+        </div>
+        <h1>EHM</h1>
+        <h2>Dental Clinic<br> ┈┈┈┈┈┈ <br> Laboratory</h2>
+        <h3>Life's fair with Dental Care</h3>
+    </div>
+    </div>
+  </div>
+</center>
+
+</body>
 </html>
