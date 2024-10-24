@@ -84,7 +84,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['username'])) {
 </head>
 <body>
 <nav>
-    <a href="Home_page.php">
+    <a href="HOME_PAGE/Home_page.php">
       <div class="logo">
         <h1>EHM Dental Clinic</h1>
       </div>
