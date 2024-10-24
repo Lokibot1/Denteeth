@@ -14,108 +14,6 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle update request
-if (isset($_POST['update'])) {
-    // Get form data from modal
-    $id = $_POST['id'];
-    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
-    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
-    $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
-    $contact = mysqli_real_escape_string($con, $_POST['contact']);
-    $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
-    $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
-    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
-
-    // Update query for tbl_patient
-    $update_patient_query = "UPDATE tbl_patient 
-                             SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
-                             WHERE id=$id";
-
-    // Update query for tbl_appointments
-    $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '2', service_type='$service_type' 
-                                 WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
-
-    // Execute both queries
-    if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-        // Redirect to the same page after updating
-        header("Location: doctor_dashboard.php");
-        exit();
-    } else {
-        echo "Error updating record: " . mysqli_error($con);
-    }
-}
-
-
-if (isset($_POST['finish'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    // Get the appointment ID from the form
-    $id = $_POST['id'];
-
-    // Prepare the query to update the status to 'finished' using a prepared statement
-    $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
-    $status = 4; // Assuming '4' represents finished
-    $stmt->bind_param("ii", $status, $id);
-
-    // Execute the query
-    if ($stmt->execute()) {
-        // Redirect back to the dashboard
-        header("Location: doctor_dashboard.php");
-        exit();
-    } else {
-        echo "Error updating status: " . $stmt->error;
-    }
-
-    $stmt->close();
-}
-
-if (isset($_POST['declined'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    $id = $_POST['id'];
-
-    // Fetch the appointment data to insert into appointments_bin
-    $stmt = $con->prepare("SELECT * FROM tbl_appointments WHERE id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result && $result->num_rows > 0) {
-        $appointment = $result->fetch_assoc();
-
-        // Insert into appointments_bin
-        $insert_stmt = $con->prepare("INSERT INTO tbl_appointments_bin (name, contact, date, time, modified_date, modified_time, service_type, status)
-                                      VALUES (?, ?, ?, ?, ?, ?)");
-        $status = '2';
-        $insert_stmt->bind_param("ssssss", $appointment['name'], $appointment['contact'], $appointment['date'], $appointment['time'], $appointment['modified_date'], $appointment['modified_time'], $appointment['service_type'], $status);
-        $insert_stmt->execute();
-        $insert_stmt->close();
-    }
-
-    // Delete the appointment from the appointments table
-    $delete_stmt = $con->prepare("DELETE FROM tbl_appointments WHERE id=?");
-    $delete_stmt->bind_param("i", $id);
-
-    // Execute the delete query
-    if ($delete_stmt->execute()) {
-        // Redirect back to the dashboard
-        header("Location: doctor_dashboard.php");
-        exit();
-    } else {
-        echo "Error deleting record: " . $delete_stmt->error;
-    }
-
-    $stmt->close();
-    $delete_stmt->close();
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -250,7 +148,7 @@ if (isset($_POST['declined'])) {
             </div>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 15;
+            $resultsPerPage = 20;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -273,9 +171,7 @@ if (isset($_POST['declined'])) {
                   JOIN tbl_service_type s ON a.service_type = s.id
                   JOIN tbl_patient p ON a.id = p.id  -- Ensure you're joining using id
                   JOIN tbl_status t ON a.status = t.id
-                  WHERE (DATE(a.date) BETWEEN '$start_of_week' AND '$end_of_week'  
-                         OR DATE(a.modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
-                    AND a.status = '4'
+                  WHERE a.status = '4'
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);

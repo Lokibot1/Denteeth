@@ -102,7 +102,6 @@ hr {
     width: 300px;
     height: 70px;
     border-radius: 20px 20px;
-    border: 2px solid #333;
     padding: 10px;
     font-size: 18px;
     font-weight: bold;
@@ -137,7 +136,6 @@ td {
 }
 
 table {
-    margin-top: 20px;
     width: 100%;
 }
 
@@ -317,5 +315,4 @@ textarea {
 
 .pagination-container {
     text-align: right;
-    margin-top: 20px;
 }

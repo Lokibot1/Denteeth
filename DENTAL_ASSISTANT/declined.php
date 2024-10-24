@@ -136,7 +136,7 @@ $result = mysqli_query($con, $query);
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <title>Doctor Dashboard</title>
+    <title>Dental Assistant Dashboard</title>
 </head>
 
 <body>

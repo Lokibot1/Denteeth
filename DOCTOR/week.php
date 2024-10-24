@@ -64,7 +64,7 @@ if (isset($_POST['finish'])) {
     // Execute the query
     if ($stmt->execute()) {
         // Redirect back to the dashboard
-        header("Location: doctor_dashboard.php");
+        header("Location: week.php");
         exit();
     } else {
         echo "Error updating status: " . $stmt->error;
@@ -73,48 +73,15 @@ if (isset($_POST['finish'])) {
     $stmt->close();
 }
 
-if (isset($_POST['declined'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
+if (isset($_POST['decline'])) {
     $id = $_POST['id'];
+    $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
+    mysqli_query($con, $deleteQuery);
 
-    // Fetch the appointment data to insert into appointments_bin
-    $stmt = $con->prepare("SELECT * FROM tbl_appointments WHERE id=?");
-    $stmt->bind_param("i", $id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result && $result->num_rows > 0) {
-        $appointment = $result->fetch_assoc();
-
-        // Insert into appointments_bin
-        $insert_stmt = $con->prepare("INSERT INTO tbl_appointments_bin (name, contact, date, time, modified_date, modified_time, service_type, status)
-                                      VALUES (?, ?, ?, ?, ?, ?)");
-        $status = '2';
-        $insert_stmt->bind_param("ssssss", $appointment['name'], $appointment['contact'], $appointment['date'], $appointment['time'], $appointment['modified_date'], $appointment['modified_time'], $appointment['service_type'], $status);
-        $insert_stmt->execute();
-        $insert_stmt->close();
-    }
-
-    // Delete the appointment from the appointments table
-    $delete_stmt = $con->prepare("DELETE FROM tbl_appointments WHERE id=?");
-    $delete_stmt->bind_param("i", $id);
-
-    // Execute the delete query
-    if ($delete_stmt->execute()) {
-        // Redirect back to the dashboard
-        header("Location: doctor_dashboard.php");
-        exit();
-    } else {
-        echo "Error deleting record: " . $delete_stmt->error;
-    }
-
-    $stmt->close();
-    $delete_stmt->close();
+    // Redirect to refresh the page and show updated records
+    header("Location: week.php");
 }
+
 // SQL query to count total records
 $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '3'";
 $countResult = mysqli_query($con, $countQuery);
@@ -267,7 +234,7 @@ $result = mysqli_query($con, $query);
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 15;
+            $resultsPerPage = 20;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -279,7 +246,7 @@ $result = mysqli_query($con, $query);
             $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments 
                WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
                OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
-               AND status = '1'";
+               AND status = '3'";
             $countResult = mysqli_query($con, $countQuery);
             $totalCount = mysqli_fetch_assoc($countResult)['total'];
             $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
@@ -298,7 +265,6 @@ $result = mysqli_query($con, $query);
             ?>
 
             <!-- HTML Table -->
-
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
                     <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
@@ -344,7 +310,7 @@ $result = mysqli_query($con, $query);
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' style='background-color:blue; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>Edit</button>
                             <form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='declined' value='Declined' onclick=\"return confirm('Are you sure you want to remove this record?');\" style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
                             </form>";
 
                         if ($row['status'] != 'finished') {

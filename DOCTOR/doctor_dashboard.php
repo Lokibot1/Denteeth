@@ -73,13 +73,13 @@ if (isset($_POST['finish'])) {
     $stmt->close();
 }
 
-if (isset($_POST['declined'])) {
+if (isset($_POST['decline'])) {
     $id = $_POST['id'];
     $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
     mysqli_query($con, $deleteQuery);
 
     // Redirect to refresh the page and show updated records
-    header("Location: dental_assistant_dashboard.php");
+    header("Location: doctor_dashboard.php");
 }
 
 // SQL query to count total records
@@ -234,7 +234,7 @@ $result = mysqli_query($con, $query);
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 15;
+            $resultsPerPage = 20;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -294,7 +294,7 @@ $result = mysqli_query($con, $query);
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         // Prepare data for display
-                        $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
+                        $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];  
                         $timeToDisplay = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
                         $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
 
@@ -308,7 +308,7 @@ $result = mysqli_query($con, $query);
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' style='background-color:blue; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>Edit</button>
                             <form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='declined' value='Declined' onclick=\"return confirm('Are you sure you want to remove this record?');\" style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
                             </form>";
 
                         if ($row['status'] != 'finished') {
