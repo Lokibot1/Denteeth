@@ -559,7 +559,7 @@ if (isset($_POST['update'])) {
     <div class="ContactUs">
         <center>
             <h1>CONTACT US</h1> 
-            <p>dasdasdasdasd</p>
+            <p>_____________________________________________________________________________________________________________-</p>
             <div class="fb_container">
                 <div class="fb">
                     <h3>YOU CAN FOLLOW US ON</h3>
