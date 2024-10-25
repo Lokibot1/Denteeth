@@ -323,7 +323,7 @@ if (isset($_POST['update'])) {
 
 <div id="abt-right">
       <div>
-        <img src="img/abt-img1.png" alt="mirror">
+        <img src="img/abt-img3.png" alt="mirror">
       </div>
       <br>
       <br>
