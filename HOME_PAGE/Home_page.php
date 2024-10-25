@@ -576,7 +576,7 @@ if (isset($_POST['update'])) {
                     <h3>YOU CAN FOLLOW US ON</h3>
                     <span class="fb-span">FACEBOOK</span>
                     <div class="fb-img-area">
-                        <a href="">
+                        <a href="https://www.facebook.com/ehmdentalclinic">
                             <img src="img/fb.png" alt="Facebook Logo">
                         </a>
                         <h3>EHM Dental Clinic</h3>
