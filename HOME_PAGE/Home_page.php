@@ -81,7 +81,7 @@ if (isset($_POST['update'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="Home_page.css">
+  <link rel="stylesheet" href="home_page.css">
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -114,7 +114,6 @@ if (isset($_POST['update'])) {
         <li><a href="../login.php">Log In</a></li>
     </ul>
 </nav>
-
 <div class="popup-overlay" id="termsPopup">
     <div class="popup">
         <div class="popup-header">
@@ -189,7 +188,6 @@ if (isset($_POST['update'])) {
     });
   </script>
 
-
 <div class="sidebar" id="sidebar">
     <div class="close-btn" id="close-btn">&times;</div>
     <ul>
@@ -201,6 +199,20 @@ if (isset($_POST['update'])) {
         <li><a href="../login.php">Log In</a></li>
     </ul>
 </div>
+<script>
+        // JavaScript for Sidebar Toggle
+        const hamburger = document.querySelector('.hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const closeBtn = document.getElementById('close-btn');
+
+        hamburger.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+    </script>
   <section id="Homepage">
     <center>
       <div class="img-area">
@@ -307,7 +319,7 @@ if (isset($_POST['update'])) {
 
 <div id="abt-left">
   <div>
-    <img src="img/abt-img1.png" alt="mirror">
+    <img src="img/abt-img2.png" alt="mirror">
   </div>
     <br>
     <br>
@@ -323,7 +335,7 @@ if (isset($_POST['update'])) {
 
 <div id="abt-right">
       <div>
-        <img src="img/abt-img1.png" alt="mirror">
+        <img src="img/abt-img3.png" alt="mirror">
       </div>
       <br>
       <br>
@@ -490,7 +502,7 @@ if (isset($_POST['update'])) {
                 <div class="loc">
                     <div class="loc-img">
                         <a href="">
-                            <img src="img/loc.png" alt="Facebook Logo">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3859.977401090534!2d121.00833437393719!3d14.657223975690215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397b66038db6f6b%3A0x77228c7173b33747!2sEHM%20Dental%20Clinic!5e0!3m2!1sen!2sph!4v1729854317715!5m2!1sen!2sph" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                         </a>
                         <h3>Our Location</h3>
                     </div>
@@ -559,7 +571,6 @@ if (isset($_POST['update'])) {
     <div class="ContactUs">
         <center>
             <h1>CONTACT US</h1> 
-            <p>_____________________________________________________________________________________________________________-</p>
             <div class="fb_container">
                 <div class="fb">
                     <h3>YOU CAN FOLLOW US ON</h3>

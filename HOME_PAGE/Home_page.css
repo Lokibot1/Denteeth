@@ -483,7 +483,7 @@ nav a:hover {
 
 @media (max-width: 1280px) {
     #s-bx h1 {
-        font-size: 130px;
+        font-size: 150px;
         top: 15%;
         left: 33%;
     }
@@ -541,126 +541,7 @@ nav a:hover {
         line-height: 45px;
     }
 }
-@media (max-width: 1030px) {
-    #s-bx h1 {
-        font-size: 150px;
-        top: 15%;
-        left: 38%;
-    }
 
-    #s-bx h2 {
-        font-size: 30px;
-        top: 23%;
-        left: 63%;
-        line-height: 30px;
-    }
-
-    #s-bx h3 {
-        font-size: 30px;
-        top: 47%;
-        left: 33%;
-    }
-
-    .s-img img { 
-        top: 15%;   
-        right: 55%;
-        width: 350px;
-    }
-
-    #s-bx p{
-        top: 58%; 
-    }
-    #s-txt4{
-        left: 60%;
-    }
-    #container div {
-        width: 450px;
-        height: 450px;
-    }
-
-    #side-img img {
-        width: 400px;
-        height: 450px;
-    }
-    .s-txt{
-        top: 205% ;
-        left: 45%;
-    }
-}
-@media (max-width: 768px){
-    #s-bx h1 {
-        font-size: 130px;
-        top: 15%;
-        left: 30%;
-    }
-
-    #s-bx h2 {
-        font-size: 30px;
-        top: 26%;
-        left: 70%;
-        line-height: 35px;
-    }
-
-    #s-bx h3 {
-        font-size: 35px;
-        top: 40%;
-        left: 15%;
-    }
-
-    #s-bx p {
-        width: 80%;
-        top: 50%;
-        left: 10%;
-    }
-
-    .s-img img {
-        top: 10%;
-        right: 58%;
-        width: 350px;
-    }
-
-    #s-txt4{
-        top: 80%;
-        left: 35%;
-        padding: 10px 10px;
-        width: 30% ;
-    }
-
-    #container {
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-    }
-
-    #container div {
-        height: 55%;
-        width: 85%; 
-        margin-bottom: 20px;
-    }
-    #container p {
-        font-size: 20px;
-        line-height: 25px;
-
-    }
-    #side-img img {
-        margin-top: 5%;
-        margin-left: 15%;
-        width: 65%;
-        height: auto;
-        max-width: 100%;
-    }
-
-    .s-txt {
-        position: relative;
-        top: 0;
-        left: 0;
-        width: 90%;
-        margin: 0 auto;
-        font-size: 14px;
-        text-align: justify;
-        line-height: 30px;
-    }
-}
 @media (max-width: 480px) {
     #s-bx h1 {
         font-size: 70px;
@@ -873,33 +754,6 @@ span {
         font-size: 18px;
     }
 }
-@media (max-width: 768px) {
-    .About_Us {
-        font-size: 35px;
-    }
-
-    #abt-left img,
-    #abt-right img {
-        width: 65%;
-        height: auto;
-        margin-left: 15%;
-        margin-top: 3%;
-    }
-
-    .abtl-txt, .abtr-txt, .abtr-txt2 {
-        position: static;
-        width: 90%;
-        font-size: 16px;
-        text-align: center;
-        line-height: 25px;
-    }
-
-    #abt-left, #abt-right {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-}
 
 @media (max-width: 480px) {
     .About_Us {
@@ -1022,16 +876,21 @@ span {
 
 @media (max-width: 768px) {
     #Services h1 {
-        font-size: 45px;
+        font-size: 50px;
+    }
+
+    #Services .container,
+    #crvs-container {
+        grid-template-columns: 1fr;
     }
 
     .img-wrapper img {
-        height: 200px;
-        width: 350px;
+        height: 180px;
+        width: 280px;
     }
 
     .img-wrapper p {
-        font-size: 16px;
+        font-size: 18px;
     }
 }
 
@@ -1079,16 +938,21 @@ span {
     margin-bottom: 10px;
 }
 
-/* Image Styling */
 .loc-img {
-    margin-top: 50px;
-    width: 50%;
-    border-radius: 50%;
-    margin-bottom: 20px;
-    margin-left: auto; /* Automatically centers the image */
-    margin-right: auto;
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 4; /* Creates a vertical rectangle (portrait) */
+    overflow: hidden;
 }
 
+.loc-img iframe {
+    position: absolute;
+    top: 12%;
+    left: 10%;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
 .form-cont {
     margin-right: 10%;
 }
@@ -1167,7 +1031,7 @@ input[type="submit"]:hover {
         width: 100%; /* Full width for better usability */
     }
 
-    .loc-img, .form-cont {
+    .loc-img {
         margin-left: auto;
         margin-right: auto;
         width: 50%; 
@@ -1184,7 +1048,7 @@ input[type="submit"]:hover {
         margin-left: 3%;
         margin-right: auto;
     }
-    .loc-img img{
+    .loc-img iframe{
         width: 350px;
     }
     .form-cont {
