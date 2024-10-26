@@ -260,6 +260,7 @@ $result = mysqli_query($con, $query);
             
             $result = mysqli_query($con, $query);
             ?>
+            <br><br>
 
             <!-- HTML Table -->
 
@@ -305,16 +306,19 @@ $result = mysqli_query($con, $query);
                         <td>{$timeToDisplayFormatted}</td>
                         <td>{$row['service_name']}</td>
                         <td>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' style='background-color:blue; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>Edit</button>
+                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:7px 1px; cursor:pointer;'>Update</button>
                             <form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
+                                 style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:7px 1px; cursor:pointer;'>
                             </form>";
-
+                            
                         if ($row['status'] != 'finished') {
                             echo "<form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='finish' value='Finish' style='background-color:green; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                            <input type='submit' name='finish' value='Finish' 
+                            style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:7px 1px; cursor:pointer;'>
                         </form>";
                         }
 

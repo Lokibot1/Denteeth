@@ -165,7 +165,9 @@ if (isset($_SESSION['form_submitted'])) {
                 ?>
             </div>
         </div>
-
+        <br><br><br>
+      
+        <!--Html Table-->
         <h2>Transaction History</h2>
         <button id="openModalBtn" class="add-transaction-btn">Add New Transaction</button>
 

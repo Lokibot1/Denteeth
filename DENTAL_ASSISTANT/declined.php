@@ -304,6 +304,7 @@ $result = mysqli_query($con, $query);
             
             $result = mysqli_query($con, $query);
             ?>
+            <br><br><br>
 
             <!-- HTML Table -->
             <div class="pagination-container">
@@ -358,20 +359,23 @@ $result = mysqli_query($con, $query);
                         <td>{$timeToDisplayFormattedd}</td>
                         <td>{$row['service_name']}</td>
                         <td>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' style='background-color:blue; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>Edit</button>
+                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
                             <form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                              </form>";
                         if ($row['status'] != 'Restore') {
                             echo "<form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='restore' value='Restore' style='background-color:green; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                <input type='submit' name='restore' value='Restore' 
+                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                             </form>";
                         }
                         if ($row['status'] != 'Delete') {
                             echo "<form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='delete' value='Delete' style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                            <input type='submit' name='delete' value='Delete' 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                         </form>";
                         }
 
