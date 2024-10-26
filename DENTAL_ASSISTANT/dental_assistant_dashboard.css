@@ -313,6 +313,13 @@ textarea {
     /* Darker shade for hover */
 }
 
+
+.centered-table {
+    margin-left: 20%;
+    padding: 10px;
+    width: 75%;
+}
+
 .pagination-container {
     text-align: right;
 }

@@ -231,7 +231,7 @@ $result = mysqli_query($con, $query);
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
-            
+
             <?php
             // Set the number of results per page
             $resultsPerPage = 15;
@@ -374,7 +374,6 @@ $result = mysqli_query($con, $query);
                     <input type="submit" name="update" value="Save">
                 </form>
             </div>
-
             <script>
                 // Open the modal and populate it with data
                 function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
@@ -388,17 +387,26 @@ $result = mysqli_query($con, $query);
                     document.getElementById('modal-modified_time').value = modified_time;
                     document.getElementById('modal-service_type').value = service_type;
 
-                    // Restrict date to the current week, starting from Monday
+                    // Get today's date
                     const today = new Date();
-                    const dayOfWeek = today.getDay();
-                    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
-                    const firstDay = new Date(today.setDate(today.getDate() + mondayOffset)); // Start of the week (Monday)
-                    const lastDay = new Date(firstDay);
-                    lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
 
-                    // Disable past dates within the current week
+                    // Calculate the start (today) and end (six days from today) of the current week
+                    const firstDay = new Date(today); // Start of the week (today)
+                    const lastDay = new Date(firstDay);
+                    lastDay.setDate(firstDay.getDate() + 6); // End of the week (six days from today)
+
+                    // Set min and max for the date input
                     document.getElementById('modal-modified_date').setAttribute('min', formatDate(firstDay));
                     document.getElementById('modal-modified_date').setAttribute('max', formatDate(lastDay));
+
+                    // Display the moving week in the console
+                    const weekDays = [];
+                    for (let i = 0; i < 7; i++) {
+                        const currentDay = new Date(firstDay);
+                        currentDay.setDate(firstDay.getDate() + i); // Get each day of the week
+                        weekDays.push(formatDate(currentDay)); // Format and add to array
+                    }
+                    console.log(weekDays.join(' ')); // You can also display this in the UI instead
 
                     // Set time input limits
                     document.getElementById('modal-modified_time').setAttribute('min', '09:00');
