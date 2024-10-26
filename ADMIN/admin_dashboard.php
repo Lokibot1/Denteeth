@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['admin'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -14,46 +14,6 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle delete request
-if (isset($_POST['delete'])) {
-    // Get the appointment ID from the form
-    $id = $_POST['id'];
-
-    // Retrieve the appointment details
-    $query = "SELECT * FROM appointments WHERE id = $id";
-    $result = mysqli_query($con, $query);
-    $appointment = mysqli_fetch_assoc($result);
-
-    if ($appointment) {
-        // Insert the deleted appointment data into the deleted_appointments table
-        $fname = $appointment['fname'];
-        $contact = $appointment['contact'];
-        $date = $appointment['date'];
-        $time = $appointment['time'];
-        $service_type = $appointment['service_type'];
-
-        $insert_query = "INSERT INTO deleted_appointments (fname, contact, date, time, service_type) 
-                         VALUES ('$fname', '$contact', '$date', '$time', '$service_type')";
-
-        // Execute the insert query
-        if (mysqli_query($con, $insert_query)) {
-            // Now delete the appointment from the appointments table
-            $delete_query = "DELETE FROM appointments WHERE id = $id";
-
-            if (mysqli_query($con, $delete_query)) {
-                // Redirect to the same page after deleting
-                header("Location: admin_dashboard.php");
-                exit();
-            } else {
-                echo "Error deleting record: " . mysqli_error($con);
-            }
-        } else {
-            echo "Error moving record to deleted appointments: " . mysqli_error($con);
-        }
-    } else {
-        echo "Appointment not found.";
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -63,77 +23,53 @@ if (isset($_POST['delete'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="admin_dashboard.css">
-    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
-    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+        integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     <title>Admin Dashboard</title>
 </head>
 
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <div class="logo-container">
-            <label class="logo">Denteeth</label>
-            <form method="POST" action="../logout.php">
-                <button type="submit" class="logout-button">Logout</button>
-            </form>
-        </div>
-        <div class="w3-sidebar w3-light-grey w3-bar-block custom-sidebar">
-            <a href="admin_dashboard.php">
-                <h3 class="w3-bar-item">ADMIN<br>DASHBOARD</h3>
-            </a>
-            <a href="pending.php" class="w3-bar-item w3-button">Pending Appointments</a>
-            <a href="declined.php" class="w3-bar-item w3-button">Decline Appointments</a>
-            <a href="day.php" class="w3-bar-item w3-button">Appointment for the day</a>
-            <a href="week.php" class="w3-bar-item w3-button">Appointment for the week</a>
-            <a href="finished.php" class="w3-bar-item w3-button">Finished Appointments</a>
-            <a href="services.php" class="w3-bar-item w3-button">Services</a>
-            <a href="day.php" class="w3-bar-item w3-button">Manage Users</a>
-            <a href="transaction_history.php" class="w3-bar-item w3-button">Transaction History</a>
-        </div>
+        <a href="../HOME_PAGE/Home_page.php">
+            <div class="logo">
+                <h1><span>EHM</span> Dental Clinic</h1>
+            </div>
+        </a>
+        <form method="POST" action="../logout.php">
+            <button type="submit" class="logout-button">Logout</button>
+        </form>
+        </a>
     </nav>
+    <div>
+        <aside class="sidebar">
+            <ul>
+                <br>
+                <a class="active" href="admin_dashboard.php">
+                    <h3>ADMIN<br>DASHBOARD</h3>
+                </a>
+                <br>
+                <br>
+                <hr>
+                <br>
+                <li><a href="pending.php">Pending Appointments</a></a></li>
+                <li><a href="declined.php">Decline Appointments</a></a></li>
+                <li><a href="day.php">Appointment for the day</a></li>
+                <li><a href="week.php">Appointment for the week</a></li>
+                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="services.php">Services</a></li>
+                <li><a href="manage_user.php">Manage Users</a></li>
+                <li><a href="declined.php">Declined Appointment</a></li>
+                <li><a href="transaction_history.php">Transaction History</a></li>
+            </ul>
+        </aside>
+    </div>
     <!-- Main Content/Crud -->
-    <div class="content-box">
-        <div class="top">
-            <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM appointments 
-                                WHERE status = 'pending'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                echo $pending_appointments ? $pending_appointments : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
-                <p>DECLINED APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM appointments 
-                                WHERE status = 'pending'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                echo $pending_appointments ? $pending_appointments : 'No data available';
-                ?>
-            </div>
+    <div class="top">
+        <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
@@ -152,8 +88,9 @@ if (isset($_POST['delete'])) {
 
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM appointments 
-                              WHERE DATE(date) = '$today'";
+                              FROM tbl_appointments 
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
+
 
                 $result_today = mysqli_query($con, $sql_today);
 
@@ -169,6 +106,26 @@ if (isset($_POST['delete'])) {
                 ?>
             </div>
             <div class="round-box">
+                <p>PENDING APPOINTMENTS:</p>
+                <?php
+                // Query to count pending appointments
+                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
+                                FROM tbl_appointments 
+                                WHERE status = '1'";
+                $result_pending = mysqli_query($con, $sql_pending);
+
+                // Check for SQL errors
+                if (!$result_pending) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_pending = mysqli_fetch_assoc($result_pending);
+                $pending_appointments = $row_pending['total_pending_appointments'];
+
+                echo $pending_appointments ? $pending_appointments : 'No data available';
+                ?>
+            </div>
+            <div class="round-box">
                 <p>APPOINTMENT FOR THE WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
@@ -177,8 +134,11 @@ if (isset($_POST['delete'])) {
 
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                             FROM appointments 
-                             WHERE DATE(date) BETWEEN '$start_of_week' AND '$end_of_week'";
+                 FROM tbl_appointments 
+                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 AND status = '3'";
+
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
@@ -192,11 +152,11 @@ if (isset($_POST['delete'])) {
                 echo $appointments_for_week ? $appointments_for_week : 'No data available';
                 ?>
             </div>
-            <div class="round-box down-box">
-                <p>FINISHED APPOINTMENTS:</p>
+            <div class="round-box">
+                <p>DECLINED APPOINTMENTS:</p>
                 <?php
                 // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM appointments WHERE status = 'finished'";
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '2'";
                 $result_finished = mysqli_query($con, $sql_finished);
 
                 // Check for SQL errors
@@ -210,147 +170,117 @@ if (isset($_POST['delete'])) {
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
-        </div>
+            <div class="round-box">
+                <p>FINISHED APPOINTMENTS:</p>
+                <?php
+                // Query to count finished appointments
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
+                $result_finished = mysqli_query($con, $sql_finished);
 
-        <div>
+                // Check for SQL errors
+                if (!$result_finished) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_finished = mysqli_fetch_assoc($result_finished);
+                $finished_appointments = $row_finished['total_finished_appointments'];
+
+                echo $finished_appointments ? $finished_appointments : 'No data available';
+                ?>
+            </div>
+            <?php
+            // Set the number of results per page
+            $resultsPerPage = 20;
+
+            // Get the current page number from query parameters, default to 1
+            $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+
+            // Calculate the starting row for the SQL query
+            $startRow = ($currentPage - 1) * $resultsPerPage;
+
+            // SQL query to count total records
+            $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status IN ('1', '2', '3', '4')";
+            $countResult = mysqli_query($con, $countQuery);
+            $totalCount = mysqli_fetch_assoc($countResult)['total'];
+            $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
+            
+            // SQL query with JOIN to fetch the limited number of records with OFFSET
+            $query = "SELECT a.*, 
+            s.service_type AS service_name, 
+            p.first_name, p.middle_name, p.last_name,
+            t.status     
+          FROM tbl_appointments a
+          JOIN tbl_service_type s ON a.service_type = s.id
+          JOIN tbl_patient p ON a.id = p.id
+          JOIN tbl_status t ON a.status = t.id
+          WHERE a.status IN ('1', '2', '3', '4')
+          LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
+            
+            $result = mysqli_query($con, $query);
+            ?>
+
             <!-- HTML Table -->
-            <div>
-                <table>
-                    <tr>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th>Type Of Service</th>
-                        <th>Actions</th>
-                    </tr>
-                    <?php
-                    $result = mysqli_query($con, "SELECT * FROM appointments");
 
-                    if (mysqli_num_rows($result) > 0) {
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            echo "<tr>
-                    <td>{$row['fname']}</td>
-                    <td>{$row['contact']}</td>
-                    <td>{$row['date']}</td>
-                    <td>{$row['time']}</td>
-                    <td>{$row['service_type']}</td>
-                    <td>
-                        <button type='button' onclick='openModal({$row['id']}, \"{$row['fname']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_type']}\")'>Edit</button>
-                        <form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\">
-                        </form>";
+            <div class="pagination-container">
+                <?php if ($currentPage > 1): ?>
+                    <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
+                        < </a>
+                        <?php endif; ?>
 
-                            // Only display the 'Finish' button if the status is not 'finished'
-                            if ($row['status'] != 'finished') {
-                                echo "<form method='POST' action='' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='finish' value='Finish'>
-                      </form>";
-                            }
+                        <?php if ($currentPage < $totalPages): ?>
+                            <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn"> > </a>
+                        <?php endif; ?>
 
-                            echo "</td></tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='6'>No records found</td></tr>";
-                    }
-                    ?>
-
-                </table>
+                        <?php if ($totalCount > 15): ?>
+                        <?php endif; ?>
             </div>
-
-            <!-- Edit Modal -->
-            <div id="editModal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <form method="POST" action="">
-                        <input type="hidden" name="id" id="modal-id">
-                        <label for="fname">Name:</label>
-                        <input type="text" name="fname" id="modal-fname" required><br>
-                        <label for="contact">Contact:</label>
-                        <input type="text" name="contact" id="modal-contact" required><br>
-                        <label for="date">Date:</label>
-                        <input type="date" name="date" id="modal-date" required><br>
-                        <label for="time">Time:</label>
-                        <input type="time" name="time" id="modal-time" required><br>
-                        <label for="service_type">Type Of Service:</label>
-                        <select name="service_type" id="modal-service_type" required>
-                            <option value="">--Select Service Type--</option>
-                            <option value="All Porcelain Veneers & Zirconia">All Porcelain Veneers & Zirconia</option>
-                            <option value="Crown & Bridge">Crown & Bridge</option>
-                            <option value="Dental Cleaning">Dental Cleaning</option>
-                            <option value="Dental Implants">Dental Implants</option>
-                            <option value="Dental Whitening">Dental Whitening</option>
-                            <option value="Dentures">Dentures</option>
-                            <option value="Extraction">Extraction</option>
-                            <option value="Full Exam & X-Ray">Full Exam & X-Ray</option>
-                            <option value="Orthodontic Braces">Orthodontic Braces</option>
-                            <option value="Restoration">Restoration</option>
-                            <option value="Root Canal Treatment">Root Canal Treatment</option>
-                        </select><br>
-                        <input type="submit" name="update" value="Save">
-                    </form>
-                </div>
-            </div>
-
-            <script>
-                // Open the modal and populate it with data
-                function openModal(id, fname, contact, date, time, service_type) {
-                    document.getElementById('modal-id').value = id;
-                    document.getElementById('modal-fname').value = fname;
-                    document.getElementById('modal-contact').value = contact;
-                    document.getElementById('modal-date').value = date;
-                    document.getElementById('modal-time').value = time;
-                    document.getElementById('modal-service_type').value = service_type;
-
-                    // Restrict date to current week, starting from Monday
-                    const today = new Date();
-                    const dayOfWeek = today.getDay();
-                    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // Adjust if today is Sunday (day 0)
-                    const firstDay = new Date(today.setDate(today.getDate() + mondayOffset)); // Start of the week (Monday)
-                    const lastDay = new Date(firstDay);
-                    lastDay.setDate(firstDay.getDate() + 6); // End of the week (Sunday)
-
-                    const currentDate = new Date(); // Current date for comparison
-
-                    // Disable past dates within the current week
-                    document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
-                    document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
-
-                    // If the date has already passed, disable it
-                    if (new Date(date) < currentDate) {
-                        document.getElementById('modal-date').classList.add('disabled-date');
-                        document.getElementById('modal-date').setAttribute('disabled', true); // Make unselectable
-                    } else {
-                        document.getElementById('modal-date').classList.remove('disabled-date');
-                        document.getElementById('modal-date').removeAttribute('disabled'); // Make selectable
-                    }
-
-                    document.getElementById('editModal').style.display = 'block';
-                }
-
-                // Close the modal
-                function closeModal() {
-                    document.getElementById('editModal').style.display = 'none';
-                }
-
-                // Format date as YYYY-MM-DD
-                function formatDate(date) {
-                    const year = date.getFullYear();
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const day = date.getDate().toString().padStart(2, '0');
-                    return `${year}-${month}-${day}`;
-                }
-
-                // Close modal when clicking outside of it
-                window.onclick = function (event) {
-                    if (event.target == document.getElementById('editModal')) {
-                        closeModal();
-                    }
-                }
-            </script>
         </div>
+        <!-- Table -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Modified_Date</th>
+                    <th>Modified_Time</th>
+                    <th>Type Of Service</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        // Check if modified_date and modified_time are empty
+                        $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
+                        $modified_time = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
+
+                        $dateToDisplay = !empty($row['date']) ? $row['date'] : $row['date'];
+                        $timeToDisplay = !empty($row['time']) ? $row['time'] : $row['time'];
+
+                        // Format time to HH:MM AM/PM
+                        $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+                        $timeToDisplayFormattedd = date("h:i A", strtotime($modified_time));
+
+                        echo "<tr>
+                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td>{$dateToDisplay}</td>
+                        <td>{$timeToDisplayFormatted}</td>
+                        <td>{$modified_date}</td>
+                        <td>{$timeToDisplayFormattedd}</td>
+                        <td>{$row['service_name']}</td>
+                        <td>{$row['status']}</td>
+                    </tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='8'>No records found</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
     </div>
 </body>
 

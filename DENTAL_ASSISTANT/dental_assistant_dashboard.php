@@ -85,8 +85,7 @@ if (!$con) {
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
-                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '1'";
-
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
 
 
                 $result_today = mysqli_query($con, $sql_today);
@@ -134,7 +133,7 @@ if (!$con) {
                  FROM tbl_appointments 
                  WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
                  OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
-                 AND status = '1'";
+                 AND status = '3'";
 
                 $result_week = mysqli_query($con, $sql_week);
 

@@ -11,7 +11,7 @@ if ($con->connect_error) {
 $service_name = isset($_GET['service_name']) ? htmlspecialchars($_GET['service_name']) : 'Dental Cleaning';
 
 // Prepare the SQL query to fetch the service by name
-$sql = "SELECT * FROM services WHERE service_name = ?";
+$sql = "SELECT * FROM tbl_services WHERE service_name = ?";
 $stmt = $con->prepare($sql);
 if (!$stmt) {
   echo "Error preparing statement: " . $con->error;
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
   $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
   // Prepare the insert query
-  $insert_query = "INSERT INTO appointments (fname, contact, date, time, service_type) VALUES (?, ?, ?, ?, ?)";
+  $insert_query = "INSERT INTO tbl_appointments (fname, contact, date, time, service_type) VALUES (?, ?, ?, ?, ?)";
 
   $insert_stmt = $con->prepare($insert_query);
   if (!$insert_stmt) {

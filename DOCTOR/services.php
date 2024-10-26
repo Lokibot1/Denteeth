@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+
 // Check if the user is logged in and has the required role
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1', '2'])) {
     header("Location: ../login.php");
@@ -106,7 +107,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Move the uploaded file
         if (move_uploaded_file($_FILES["service_image"]["tmp_name"], $target_file)) {
             // Prepare and bind an update statement
-            $stmt = $con->prepare("UPDATE services SET service_image = ?, service_description = ?, partial_price_min = ?, partial_price_max = ?, complete_price_min = ?, complete_price_max = ? WHERE service_name = ?");
+            $stmt = $con->prepare("UPDATE tbl_services SET service_image = ?, service_description = ?, partial_price_min = ?, partial_price_max = ?, complete_price_min = ?, complete_price_max = ? WHERE service_name = ?");
             $stmt->bind_param("ssdddss", $target_file, $description, $partial_price_min, $partial_price_max, $complete_price_min, $complete_price_max, $service_name);
 
             // Execute the statement
@@ -145,8 +146,8 @@ $con->close();
 </head>
 
 <body>
-   <!-- Navigation/Sidebar -->
-   <nav>
+    <!-- Navigation/Sidebar -->
+    <nav>
         <a href="../HOME_PAGE/Home_page.php">
             <div class="logo">
                 <h1><span>EHM</span> Dental Clinic</h1>
@@ -174,7 +175,7 @@ $con->close();
                 <li><a href="services.php">Services</a></li>
             </ul>
         </aside>
-</div>
+    </div>
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
@@ -394,7 +395,7 @@ $con->close();
                         <h2>Edit Dental Whitening</h2>
                         <form id="serviceFormWhitening" method="POST" action="services.php"
                             enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" value="Whitening">
+                            <input type="hidden" name="service_name" value="Dental Whitening">
                             <!-- Add this hidden input -->
                             <label>Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputWhitening" accept="image/*" required

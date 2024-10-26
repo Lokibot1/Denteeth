@@ -10,28 +10,40 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
 // Database connection
 include("../dbcon.php");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_SESSION['form_submitted'])) {
-    // Prepare and bind
-    $stmt = $con->prepare("INSERT INTO tbl_transaction_history (name, contact, service_type, date, time, bill, change_amount, outstanding_balance) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssddd", $patient_name, $contact_no, $service_type, $date, $time, $bill, $change_amount, $outstanding_balance);
+$editMode = false; // Flag to determine if we're editing
+$idToEdit = null; // Variable to hold the ID of the record to edit
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Check if it's an update or insert based on whether an ID is present in POST data
+    if (isset($_POST['id'])) {
+        // Update existing transaction
+        $idToEdit = (int) $_POST['id'];
+        $stmt = $con->prepare("UPDATE tbl_transaction_history SET name = ?, contact = ?, service_type = ?, date = ?, time = ?, bill = ?, change_amount = ?, outstanding_balance = ? WHERE id = ?");
+        $stmt->bind_param("issssdddi", $patient_name, $contact, $service_type, $date, $time, $bill, $change_amount, $outstanding_balance, $idToEdit);
+
+        // Set the flag to true
+        $editMode = true;
+    } else {
+        // Insert new transaction
+        $stmt = $con->prepare("INSERT INTO tbl_transaction_history (name, contact, service_type, date, time, bill, change_amount, outstanding_balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("issssddd", $patient_name, $contact, $service_type, $date, $time, $bill, $change_amount, $outstanding_balance);
+    }
 
     // Get and sanitize values from POST
-    $name = trim($_POST['first_name'] . ' ' . $_POST['last_name']); // Combine first and last name
-    $contact= trim($_POST['contact']);
-    $service_type = trim($_POST['service_type']);
-    $date = trim($_POST['date']);
-    $time = trim($_POST['time']);
-    $bill = (float)$_POST['bill'];
-    $change_amount = (float)$_POST['change_amount'];
-    $outstanding_balance = (float)$_POST['outstanding_balance'];
+    $patient_name = mysqli_real_escape_string($con, $_POST['dropdown']); // Set name to the selected ID
+    $contact = mysqli_real_escape_string($con, trim($_POST['contact']));
+    $service_type = mysqli_real_escape_string($con, trim($_POST['service_type']));
+    $date = mysqli_real_escape_string($con, trim($_POST['date']));
+    $time = mysqli_real_escape_string($con, trim($_POST['time']));
+    $bill = (float) $_POST['bill'];
+    $change_amount = (float) $_POST['change_amount'];
+    $outstanding_balance = (float) $_POST['outstanding_balance'];
 
     // Execute the query
     if ($stmt->execute()) {
-        // Set a flag in the session to prevent form resubmission
-        $_SESSION['form_submitted'] = true;
-
-        // Redirect to the same page to clear POST data
-        header("Location: " . $_SERVER['REQUEST_URI']);
+        // Clear form submitted flag after successful operation
+        unset($_SESSION['form_submitted']);
+        header("Location: " . $_SERVER['REQUEST_URI']); // Redirect to avoid form resubmission
         exit();
     } else {
         echo "<p>Error: " . $stmt->error . "</p>";
@@ -44,6 +56,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_SESSION['form_submitted']))
 // Clear the form submitted flag after page reload
 if (isset($_SESSION['form_submitted'])) {
     unset($_SESSION['form_submitted']);
+}
+
+$sql = "SELECT id, last_name, first_name, middle_name FROM tbl_patient"; // Update with your actual table and field names
+$result_dropdown = $con->query($sql);
+
+// Prepare an array for dropdown options
+$dropdown_options = [];
+if ($result_dropdown && $result_dropdown->num_rows > 0) {
+    while ($row = $result_dropdown->fetch_assoc()) {
+        $full_name = htmlspecialchars($row['last_name'] . ', ' . $row['first_name'] . ' ' . $row['middle_name']);
+        $dropdown_options[$row['id']] = $full_name; // Using patient ID as the key
+    }
+} else {
+    echo "<p>No patients found for the dropdown.</p>";
 }
 ?>
 
@@ -80,7 +106,10 @@ if (isset($_SESSION['form_submitted'])) {
             <a href="dental_assistant_dashboard.php">
                 <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
             </a>
-            <br><hr><br>
+            <br>
+            <br>
+            <hr>
+            <br>
             <li><a href="pending.php">Pending Appointments</a></li>
             <li><a href="day.php">Appointment for the day</a></li>
             <li><a href="week.php">Appointment for the week</a></li>
@@ -169,110 +198,191 @@ if (isset($_SESSION['form_submitted'])) {
       
         <!--Html Table-->
         <h2>Transaction History</h2>
-        <button id="openModalBtn" class="add-transaction-btn">Add New Transaction</button>
+        <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
 
-        <!-- Modal for adding new transactions -->
-        <div id="transactionModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <h2>Add New Transaction</h2>
-                <form method="POST" action="">
-                    <label for="modal-first-name">First Name:</label>
-                    <input type="text" name="first_name" id="modal-first-name" required>
-                    <br>
-                    <label for="modal-last-name">Last Name:</label>
-                    <input type="text" name="last_name" id="modal-last-name" required>
-                    <br>
-                    <label for="modal-middle-name">Middle Name:</label>
-                    <input type="text" name="middle_name" id="modal-middle-name" required>
-                    <br>
-                    <label for="modal-contact">Contact:</label>
-                    <input type="text" name="contact" id="modal-contact" required>
-                    <br>
-                    <label>Type of Service:</label>
-                    <input type="text" name="type_of_service" required><br>
-                    <label for="modal-date">Date:</label>
-                    <input type="date" name="date" id="modal-date" required>
-                    <br>
-                    <p>
-                        <label for="modal-time">Time:</label>
-                        <input type="time" name="time" id="modal-time" required>
-                    </p>
-                    <label for="modal-bill">Bill:</label>
-                    <input type="number" step="0.01" name="bill" id="modal-bill" required>
-                    <br>
-                    <label for="modal-change-amount">Change Amount:</label>
-                    <input type="number" step="0.01" name="change_amount" id="modal-change-amount" required>
-                    <br>
-                    <label for="modal-outstanding-balance">Outstanding Balance:</label>
-                    <input type="number" step="0.01" name="outstanding_balance" id="modal-outstanding-balance" required>
-                    <br>
-                    <input type="submit" value="Add Transaction">
-                </form>
-            </div>
+        <?php
+        // Set the number of results per page
+        $resultsPerPage = 20;
+
+        // Get the current page number from query parameters, default to 1
+        $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+
+        // Calculate the starting row for the SQL query
+        $startRow = ($currentPage - 1) * $resultsPerPage;
+
+        // SQL query to count total records
+        $countQuery = "SELECT COUNT(*) as total FROM tbl_transaction_history";
+        $countResult = mysqli_query($con, $countQuery);
+        $totalCount = mysqli_fetch_assoc($countResult)['total'];
+        $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
+        
+        // SQL query with JOIN to fetch the limited number of records with OFFSET
+        $query = "SELECT a.*, 
+            s.service_type AS service_name, 
+            p.first_name, p.middle_name, p.last_name  
+          FROM tbl_transaction_history a
+          JOIN tbl_service_type s ON a.service_type = s.id
+          JOIN tbl_patient p ON a.name = p.id 
+          LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
+        
+        $result = mysqli_query($con, $query);
+        ?>
+
+        <!-- HTML Table -->
+
+        <div class="pagination-container">
+            <?php if ($currentPage > 1): ?>
+                <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
+                    < </a>
+                    <?php endif; ?>
+
+                    <?php if ($currentPage < $totalPages): ?>
+                        <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn"> > </a>
+                    <?php endif; ?>
+
+                    <?php if ($totalCount > 15): ?>
+                    <?php endif; ?>
         </div>
+    </div>
+    <!-- Table -->
+    <table class="table table-bordered centered-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Contact</th>
+                <th>Type Of Service</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Bill</th>
+                <th>Change Amount</th>
+                <th>Outstanding Balance</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            if (mysqli_num_rows($result) > 0) {
+                while ($row = mysqli_fetch_assoc($result)) {
+                    // Check if modified_date and modified_time are empty
+                    $dateToDisplay = !empty($row['date']) ? $row['date'] : $row['date'];
+                    $timeToDisplay = !empty($row['time']) ? $row['time'] : $row['time'];
 
-        <table class="transaction-table">
-            <thead>
-                <tr>
-                    <th>Patient Name</th>
-                    <th>Contact </th>
-                    <th>Type of Service</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Bill</th>
-                    <th>Change Amount</th>
-                    <th>Outstanding Balance</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $sql = "SELECT * FROM tbl_transaction_history";
-                $result = mysqli_query($con, $sql);
+                    // Format time to HH:MM AM/PM
+                    $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
 
-                if ($result && mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>
-                                <td>{$row['name']}</td>
-                                <td>{$row['contact']}</td>
-                                <td>{$row['service_type']}</td>
-                                <td>{$row['date']}</td>
-                                <td>{$row['time']}</td>
-                                <td>{$row['bill']}</td>
-                                <td>{$row['change_amount']}</td>
-                                <td>{$row['outstanding_balance']}</td>
-                              </tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='8'>No transactions found</td></tr>";
+                    echo "<tr>
+                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td>{$row['service_name']}</td>
+                        <td>{$dateToDisplay}</td>
+                        <td>{$timeToDisplayFormatted}</td>
+                        <td>{$row['bill']}</td>
+                        <td>{$row['change_amount']}</td>
+                        <td>{$row['outstanding_balance']}</td>
+                        <td>
+                                <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' style='background-color:blue; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>Edit</button>
+                                <form method='POST' action='' style='display:inline;'>
+                                    <input type='hidden' name='id' value='{$row['id']}'>
+                                    <input type='submit' name='delete' value='delete' style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                </form>
+                            </td>
+            </tr>";
                 }
+            } else {
+                echo "<tr><td colspan='8'>No records found</td></tr>";
+            }
+            ?>
+        </tbody>
+    </table>
 
-                // Close the database connection
-                mysqli_close($con);
-                ?>
-            </tbody>
-        </table>
+    <!-- Modal for adding new transactions -->
+    <div id="transactionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2><?php echo $editMode ? 'Edit Transaction' : 'Add Transaction'; ?></h2>
+            <form method="POST" action="">
+                <label for="dropdown">Choose an option:</label>
+                <select name="dropdown" required>
+                    <option value="">Select a patient</option>
+                    <?php foreach ($dropdown_options as $id => $name): ?>
+                        <option value="<?php echo $id; ?>"><?php echo $name; ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <br>
+                <label for="modal-contact">Contact:</label>
+                <input type="text" name="contact" id="modal-contact" required>
+                <br>
+                <label for="service_type">Type Of Service:</label>
+                <select name="service_type" id="modal-service_type" required>
+                    <option value="">--Select Service Type--</option>
+                    <option value="1">All Porcelain Veneers & Zirconia</option>
+                    <option value="2">Crown & Bridge</option>
+                    <option value="3">Dental Cleaning</option>
+                    <option value="4">Dental Implants</option>
+                    <option value="5">Dental Whitening</option>
+                    <option value="6">Dentures</option>
+                    <option value="7">Extraction</option>
+                    <option value="8">Full Exam & X-Ray</option>
+                    <option value="9">Orthodontic Braces</option>
+                    <option value="10">Restoration</option>
+                    <option value="11">Root Canal Treatment</option>
+                </select>
+                <label for="date">Date:</label>
+                <input type="date" name="date" id="modal-date" required>
+                <br>
+                <p>
+                    <label for="time">Time:</label>
+                    <input type="time" name="time" id="modal-time" min="09:00" max="18:00" required>
+                    CLINIC HOURS 9:00 AM TO 6:00 PM
+                </p>
+                <label for="modal-bill">Bill:</label>
+                <input type="number" step="0.01" name="bill" id="modal-bill" required>
+                <br>
+                <label for="modal-change">Change Amount:</label>
+                <input type="number" step="0.01" name="change_amount" id="modal-change" required>
+                <br>
+                <label for="modal-balance">Outstanding Balance:</label>
+                <input type="number" step="0.01" name="outstanding_balance" id="modal-balance" required>
+                <br>
+                <button type="submit"><?php echo $editMode ? 'Update' : 'Add'; ?></button>
+            </form>
+        </div>
     </div>
 
     <script>
-        // JavaScript to open and close modal
+        // Modal functions
         const modal = document.getElementById("transactionModal");
-        const openModalBtn = document.getElementById("openModalBtn");
+        const btn = document.getElementById("openModalBtn");
 
-        openModalBtn.onclick = function () {
-            modal.style.display = "block";
+        btn.onclick = function () {
+            openModal(); // Call openModal function when the button is clicked
+        }
+
+        function openModal(id, firstName, middleName, lastName, contact, date, time, serviceType) {
+            document.getElementById('transactionModal').style.display = "block";
+            if (id) {
+                // Populate the form for editing
+                document.querySelector('input[name="id"]').value = id;
+                document.querySelector('input[name="contact"]').value = contact;
+                document.querySelector('input[name="service_type"]').value = serviceType;
+                document.querySelector('input[name="date"]').value = date;
+                document.querySelector('input[name="time"]').value = time;
+            } else {
+                // Clear the form for adding
+                document.querySelector('input[name="id"]').value = '';
+                document.querySelector('input[name="contact"]').value = '';
+                document.querySelector('input[name="service_type"]').value = '';
+                document.querySelector('input[name="date"]').value = '';
+                document.querySelector('input[name="time"]').value = '';
+            }
         }
 
         function closeModal() {
-            modal.style.display = "none";
-        }
-
-        window.onclick = function (event) {
-            if (event.target == modal) {
-                closeModal();
-            }
+            document.getElementById('transactionModal').style.display = "none";
         }
     </script>
+
+    </div>
 </body>
 
 </html>
