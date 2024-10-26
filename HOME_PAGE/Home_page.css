@@ -9,7 +9,7 @@ body {
     margin: 0%;
     padding: 0%;
     overflow-x: hidden;
-    background-color: #ECD9B1;
+    background-color: #F9F2B4;
     font-family: "Montserrat", sans-serif;
 }
 .popup-overlay {
@@ -35,7 +35,7 @@ body {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    max-height: 80%; /* Mas okay fittings sa small screens */
+    max-height: 80%; 
     animation: fadeIn 0.3s ease;
 }
 
@@ -93,7 +93,6 @@ body {
     background-color: #00ff37;
 }
 
-/* Decline button style */
 .decline-btn {
     background-color: #dc3545;
     color: white;
@@ -103,7 +102,6 @@ body {
     background-color: #ff0019;
 }
 
-/* Scrollbar styling */
 .popup-content::-webkit-scrollbar {
     width: 10px;
 }
@@ -340,7 +338,7 @@ nav a:hover {
 
 #s-bx p {
     position: absolute;
-    top: 65%;
+    top: 67%;
     left: 20%;
     font-size: 20px;
     text-align: justify;
@@ -349,7 +347,7 @@ nav a:hover {
 
 #s-txt4 {
     position: absolute;
-    top: 90%;
+    top: 85%;
     right: 45%;
     color: #F9F2B4;
     font-size: 30px;
@@ -565,8 +563,9 @@ nav a:hover {
     #s-bx p {
         font-size: 13px;
         width: 80%;
-        top: 50%;
+        top: 55%;
         left: 8%;
+        line-height: 25px;
     }
 
     .s-img img {
@@ -576,8 +575,8 @@ nav a:hover {
     }
 
     #s-txt4 {
-        font-size: 10px;
-        width: 90px;
+        font-size: 15px;
+        width: 150px;
         left: 50%;
         transform: translateX(-50%);
     }
@@ -632,7 +631,6 @@ nav a:hover {
     margin-bottom: 15px;
 }
 
-/* Image and Text Layout for Large Screens */
 #abt-left img {
     margin-top: -3%;
     margin-bottom: -3%;
@@ -776,7 +774,6 @@ span {
         line-height: 25px;
     }
 
-    /* Stack images and text vertically for small screens */
     #abt-left, #abt-right {
         display: flex;
         flex-direction: column;
@@ -798,7 +795,6 @@ span {
     margin-bottom: 15px;
 }
 
-/* Grid Layout for Large Screens */
 #Services .container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -811,7 +807,6 @@ span {
     gap: 20px;
 }
 
-/* Image Box Styling */
 .img-box {
     border-radius: 20px;
     margin: 30px auto;
@@ -824,7 +819,6 @@ span {
     transform: scale(1.05);
 }
 
-/* Image Wrapper and Image Styling */
 .img-wrapper img {
     height: 220px;
     width: 350px;
@@ -843,7 +837,6 @@ span {
     text-align: center;
 }
 
-/* Text Overlay on Image */
 .img-wrapper p {
     position: absolute;
     top: 50%;
@@ -857,7 +850,6 @@ span {
     text-shadow: 3px 3px 1px rgba(0, 0, 0, 0.7);
 }
 
-/* Responsive Styles */
 @media (max-width: 1024px) {
     #Services h1 {
         font-size: 60px;
@@ -917,31 +909,30 @@ span {
     padding: 40px 0;
 }
 
-/* Flexbox container for layout */
 .apt-container {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-top: 20px;
-    gap: 20px; /* Adds space between the two divs */
+    gap: 20px; 
 }
 
-.loc, .form-cont {
-    width: 50%; /* Equal width for both containers */
+.loc, .form-cont{
+    width: 50%; 
+    padding: 20px;
 }
 
-/* Heading Styling */
 .apt-container h3 {
     align-items: center;
     font-size: 25px;
-    color: #FF9F00;
+    color: #F9F2B4;
     margin-bottom: 10px;
 }
 
 .loc-img {
     position: relative;
     width: 100%;
-    aspect-ratio: 4 / 4; /* Creates a vertical rectangle (portrait) */
+    aspect-ratio: 4 / 4; 
     overflow: hidden;
 }
 
@@ -953,22 +944,16 @@ span {
     height: 100%;
     border: 0;
 }
-.form-cont {
-    margin-right: 10%;
-}
 
-/* Form Styling */
 .form {
-    width: 100%;
-    max-width: 400px;
-    padding: 10px;
+    width: 100%; 
+    padding: 20px; 
     border: 1px solid #ccc;
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: #F9F2B4;
     border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); 
+    margin-top: 25px;
 }
-
-/* Input Fields */
 label {
     font-weight: bold;
     margin-top: 10px;
@@ -977,58 +962,74 @@ label {
     color: #333;
     font-size: 14px;
 }
+    .labels {
+        display: flex;
+        gap: 150px; 
+        align-items: center;
+    }
+    .name-fields {
+        display: flex;
+        gap: 30px; 
+        align-items: center;
+    }
+
+    #modal-last-name,
+    #modal-first-name,
+    #modal-middle-name {
+        width: 200px; 
+    }
 
 input[type="text"],
 input[type="time"],
 input[type="date"],
 select {
-    width: 100%; /* Full width for better usability */
+    width: 100%; 
     padding: 12px;
     margin: 10px 0;
-    border: 1px solid #ccc;
+    border: 3px solid #000000;
     border-radius: 8px;
     box-sizing: border-box;
     background-color: #f9f9f9;
     font-size: 16px;
 }
 
-/* Input Focus Styling */
+
 input[type="text"]:focus,
 input[type="time"]:focus,
 input[type="date"]:focus,
 select:focus {
     border-color: #FF9F00;
     outline: none;
-    box-shadow: 0 0 8px rgba(255, 159, 0, 0.3); /* Glow effect */
+    box-shadow: 0 0 8px rgba(255, 159, 0, 0.3); 
 }
 
-/* Submit Button */
 input[type="submit"] {
-    background-color: #6a6f4c;
-    color: white;
-    font-size: 18px;
-    padding: 12px;
+    background-color: #35503F;
+    color: #F9F2B4;
+    font-size: 25px;
+    font-weight: bold;
+    padding: 15px;
     border: none;
     border-radius: 25px;
     cursor: pointer;
     width: 100%;
-    transition: background-color 0.3s ease; /* Smooth transition */
+    margin-top: 5px;
+    transition: background-color 0.3s ease; 
 }
 
 input[type="submit"]:hover {
-    background-color: #FF9F00; /* Bright hover effect */
+    background-color: #FF9F00; 
 }
 
-/* Responsive for Tablets */
 @media (max-width: 768px) {
     .apt-container {
         flex-direction: column; /* Stacks elements vertically */
         align-items: center;
-        gap: 40px; /* More space between stacked elements */
+        gap: 40px; 
     }
 
     .loc, .form-cont {
-        width: 100%; /* Full width for better usability */
+        width: 100%; 
     }
 
     .loc-img {
@@ -1038,38 +1039,49 @@ input[type="submit"]:hover {
     }
 }
 
-/* Responsive for Mobile Phones */
 @media (max-width: 480px) {
     .apt-container h3 {
-        font-size: 20px; /* Smaller heading for mobile */
+        font-size: 20px; 
     }
 
     .loc-img {
-        margin-left: 3%;
-        margin-right: auto;
+        
+        aspect-ratio: 2 / 4; 
     }
-    .loc-img iframe{
-        width: 350px;
+    .loc-img iframe {
+        transform: translateY(50px); 
+        width: 100%;
+        height: 100%;
+        top: 20px;
+        left: 0;
     }
     .form-cont {
-        margin-right: 0; /* Remove extra margin for mobile */
+        margin-right: 0; 
     }
 
     .form {
-        max-width: 100%; /* Full-width form */
-        padding: 15px; /* Slightly larger padding */
+        max-width: 100%; 
+        padding: 15px; 
     }
-
+    .name-fields{
+        gap: 5%;
+    }
+    
+    #modal-last-name,
+    #modal-first-name,
+    #modal-middle-name {
+        width: 90px;
+    }
     input[type="submit"] {
-        font-size: 16px; /* Slightly smaller button text */
+        font-size: 16px; 
     }
 
     input[type="text"],
     input[type="time"],
     input[type="date"],
     select {
-        font-size: 14px; /* Smaller input text for mobile */
-        padding: 10px; /* Smaller padding */
+        font-size: 14px; 
+        padding: 10px;
     }
 }
 
@@ -1086,8 +1098,10 @@ input[type="submit"]:hover {
     font-size: 70px;
     margin-bottom: 20px;
 }
+.ContactUs p{
+    color: #fff;
+}
 
-/* Flexbox container */
 .fb_container {
     display: flex;
     justify-content: space-between;
@@ -1115,7 +1129,6 @@ input[type="submit"]:hover {
     color: #00A0FF;
 }
 
-/* Image styling */
 .fb-img-area img {
     margin-top: 30px;
     width: 50%;
@@ -1123,19 +1136,17 @@ input[type="submit"]:hover {
     margin-bottom: 20px;
 }
 
-/* Icon styling */
 .icon {
     display: flex;
     align-items: center;
     margin-left: 90px;
-    margin-top: 80px;
+    margin-top: 160px;
 }
 
 .icon i {
-    color: #fff;
+    color: #F9F2B4;
     font-size: 90px;
     margin-right: 20px;
-    text-shadow: -5px 5px 15px #FF9F00;
 }
 
 .icon p {
@@ -1166,7 +1177,6 @@ input[type="submit"]:hover {
     color: #ffffff;
 }
 
-/* Hover effect */
 .btnup:hover {
     box-shadow: 0px 5px 15px #FF9F00;
     transform: scale(1.5);
@@ -1176,7 +1186,6 @@ input[type="submit"]:hover {
     color: #FF9F00;
 }
 
-/* Responsive Styles */
 @media (max-width: 1024px) {
     .ContactUs h1 {
         font-size: 50px;

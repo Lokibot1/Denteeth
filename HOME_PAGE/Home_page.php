@@ -257,16 +257,12 @@ if (isset($_POST['update'])) {
             Laboratory
           </h2>
           <br>
-          <h3>Life's fair with Dental Care</h3>
+          <h3>Life's fair, with Dental Care</h3>
           <br>
           <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-            sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco
-            laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-            in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-            mollit anim id est laborum.
+          Healthy Smile starts within us. At EHM Dental Clinic,  we are dedicated
+          to making your smile vibrant and your dental health exceptional. Book an 
+          Appointment with us today, and let’s help your smile shine its brightest!
           </p>
           <br>
           <a href="#Appointment  " id="s-txt4">SMILE NOW!</a>
@@ -535,27 +531,26 @@ if (isset($_POST['update'])) {
                   width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"></iframe>
               </a>
-              <h3>Our Location</h3>
+              <h3>OUR LOCATION</h3>
             </div>
           </div>
           <div class="form-cont">
             <h3>BOOK AN APPOINTMENT HERE</h3>
             <div class="form">
               <form method="POST" action="">
-                <label for="modal-last-name">Last Name:</label>
-                <input type="text" name="last_name" id="modal-last-name" placeholder="Enter your Last Name" required>
-                <label for="modal-first-name">First Name:</label>
-                <input type="text" name="first_name" id="modal-first-name" placeholder="Enter your First Name" required>
-                <label for="modal-middle-name">Middle Name:</label>
-                <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter your Middle Name"
-                  required>
-                <br>
-                <label for="contact">Contact:</label>
-                <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
+
+            <label for="modalt-name">Full Name: <br> (Last Name, First Name, Middle Name)</label>
+            <div class="name-fields">
+            <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
+            <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
+            <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Name" required>
+            </div>
+            <label for="contact">Contact:</label>
+            <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
                   required><br>
-                <label for="date">Date:</label>
+            <label for="date">Date:</label>
                 <input type="date" name="date" id="modal-date" required><br>
-                <label for="time">Time:</label>
+                <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
                 <input type="time" name="time" id="modal-time" required><br>
                 <label for="service_type">Type Of Service:</label>
                 <select name="service_type" id="modal-service_type" required>
@@ -619,16 +614,16 @@ if (isset($_POST['update'])) {
     <div class="ContactUs">
       <center>
         <h1>CONTACT US</h1>
-        <p>dasdasdasdasd</p>
+        <p>If you have any concerns, please reach out to us via:</p>
         <div class="fb_container">
           <div class="fb">
             <h3>YOU CAN FOLLOW US ON</h3>
             <span class="fb-span">FACEBOOK</span>
             <div class="fb-img-area">
-              <a href="">
+              <a href="https://www.facebook.com/ehmdentalclinic">
                 <img src="img/fb.png" alt="Facebook Logo">
               </a>
-              <h3>EHM Dental Clinic</h3>
+              <h3 style="color: #F9F2B4;">EHM Dental Clinic</h3>
             </div>
           </div>
           <div class="fb2">
