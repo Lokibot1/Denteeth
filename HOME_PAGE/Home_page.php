@@ -120,7 +120,7 @@ if (isset($_POST['update'])) {
     </a>
     <div class="hamburger">&#9776;</div>
     <ul>
-    <li><a href="#Homepage">Home</a></li>
+      <li><a href="#Homepage">Home</a></li>
       <li><a href="#About_Us"> About Us</a></li>
       <li><a href="#Services">Services</a></li>
       <li><a href="#Appointment">Book Appointment</a></li>
@@ -260,9 +260,9 @@ if (isset($_POST['update'])) {
           <h3>Life's fair, with Dental Care</h3>
           <br>
           <p>
-          Healthy Smile starts within us. At EHM Dental Clinic,  we are dedicated
-          to making your smile vibrant and your dental health exceptional. Book an 
-          Appointment with us today, and let’s help your smile shine its brightest!
+            Healthy Smile starts within us. At EHM Dental Clinic, we are dedicated
+            to making your smile vibrant and your dental health exceptional. Book an
+            Appointment with us today, and let’s help your smile shine its brightest!
           </p>
           <br>
           <a href="#Appointment  " id="s-txt4">SMILE NOW!</a>
@@ -539,19 +539,19 @@ if (isset($_POST['update'])) {
             <div class="form">
               <form method="POST" action="">
 
-            <label for="modalt-name">Full Name: <br> (Last Name, First Name, Middle Name)</label>
-            <div class="name-fields">
-            <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
-            <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
-            <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Name" required>
-            </div>
-            <label for="contact">Contact:</label>
-            <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
+                <label for="modalt-name">Full Name: <br> (Last Name, First Name, Middle Name)</label>
+                <div class="name-fields">
+                  <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
+                  <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
+                  <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Name" required>
+                </div>
+                <label for="contact">Contact:</label>
+                <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
                   required><br>
-            <label for="date">Date:</label>
+                <label for="date">Date:</label>
                 <input type="date" name="date" id="modal-date" required><br>
                 <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
-                <input type="time" name="modified_time" id="modal-modified_time">
+                <input type="time" name="time" id="modal-time">
                 <label for="service_type">Type Of Service:</label>
                 <select name="service_type" id="modal-service_type" required>
                   <option value="">--Select Service Type--</option>
@@ -600,8 +600,8 @@ if (isset($_POST['update'])) {
                     weekDays.push(formatDate(currentDay)); // Format and add to array
                   }
                   // Set min and max time dynamically
-                  document.getElementById('modal-modified_time').setAttribute('min', '09:00');
-                  document.getElementById('modal-modified_time').setAttribute('max', '18:00');
+                  document.getElementById('modal-time').setAttribute('min', '09:00');
+                  document.getElementById('modal-time').setAttribute('max', '18:00');
 
                   // Example output: Display the moving week in the console
                   console.log(weekDays.join(' ')); // You can also display this in the UI instead
