@@ -241,7 +241,6 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
 
             <h2>Transaction History</h2>
             <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
-
             <?php
             // Set the number of results per page
             $resultsPerPage = 20;

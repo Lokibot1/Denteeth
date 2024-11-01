@@ -237,7 +237,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 
         <h2>Transaction History</h2>
         <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
-
+        
         <?php
         // Set the number of results per page
         $resultsPerPage = 20;
@@ -320,11 +320,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                             <td>{$row['change_amount']}</td>
                             <td>{$row['outstanding_balance']}</td>
                             <td>
-                                    <button type='button' onclick='openModal2({$row['id']}, \"{$row['contact']}\", \"{$row['service_name']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['bill']}\", \"{$row['change_amount']}\", \"{$row['outstanding_balance']}\")' style='background-color:blue; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;'>Edit</button>
+                                    <button type='button' onclick='openModal2({$row['id']}, \"{$row['contact']}\", \"{$row['service_name']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['bill']}\", \"{$row['change_amount']}\", \"{$row['outstanding_balance']}\")' 
+                                    style='background-color: blue; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
                     
                                     <form method='POST' action='' style='display:inline;'>
                                         <input type='hidden' name='id' value='{$row['id']}'>
-                                        <input type='submit' name='delete' value='delete' style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                        <input type='submit' name='delete' value='Delete' 
+                                        style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                                     </form>
                                 </td>
                 </tr>";
@@ -372,19 +374,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 <input type="date" name="date" id="modal-date" required>
                 <br>
                 <p>
-                    <label for="time">Time:</label>
+                    <label for="time">Time: <br>  CLINIC HOURS 9:00 AM TO 6:00 PM</label>
                     <input type="time" name="time" id="modal-time" min="09:00" max="18:00" required>
-                    CLINIC HOURS 9:00 AM TO 6:00 PM
+                   
                 </p>
+                <div class="bill-fields">
                 <label for="modal-bill">Bill:</label>
-                <input type="number" step="0.01" name="bill" id="modal-bill" required>
-                <br>
                 <label for="modal-change">Change Amount:</label>
-                <input type="number" step="0.01" name="change_amount" id="modal-change" required>
-                <br>
                 <label for="modal-balance">Outstanding Balance:</label>
+                </div>
+                <div class="bill-inputs">
+                <input type="number" step="0.01" name="bill" id="modal-bill" required>
+                <input type="number" step="0.01" name="change_amount" id="modal-change" required>
                 <input type="number" step="0.01" name="outstanding_balance" id="modal-balance" required>
-                <br>
+                </div>
+                
                 <button type="submit"><?php echo $editMode ? 'Update' : 'Add'; ?></button>
             </form>
         </div>

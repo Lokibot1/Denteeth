@@ -93,7 +93,7 @@ if (isset($_POST['update'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="Home_page.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -543,7 +543,7 @@ if (isset($_POST['update'])) {
             <div class="name-fields">
             <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
             <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
-            <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Name" required>
+            <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Initial" required>
             </div>
             <label for="contact">Contact:</label>
             <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"

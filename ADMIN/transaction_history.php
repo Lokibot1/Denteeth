@@ -247,7 +247,6 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
 
             <h2>Transaction History</h2>
             <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
-
             <?php
             // Set the number of results per page
             $resultsPerPage = 20;
@@ -272,7 +271,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.name = p.id 
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
-            
+             
             $result = mysqli_query($con, $query);
             ?>
 

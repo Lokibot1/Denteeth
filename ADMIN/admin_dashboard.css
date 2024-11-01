@@ -76,15 +76,21 @@ nav .logo:hover {
 
 .sidebar h3 {
     font-size: 25px;
+    color: #ffff;
+    text-shadow: none;
 }
-
+.sidebar h3:hover{
+    color: #FF9F00;
+    text-shadow: 0px 0px 9px #FF9F00;
+    transition: color .3s, text-shadow .3s;
+}
 .sidebar ul {
     list-style: none;
     padding: 0;
 }
 
 .sidebar li {
-    margin-bottom: 50px;
+    margin-bottom: 25px;
     font-size: 20px;
 }
 
@@ -112,7 +118,7 @@ hr {
 }
 
 .round-box {
-    width: 250px;
+    width: 190px;
     height: 70px;
     border-radius: 20px 20px;
     padding: 10px;
@@ -122,12 +128,12 @@ hr {
     display: inline-block;
     background-color: #CFD1F4;
     margin-right: 10px;
-    margin-left: 10px;
+    margin-left: 5px;
     margin-top: 70px;
 }
 
 li.active a {
-    color: #FF9F00;
+    color: #ffff;
     /* Example active link color */
     font-weight: bold;
 }
@@ -176,7 +182,7 @@ td {
 
 textarea {
     width: 97%;
-    height: 300px;
+    height: 250px;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
@@ -219,6 +225,7 @@ textarea {
 .modal-content input[type="time"],
 .modal-content input[type="date"],
 .modal-content input[type="file"],
+.modal-content input[type="password"],
 .modal-content select {
     width: 100%;
     padding: 10px;
@@ -308,7 +315,7 @@ textarea {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.pagination-btn {
+.add-user-btn {
     display: inline-block;
     padding: 10px 15px;
     margin: 5px;
@@ -321,17 +328,34 @@ textarea {
     transition: background-color 0.3s;
 }
 
-.pagination-btn:hover {
-    background-color: #0A2C16;
+.add-user-btn:hover {
+    background-color: #FF9F00;
     /* Darker shade for hover */
 }
 
 
 .centered-table {
-    margin-left: 20%;
     padding: 10px;
-    width: 75%;
+    width: 100%;
 }
+.pagination-btn {
+    display: inline-block;
+    padding: 10px 15px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #0A2C16;
+    /* Bootstrap primary color */
+    color: white;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.pagination-btn:hover {
+    background-color: #FF9F00;
+    /* Darker shade for hover */
+}
+
 
 .pagination-container {
     text-align: right;

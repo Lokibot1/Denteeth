@@ -211,7 +211,7 @@ if (!$con) {
             
             $result = mysqli_query($con, $query);
             ?>
-
+            <br><br>
             <!-- HTML Table -->
 
             <div class="pagination-container">

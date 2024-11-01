@@ -197,6 +197,7 @@ if (!$con) {
             
             $result = mysqli_query($con, $query);
             ?>
+            <br><br><br>
 
             <!-- HTML Table -->
 
