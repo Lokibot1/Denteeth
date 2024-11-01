@@ -1,6 +1,8 @@
 <?php
 session_start();
 
+
+
 // Check if the user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
     header("Location: ../login.php");
@@ -10,8 +12,13 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
 // Database connection
 include("../dbcon.php");
 
+
+
 $editMode = false; // Flag to determine if we're editing
 $idToEdit = null; // Variable to hold the ID of the record to edit
+
+
+
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if it's an update or insert based on whether an ID is present in POST data
@@ -71,6 +78,39 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
 } else {
     echo "<p>No patients found for the dropdown.</p>";
 }
+
+$result = mysqli_query($con, "SELECT * FROM tbl_transaction_history");
+
+// Update functionality
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
+    // Retrieve updated values from the form
+    $id = mysqli_real_escape_string($conn, $_POST['id']);
+    $contact = mysqli_real_escape_string($conn, $_POST['contact']);
+    $service_type = mysqli_real_escape_string($conn, $_POST['service_type']);
+    $date = mysqli_real_escape_string($conn, $_POST['date']);
+    $time = mysqli_real_escape_string($conn, $_POST['time']);
+    $bill = mysqli_real_escape_string($conn, $_POST['bill']);
+    $change_amount = mysqli_real_escape_string($conn, $_POST['change_amount']);
+    $outstanding_balance = mysqli_real_escape_string($conn, $_POST['outstanding_balance']);
+
+    // Update query
+    $updateQuery = "UPDATE transactions SET 
+            contact = '$contact',
+            service_name = '$service_type',
+            date = '$date',
+            time = '$time',
+            bill = '$bill',
+            change_amount = '$change_amount',
+            outstanding_balance = '$outstanding_balance'
+            WHERE id = '$id'";
+
+    // Execute the query
+    if (mysqli_query($conn, $updateQuery)) {
+        echo "<script>alert('Record updated successfully'); window.location.href='transaction_history.php';</script>";
+    } else {
+        echo "Error updating record: " . mysqli_error($conn);
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -128,8 +168,8 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 $today = date('Y-m-d');
 
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM tbl_appointments 
-                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '1'";
+                                FROM tbl_appointments 
+                                WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '1'";
                 $result_today = mysqli_query($con, $sql_today);
 
                 if ($result_today) {
@@ -163,10 +203,10 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 $end_of_week = date('Y-m-d', strtotime('sunday this week'));
 
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                             FROM tbl_appointments 
-                             WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
-                             OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
-                             AND status = '1'";
+                                FROM tbl_appointments 
+                                WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                                OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                                AND status = '1'";
                 $result_week = mysqli_query($con, $sql_week);
 
                 if ($result_week) {
@@ -216,12 +256,12 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
         
         // SQL query with JOIN to fetch the limited number of records with OFFSET
         $query = "SELECT a.*, 
-            s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name  
-          FROM tbl_transaction_history a
-          JOIN tbl_service_type s ON a.service_type = s.id
-          JOIN tbl_patient p ON a.name = p.id 
-          LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
+                s.service_type AS service_name, 
+                p.first_name, p.middle_name, p.last_name  
+            FROM tbl_transaction_history a
+            JOIN tbl_service_type s ON a.service_type = s.id
+            JOIN tbl_patient p ON a.name = p.id 
+            LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
         
         $result = mysqli_query($con, $query);
         ?>
@@ -268,25 +308,26 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                     // Format time to HH:MM AM/PM
                     $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
 
+                    $contact = "0" . $row['contact'];
+
                     echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$row['contact']}</td>
-                        <td>{$row['service_name']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplayFormatted}</td>
-                        <td>{$row['bill']}</td>
-                        <td>{$row['change_amount']}</td>
-                        <td>{$row['outstanding_balance']}</td>
-                        <td>
-                               <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
-                                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                                <form method='POST' action='' style='display:inline;'>
-                                    <input type='hidden' name='id' value='{$row['id']}'>
-                                    <input type='submit' name='delete' value='delete' 
-                                    style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                                </form>
-                            </td>
-            </tr>";
+                            <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                            <td>{$contact}</td>
+                            <td>{$row['service_name']}</td>
+                            <td>{$dateToDisplay}</td>
+                            <td>{$timeToDisplayFormatted}</td>
+                            <td>{$row['bill']}</td>
+                            <td>{$row['change_amount']}</td>
+                            <td>{$row['outstanding_balance']}</td>
+                            <td>
+                                    <button type='button' onclick='openModal2({$row['id']}, \"{$row['contact']}\", \"{$row['service_name']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['bill']}\", \"{$row['change_amount']}\", \"{$row['outstanding_balance']}\")' style='background-color:blue; color:white; border:none; padding:5px 10px; border-radius:5px; cursor:pointer;'>Edit</button>
+                    
+                                    <form method='POST' action='' style='display:inline;'>
+                                        <input type='hidden' name='id' value='{$row['id']}'>
+                                        <input type='submit' name='delete' value='delete' style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                    </form>
+                                </td>
+                </tr>";
                 }
             } else {
                 echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -379,6 +420,82 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
 
         function closeModal() {
             document.getElementById('transactionModal').style.display = "none";
+        }
+    </script>
+
+    <!-- Modal2 -->
+    <div id="modal2" class="modal2">
+        <div class="modal2-content">
+            <span class="close" onclick="closeModal2()">&times;</span>
+            <h2>Edit Transaction</h2>
+            <form method="POST" action="">
+                <input type="hidden" name="id" id="modal2-id">
+                <label for="dropdown">Choose an option:</label>
+                <select name="dropdown" required>
+                    <option value="">Select a patient</option>
+                    <?php foreach ($dropdown_options as $id => $name): ?>
+                        <option value="<?php echo $id; ?>"><?php echo $name; ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <br>
+                <label for="contact">Contact:</label>
+                <input type="text" name="contact" id="modal2-contact" required>
+
+                <label for="service_type">Type Of Service:</label>
+                <select name="service_type" id="modal2-service_type" required>
+                    <option value="">--Select Service Type--</option>
+                    <option value="1">All Porcelain Veneers & Zirconia</option>
+                    <option value="2">Crown & Bridge</option>
+                    <option value="3">Dental Cleaning</option>
+                    <option value="4">Dental Implants</option>
+                    <option value="5">Dental Whitening</option>
+                    <option value="6">Dentures</option>
+                    <option value="7">Extraction</option>
+                    <option value="8">Full Exam & X-Ray</option>
+                    <option value="9">Orthodontic Braces</option>
+                    <option value="10">Restoration</option>
+                    <option value="11">Root Canal Treatment</option>
+                </select>
+                <label for="date">Date:</label>
+                <input type="date" name="date" id="modal2-date" required>
+
+                <label for="time">Time:</label>
+                <input type="time" name="time" id="modal2-time" required>
+
+                <label for="bill">Bill:</label>
+                <input type="number" name="bill" id="modal2-bill" step="0.01" required>
+
+                <label for="change_amount">Change Amount:</label>
+                <input type="number" name="change_amount" id="modal2-change_amount" step="0.01" required>
+
+                <label for="outstanding_balance">Outstanding Balance:</label>
+                <input type="number" name="outstanding_balance" id="modal2-outstanding_balance" step="0.01" required>
+
+                <!-- Update button -->
+                <button type="submit" name="update"
+                    style="background-color:green; color:white; padding:5px 10px; border:none; border-radius:5px; cursor:pointer;">Update</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Function to open modal2 and populate fields
+        function openModal2(id, contact, service_type, date, time, bill, change_amount, outstanding_balance) {
+            document.getElementById("modal2-id").value = id;
+            document.getElementById("modal2-contact").value = contact;
+            document.getElementById("modal2-service_type").value = service_type;
+            document.getElementById("modal2-date").value = date;
+            document.getElementById("modal2-time").value = time;
+            document.getElementById("modal2-bill").value = bill;
+            document.getElementById("modal2-change_amount").value = change_amount;
+            document.getElementById("modal2-outstanding_balance").value = outstanding_balance;
+
+            document.getElementById("modal2").style.display = "block";
+        }
+
+        // Function to close modal2
+        function closeModal2() {
+            document.getElementById("modal2").style.display = "none";
         }
     </script>
 

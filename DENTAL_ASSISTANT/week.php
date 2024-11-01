@@ -39,7 +39,7 @@ if (isset($_POST['update'])) {
     // Execute both queries
     if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
         // Redirect to the same page after updating
-        header("Location: dental_assistant_dashboard.php");
+        header("Location: week.php");
         exit();
     } else {
         echo "Error updating record: " . mysqli_error($con);
@@ -319,43 +319,35 @@ $result = mysqli_query($con, $query);
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         // Check if modified_date and modified_time are empty
-                        $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
-                        $modified_time = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
+                        $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                        $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
-                        $dateToDisplay = !empty($row['date']) ? $row['date'] : $row['date'];
-                        $timeToDisplay = !empty($row['time']) ? $row['time'] : $row['time'];
+                        $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
+                        $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
-                        // Format time to HH:MM AM/PM
-                        $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
-                        $timeToDisplayFormattedd = date("h:i A", strtotime($modified_time));
+                        // Format contact number with (0)+ prefix
+                        $contact = "0" . $row['contact'];
 
                         echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplayFormatted}</td>
-                        <td>{$modified_date}</td>
-                        <td>{$timeToDisplayFormattedd}</td>
-                        <td>{$row['service_name']}</td>
-                        <td>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                            <form method='POST' action='' style='display:inline;'>
-                                <input type='hidden' name='id' value='{$row['id']}'>
-                             </form>";
-                        if ($row['status'] != 'Accept') {
-                            echo "<form method='POST' action='' style='display:inline;'>
-                                <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='accept' value='Accept' 
-                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                            </form>";
-                        }
+                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td>{$contact}</td>
+                    <td>{$dateToDisplay}</td>
+                    <td>{$timeToDisplay}</td>
+                    <td>{$modified_date}</td>
+                    <td>{$modified_time}</td>
+                    <td>{$row['service_name']}</td>
+                    <td>
+                        <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$contact}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                        style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                        <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                        </form>";
                         if ($row['status'] != 'Decline') {
                             echo "<form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='decline' value='Decline' 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                        </form>";
+                        <input type='hidden' name='id' value='{$row['id']}'>
+                        <input type='submit' name='decline' value='Decline' 
+                        style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                    </form>";
                         }
 
                         echo "</td></tr>";

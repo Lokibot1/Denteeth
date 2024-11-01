@@ -39,7 +39,7 @@ if (isset($_POST['update'])) {
     // Execute both queries
     if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
         // Redirect to the same page after updating
-        header("Location: dental_assistant_dashboard.php");
+        header("Location: day.php");
         exit();
     } else {
         echo "Error updating record: " . mysqli_error($con);
