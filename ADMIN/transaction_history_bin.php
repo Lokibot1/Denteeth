@@ -321,10 +321,12 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                         <td>{$row['change_amount']}</td>
                         <td>{$row['outstanding_balance']}</td>
                         <td>
-                                <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' style='background-color:blue; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>Edit</button>
+                                <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
+                                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
                                 <form method='POST' action='' style='display:inline;'>
                                     <input type='hidden' name='id' value='{$row['id']}'>
-                                    <input type='submit' name='delete' value='delete' style='background-color:red; color:white; border:none; padding:1px 7px; border-radius:5px; cursor:pointer;'>
+                                    <input type='submit' name='delete' value='delete' 
+                                    style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                                 </form>
                             </td>
             </tr>";
