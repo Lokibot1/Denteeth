@@ -309,7 +309,7 @@ if (isset($_POST['update'])) {
     </div>
     <div id="side-img">
       <div>
-        <img src="img/s-img.png" alt="mirror">
+        <img src="img/side.png" alt="mirror">
       </div>
       <br>
       <br>
@@ -539,7 +539,7 @@ if (isset($_POST['update'])) {
             <div class="form">
               <form method="POST" action="">
 
-            <label for="modalt-name">Full Name: <br> (Last Name, First Name, Middle Name)</label>
+            <label for="modalt-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
             <div class="name-fields">
             <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
             <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
