@@ -240,12 +240,9 @@ if (!$con) {
                         $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
-                        // Format contact number with (0)+ prefix
-                        $contact = "0" . $row['contact'];
-
                         echo "<tr>
                         <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$contact}</td>
+                        <td>{$row['contact']}</td>
                         <td>{$dateToDisplay}</td>
                         <td>{$timeToDisplay}</td>
                         <td>{$modified_date}</td>

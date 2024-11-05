@@ -324,19 +324,16 @@ $result = mysqli_query($con, $query);
                         $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
-                        // Format contact number with (0)+ prefix
-                        $contact = "0" . $row['contact'];
-
                         echo "<tr>
                     <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                    <td>{$contact}</td>
+                    <td>{$row['contact']}</td>
                     <td>{$dateToDisplay}</td>
                     <td>{$timeToDisplay}</td>
                     <td>{$modified_date}</td>
                     <td>{$modified_time}</td>
                     <td>{$row['service_name']}</td>
                     <td>
-                        <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$contact}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                        <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
                         style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>

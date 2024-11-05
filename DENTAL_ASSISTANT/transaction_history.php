@@ -308,17 +308,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                     // Format time to HH:MM AM/PM
                     $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
 
-                    $contact = "0" . $row['contact'];
-
+                    $bill = "₱" . $row['bill'];
+                    $change_amount = "₱" . $row['change_amount'];
+                    $outstanding_balance = "₱" . $row['outstanding_balance'];
                     echo "<tr>
                             <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                            <td>{$contact}</td>
+                            <td>{$row['contact']}</td>
                             <td>{$row['service_name']}</td>
                             <td>{$dateToDisplay}</td>
                             <td>{$timeToDisplayFormatted}</td>
-                            <td>{$row['bill']}</td>
-                            <td>{$row['change_amount']}</td>
-                            <td>{$row['outstanding_balance']}</td>
+                            <td>{$bill}</td>
+                            <td>{$change_amount}</td>
+                            <td>{$outstanding_balance}</td>
                             <td>
                                     <button type='button' onclick='openModal2({$row['id']}, \"{$row['contact']}\", \"{$row['service_name']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['bill']}\", \"{$row['change_amount']}\", \"{$row['outstanding_balance']}\")' 
                                     style='background-color: blue; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
