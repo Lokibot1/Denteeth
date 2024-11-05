@@ -127,93 +127,93 @@ if (isset($_POST['update'])) {
       <li><a href="#Contact_Us"> Contact Us</a></li>
     </ul>
   </nav>
-  <div class="popup-overlay" id="termsPopup">
+  <div class="popup-overlay" id="termsPopup" style="display: none;"> <!-- Initially hidden -->
     <div class="popup">
-      <div class="popup-header">
-        <h2>Terms and Conditions</h2>
-        <button class="close-btn" id="closePopup">&times;</button>
-      </div>
-      <div class="popup-content">
-        <p>
-          Welcome to <strong>EHM Dental Clinic</strong>. By using our website, you agree to comply with and be bound by
-          the following terms and conditions. Please read them carefully before using our services.
-          <br> <br>
-          <strong>1. Acceptance of Terms</strong><br>
-          By accessing and using our website, you confirm that you accept these Terms and Conditions in full. If you
-          disagree with these terms, please do not use our website or book any appointments through it.
-          <br><br>
-          <strong>2. Use of Website</strong><br>
-          The information provided on this website is for general purposes only and does not constitute medical advice.
-          To book appointments, users must be 18 years or older, and minors must have a parent or guardian's consent.
-          Unauthorized use of this website may result in claims for damages and/or criminal offenses.
-          <br><br>
-          <strong>3. Appointment Booking and Cancellation Policy</strong><br>
-          Appointments are subject to availability and confirmation by the clinic. Users are responsible for providing
-          accurate information when booking.
-          Rescheduling or Cancellation of your appointment by contacting our clinic directly via phone. Appointments
-          must be canceled or rescheduled at least 24 hours in advance.
-          <br><br>
-          <strong>4. Patient Responsibility</strong><br>
-          Patients must provide accurate medical information and follow post-treatment care instructions.
-          It is the patient’s responsibility to follow all post-treatment care instructions provided by the dentist.
-          <br><br>
-          <strong>5. Privacy and Data Protection</strong><br>
-          We Collect Personal Information Collection.
-          We do not share your personal information with third parties except where required by law or necessary to
-          provide the service.
-          In order to schedule an appointment, we collect the following personal information:
-          <br>Full Name: <br>Contact Number: <br>Email Address:
-          <br><br>
-          <strong>6. Payment Terms</strong><br>
-          Payments must follow clinic policies. Some treatments may require advance payment or deposits.
-          <br><br>
-          <strong>7. Limitation of Liability</strong><br>
-          While we strive to provide accurate information on our website, we do not guarantee the availability of
-          appointment slots or the accuracy of any scheduling information provided online.
-          The clinic reserves the right to cancel or reschedule appointments with prior notice under unavoidable
-          circumstances (e.g., staff unavailability or emergencies) <br><br>
-          <strong>8. Data Security</strong><br>
-          We are committed to ensuring that your personal information is secure. We implement appropriate technical and
-          organizational measures to protect your data from unauthorized access, disclosure, or loss.
-          However, we cannot guarantee the security of information transmitted over the internet and you acknowledge
-          that any transmission of personal information is at your own risk.
-          <br><br>
-          <strong>9. Changes to Terms and Condition</strong><br>
-          The clinic reserves the right to update or modify these terms at any time. Changes will be effective
-          immediately upon posting on the website.
-          It is the user’s responsibility to review these terms regularly to stay informed of any updates. <br><br>
-          <strong>10. Intellectual Property Rights</strong><br>
-          All content on this website, including text, images, logos, and trademarks, is the property of the
-          <strong>Group 4 of QCU SBIT - 2I  2024</strong>and protected by copyright laws.
-          You may not reproduce or redistribute any content without prior written permission from the clinic, and to the
-          stated owners above. <br> <br>
-          <strong>11. Governing Law</strong><br>
-          These terms and conditions are governed by and constructed in accordance with the laws of the Philippines, and
-          you irrevocably submit to the exclusive jurisdiction of the courts in our country.
-          <br><br><strong>12. Contact Information of the Clinic</strong><br>
-          Phone: 09088975285 | Telephone: 87030319 | Address: 191 Kaingin Rd, Quezon City, 1100 Metro Manila
-        </p>
-      </div>
-      <div class="popup-buttons">
-        <button id="declineBtn" class="btn decline-btn">Decline</button>
-        <button id="acceptBtn" class="btn accept-btn">Accept</button>
-      </div>
+        <div class="popup-header">
+            <h2>Terms and Conditions</h2>
+            <button class="close-btn" id="closePopup">&times;</button>
+        </div>
+        <div class="popup-content">
+            <p>
+                Welcome to <strong>EHM Dental Clinic</strong>. By using our website, you agree to comply with and be bound by
+                the following terms and conditions. Please read them carefully before using our services.
+            </p>
+            <p><strong>1. Acceptance of Terms</strong><br>
+                By accessing and using our website, you confirm that you accept these Terms and Conditions in full. If you
+                disagree with these terms, please do not use our website or book any appointments through it.
+            </p>
+            <p><strong>2. Use of Website</strong><br>
+                The information provided on this website is for general purposes only and does not constitute medical advice.
+                Users must be 18 years or older to book appointments, and minors must have a parent or guardian's consent.
+                Unauthorized use of this website may result in claims for damages and/or criminal offenses.
+            </p>
+            <p><strong>3. Appointment Booking and Cancellation Policy</strong><br>
+                Appointments are subject to availability and confirmation by the clinic. Users are responsible for providing
+                accurate information when booking. Rescheduling or cancellation of your appointment must be done by contacting
+                our clinic directly via phone. Appointments must be canceled or rescheduled at least 24 hours in advance.
+            </p>
+            <p><strong>4. Patient Responsibility</strong><br>
+                Patients must provide accurate medical information and follow all post-treatment care instructions.
+                It is the patient’s responsibility to adhere to all instructions provided by the dentist.
+            </p>
+            <p><strong>5. Privacy and Data Protection</strong><br>
+                We collect personal information necessary to schedule appointments. We do not share your personal information with third parties except where required by law or necessary to provide the service.
+                In order to schedule an appointment, we collect the following personal information: 
+                <br>Full Name: 
+                <br>Contact Number: 
+                <br>Email Address:
+            </p>
+            <p><strong>6. Payment Terms</strong><br>
+                Payments must follow clinic policies. Some treatments may require advance payment or deposits.
+            </p>
+            <p><strong>7. Limitation of Liability</strong><br>
+                While we strive to provide accurate information on our website, we do not guarantee the availability of
+                appointment slots or the accuracy of any scheduling information provided online. The clinic reserves the right to cancel or reschedule appointments with prior notice under unavoidable
+                circumstances (e.g., staff unavailability or emergencies).
+            </p>
+            <p><strong>8. Data Security</strong><br>
+                We are committed to ensuring that your personal information is secure. We implement appropriate technical and
+                organizational measures to protect your data from unauthorized access, disclosure, or loss. However, we cannot guarantee the security of information transmitted over the internet; you acknowledge that any transmission of personal information is at your own risk.
+            </p>
+            <p><strong>9. Changes to Terms and Conditions</strong><br>
+                The clinic reserves the right to update or modify these terms at any time. Changes will be effective
+                immediately upon posting on the website. It is the user’s responsibility to review these terms regularly to stay informed of any updates.
+            </p>
+            <p><strong>10. Intellectual Property Rights</strong><br>
+                All content on this website, including text, images, logos, and trademarks, is the property of
+                <strong>Group 4 of QCU SBIT - 2I 2024</strong> and is protected by copyright laws. You may not reproduce or redistribute any content without prior written permission from the clinic and the stated owners.
+            </p>
+            <p><strong>11. Governing Law</strong><br>
+                These terms and conditions are governed by and construed in accordance with the laws of the Philippines, and
+                you irrevocably submit to the exclusive jurisdiction of the courts in our country.
+            </p>
+            <p><strong>12. Contact Information of the Clinic</strong><br>
+                Phone: 09088975285 | Telephone: 87030319 | Address: 191 Kaingin Rd, Quezon City, 1100 Metro Manila
+            </p>
+        </div>
+        <div class="popup-buttons">
+            <button id="acceptBtn" class="btn accept-btn">Accept</button>
+        </div>
     </div>
-  </div>
+</div>
 
-  <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const popup = document.getElementById('termsPopup');
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const popup = document.getElementById('termsPopup');
+        
+        // Automatically show the popup when the page loads
+        popup.style.display = 'block'; // Show the popup
 
-      document.getElementById('acceptBtn').addEventListener('click', function () {
-        popup.style.display = 'none'; // Hide the popup on accept
-      });
+        // Hide the popup when 'Accept' button is clicked
+        document.getElementById('acceptBtn').addEventListener('click', function () {
+            popup.style.display = 'none'; // Hide the popup on accept
+        });
 
-      document.getElementById('closePopup').addEventListener('click', function () {
-        popup.style.display = 'none'; // Hide the popup on close
-      });
-    }
-  );
+        // Hide the popup when the close button is clicked
+        document.getElementById('closePopup').addEventListener('click', function () {
+            popup.style.display = 'none'; // Hide the popup on close
+        });
+    });
 </script>
 
   <div class="sidebar" id="sidebar">
