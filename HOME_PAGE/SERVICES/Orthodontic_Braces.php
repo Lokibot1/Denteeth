@@ -80,7 +80,7 @@ $con->close();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="services.css">
+  <link rel="stylesheet" href="style.css">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
     rel="stylesheet">
   <title>Services</title>
@@ -121,26 +121,21 @@ $con->close();
         <div class="modal-content">
           <span class="close" onclick="closeModal()">&times;</span>
           <form method="POST" action="">
-            <h1>Booking Details</h1><br>
-            <label for="modal-first-name">First Name:</label>
-            <input type="text" name="first_name" id="modal-first-name" required><br>
-
-            <label for="modal-last-name">Last Name:</label>
-            <input type="text" name="last_name" id="modal-last-name" required><br>
-
-            <label for="modal-middle-name">Middle Name:</label>
-            <input type="text" name="middle_name" id="modal-middle-name" required><br>
-
+            <h1>Booking Details</h1>
+            <label for="modalt-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
+            <div class="name-fields">
+            <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
+            <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
+            <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Initial" required>
+            </div>
             <label for="contact">Contact:</label>
             <input type="text" name="contact" id="modal-contact" required><br>
 
             <label for="date">Date:</label>
             <input type="date" name="date" id="modal-date" required><br>
 
-            <label for="time">Time:</label>
+            <label for="time">Time: (CLINIC HOURS 9:00 AM TO 6:00 PM)</label>
             <input type="time" name="time" id="modal-time" min="09:00" max="18:00" required>
-            <p>CLINIC HOURS 9:00 AM TO 6:00 PM</p>
-
             <label for="service_type">Type Of Service:</label>
             <select name="service_type" id="modal-service_type" required>
               <option value="">--Select Service Type--</option>

@@ -125,7 +125,6 @@ if (isset($_POST['update'])) {
       <li><a href="#Services">Services</a></li>
       <li><a href="#Appointment">Book Appointment</a></li>
       <li><a href="#Contact_Us"> Contact Us</a></li>
-      <li><a href="../login.php">Log In</a></li>
     </ul>
   </nav>
   <div class="popup-overlay" id="termsPopup">
@@ -185,7 +184,7 @@ if (isset($_POST['update'])) {
           It is the user’s responsibility to review these terms regularly to stay informed of any updates. <br><br>
           <strong>10. Intellectual Property Rights</strong><br>
           All content on this website, including text, images, logos, and trademarks, is the property of the
-          <strong>Group 4 of QCU SBIT - 2I 2024</strong>and protected by copyright laws.
+          <strong>Group 4 of QCU SBIT - 2I  2024</strong>and protected by copyright laws.
           You may not reproduce or redistribute any content without prior written permission from the clinic, and to the
           stated owners above. <br> <br>
           <strong>11. Governing Law</strong><br>
@@ -203,18 +202,19 @@ if (isset($_POST['update'])) {
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      const popup = document.getElementById('termsPopup');
-      popup.style.display = 'flex'; // Show the popup
+  document.addEventListener('DOMContentLoaded', function () {
+    const popup = document.getElementById('termsPopup');
 
       document.getElementById('acceptBtn').addEventListener('click', function () {
         popup.style.display = 'none'; // Hide the popup on accept
       });
+
       document.getElementById('closePopup').addEventListener('click', function () {
-        popup.style.display = 'none';
+        popup.style.display = 'none'; // Hide the popup on close
       });
-    });
-  </script>
+    }
+  );
+</script>
 
   <div class="sidebar" id="sidebar">
     <div class="close-btn" id="close-btn">&times;</div>
@@ -224,7 +224,6 @@ if (isset($_POST['update'])) {
       <li><a href="#Services">Services</a></li>
       <li><a href="#Appointment">Book Appointment</a></li>
       <li><a href="#Contact_Us"> Contact Us</a></li>
-      <li><a href="../login.php">Log In</a></li>
     </ul>
   </div>
   <script>
@@ -537,7 +536,7 @@ if (isset($_POST['update'])) {
           <div class="form-cont">
             <h3>BOOK AN APPOINTMENT HERE</h3>
             <div class="form">
-              <form method="POST" action="">
+              <form method="POST" action="" onsubmit="showNotification(event)">
 
             <label for="modalt-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
             <div class="name-fields">
@@ -569,7 +568,20 @@ if (isset($_POST['update'])) {
                 </select><br>
                 <input type="submit" name="update" value="BOOK">
               </form>
-              <script>
+              <div id="notification" class="notification">
+                  <p>Your appointment has been successfully booked!</p>
+                  <button onclick="closeNotification()">OK</button>
+              </div>
+
+                <script>
+                  function showNotification(event) {
+                  event.preventDefault(); 
+                  document.getElementById("notification").style.display = "block";
+                }
+
+                function closeNotification() {
+                document.getElementById("notification").style.display = "none";
+                }
                 // Set min and max date for current week
                 window.onload = function () {
                   // Get today's date
