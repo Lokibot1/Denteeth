@@ -110,8 +110,8 @@ $con->close();
 
     <div class="price-item">
       <h2>
-        - Partial dentures: ₱ <?php echo $partial_price_min; ?> - ₱ <?php echo $partial_price_max; ?><br><br>
-        - Complete dentures: ₱ <?php echo $complete_price_min; ?> - ₱ <?php echo $complete_price_max; ?>
+        - Estimated Price: ₱ <?php echo $partial_price_min; ?> - ₱ <?php echo $partial_price_max; ?><br><br>
+        - Total Amount: ₱ <?php echo $complete_price_min; ?> - ₱ <?php echo $complete_price_max; ?>
       </h2>
       <!-- Button to open the modal -->
       <button id="openModal" class="button" onclick="openModal()">Open Booking Form</button>
@@ -124,9 +124,9 @@ $con->close();
             <h1>Booking Details</h1>
             <label for="modalt-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
             <div class="name-fields">
-            <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
-            <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
-            <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Initial" required>
+              <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
+              <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
+              <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Initial" required>
             </div>
             <label for="contact">Contact:</label>
             <input type="text" name="contact" id="modal-contact" required><br>
@@ -136,21 +136,11 @@ $con->close();
 
             <label for="time">Time: (CLINIC HOURS 9:00 AM TO 6:00 PM)</label>
             <input type="time" name="time" id="modal-time" min="09:00" max="18:00" required>
+
             <label for="service_type">Type Of Service:</label>
-            <select name="service_type" id="modal-service_type" required>
-              <option value="">--Select Service Type--</option>
-              <option value="1">All Porcelain Veneers & Zirconia</option>
-              <option value="2">Crown & Bridge</option>
-              <option value="3">Dental Cleaning</option>
-              <option value="4">Dental Implants</option>
-              <option value="5">Dental Whitening</option>
-              <option value="6">Dentures</option>
-              <option value="7">Extraction</option>
-              <option value="8">Full Exam & X-Ray</option>
-              <option value="9">Orthodontic Braces</option>
-              <option value="10">Restoration</option>
-              <option value="11">Root Canal Treatment</option>
-            </select><br>
+            <input type="text" id="modal-service_type_display" value="Orthodontic Braces" disabled>
+            <input type="hidden" name="service_type" id="modal-service_type" value="9">
+            <br>
             <input type="submit" name="update" value="Save">
           </form>
         </div>
@@ -159,14 +149,35 @@ $con->close();
   </div>
 
   <script>
-    // Open the modal without any parameters
+    // Open the modal and set date restrictions for the current week
     function openModal() {
+      // Get today's date
+      const today = new Date();
+
+      // Calculate the start (today) and end (six days from today) of the current week
+      const firstDay = new Date(today);
+      const lastDay = new Date(firstDay);
+      lastDay.setDate(firstDay.getDate() + 6);
+
+      // Set min and max for the date input
+      document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
+      document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
+
+      // Open the modal
       document.getElementById('myModal').style.display = 'block';
     }
 
     // Close the modal
     function closeModal() {
       document.getElementById('myModal').style.display = 'none';
+    }
+
+    // Format date as YYYY-MM-DD
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const day = date.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
     }
 
     // Close modal when clicking outside of it
