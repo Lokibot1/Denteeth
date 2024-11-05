@@ -271,7 +271,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.name = p.id 
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
-             
+            
             $result = mysqli_query($con, $query);
             ?>
 
@@ -317,25 +317,31 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                         // Format time to HH:MM AM/PM
                         $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
 
+                        // Format prices with commas
+                        $bill = "₱" . number_format($row['bill'], 2);
+                        $change_amount = "₱" . number_format($row['change_amount'], 2);
+                        $outstanding_balance = "₱" . number_format($row['outstanding_balance'], 2);
+
                         echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$row['contact']}</td>
-                        <td>{$row['service_name']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplayFormatted}</td>
-                        <td>{$row['bill']}</td>
-                        <td>{$row['change_amount']}</td>
-                        <td>{$row['outstanding_balance']}</td>
-                        <td>
-                                <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
-                                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                                <form method='POST' action='' style='display:inline;'>
-                                    <input type='hidden' name='id' value='{$row['id']}'>
-                                    <input type='submit' name='delete' value='delete' 
-                                    style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                                </form>
-                            </td>
-            </tr>";
+                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td>{$row['contact']}</td>
+                    <td>{$row['service_name']}</td>
+                    <td>{$dateToDisplay}</td>
+                    <td>{$timeToDisplayFormatted}</td>
+                    <td>{$bill}</td>
+                    <td>{$change_amount}</td>
+                    <td>{$outstanding_balance}</td>
+                    <td>
+                        <button type='button' onclick='openModal2({$row['id']}, \"{$row['contact']}\", \"{$row['service_name']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['bill']}\", \"{$row['change_amount']}\", \"{$row['outstanding_balance']}\")' 
+                        style='background-color: blue; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+
+                        <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <input type='submit' name='delete' value='Delete' 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                        </form>
+                    </td>
+                </tr>";
                     }
                 } else {
                     echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -353,7 +359,17 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                     <label for="dropdown">Choose an option:</label>
                     <select name="dropdown" required>
                         <option value="">Select a patient</option>
-                        <?php foreach ($dropdown_options as $id => $name): ?>
+                        <?php
+                        // Filter out duplicates by name
+                        $unique_options = [];
+                        foreach ($dropdown_options as $id => $name) {
+                            if (!in_array($name, $unique_options)) {
+                                $unique_options[$id] = $name;
+                            }
+                        }
+
+                        // Generate dropdown options with unique names
+                        foreach ($unique_options as $id => $name): ?>
                             <option value="<?php echo $id; ?>"><?php echo $name; ?></option>
                         <?php endforeach; ?>
                     </select>
