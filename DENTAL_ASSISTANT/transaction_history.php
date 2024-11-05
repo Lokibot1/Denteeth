@@ -350,7 +350,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 <label for="dropdown">Choose an option:</label>
                 <select name="dropdown" required>
                     <option value="">Select a patient</option>
-                    <?php foreach ($dropdown_options as $id => $name): ?>
+                    <?php
+                    // Filter out duplicates by name
+                    $unique_options = [];
+                    foreach ($dropdown_options as $id => $name) {
+                        if (!in_array($name, $unique_options)) {
+                            $unique_options[$id] = $name;
+                        }
+                    }
+
+                    // Generate dropdown options with unique names
+                    foreach ($unique_options as $id => $name): ?>
                         <option value="<?php echo $id; ?>"><?php echo $name; ?></option>
                     <?php endforeach; ?>
                 </select>
