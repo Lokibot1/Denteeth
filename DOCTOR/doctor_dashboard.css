@@ -61,16 +61,6 @@ nav .logo:hover {
     padding: 20px;
 }
 
-.sidebar h3 {
-    font-size: 25px;
-    color: #ffff;
-    text-shadow: none;
-}
-.sidebar h3:hover{
-    color: #FF9F00;
-    text-shadow: 0px 0px 9px #FF9F00;
-    transition: color .3s, text-shadow .3s;
-}
 
 .sidebar ul {
     list-style: none;
@@ -121,7 +111,7 @@ hr {
 }
 
 li.active a {
-    color: #ffff;
+    color: #FF9F00;
     /* Example active link color */
     font-weight: bold;
 }

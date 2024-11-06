@@ -340,6 +340,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
             ?>
         </tbody>
     </table>
+    <br><br>
 
     <!-- Modal for adding new transactions -->
     <div id="transactionModal" class="modal">

@@ -329,6 +329,7 @@ $result = mysqli_query($con, $query);
                 ?>
             </tbody>
         </table>
+        <br><br>
         <!-- Edit Modal -->
         <div id="editModal" class="modal">
             <div class="modal-content">
