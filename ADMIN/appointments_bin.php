@@ -33,74 +33,82 @@ if (isset($_POST['update'])) {
 
     // Update query for tbl_appointments
     $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '1', service_type='$service_type' 
+                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
                                  WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
 
     // Execute both queries
     if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
         // Redirect to the same page after updating
-        header("Location: week.php");
+        header("Location: dental_assistant_dashboard.php");
         exit();
     } else {
         echo "Error updating record: " . mysqli_error($con);
     }
 }
 
+date_default_timezone_set('Asia/Hong_Kong');
 
-if (isset($_POST['finish'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    // Get the appointment ID from the form
+if (isset($_POST['delete'])) {
+    // Get the ID from the form data
     $id = $_POST['id'];
 
-    // Prepare the query to update the status to 'finished' using a prepared statement
-    $stmt = $con->prepare("UPDATE tbl_appointments_bin SET status=?, modified_by = '1' WHERE id=?");
-    $status = 4; // Assuming '4' represents finished
-    $stmt->bind_param("ii", $status, $id);
+    // Delete the appointment permanently from tbl_appointments_bin
+    $delete_bin_query = "DELETE FROM tbl_appointments_bin WHERE id=$id";
 
-    // Execute the query
-    if ($stmt->execute()) {
-        // Redirect back to the dashboard
-        header("Location: week.php");
+    // Execute the delete query
+    if (mysqli_query($con, $delete_bin_query)) {
+        // Redirect to the same page after deleting
+        header("Location: appointments_bin.php");
         exit();
     } else {
-        echo "Error updating status: " . $stmt->error;
+        echo "Error permanently deleting appointment record from bin: " . mysqli_error($con);
     }
-
-    $stmt->close();
 }
 
-if (isset($_POST['decline'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
 
-    // Get the appointment ID from the form
+if (isset($_POST['restore'])) {
     $id = $_POST['id'];
 
-    // Prepare the query to update the status to 'declined' directly
-    $declineQuery = "UPDATE tbl_appointments SET status = '2', modified_by = '1' WHERE id = ?";
-    $stmt = $con->prepare($declineQuery);
-    $stmt->bind_param("i", $id);
+    // Fetch the appointment data from tbl_appointments_bin
+    $bin_query = "SELECT * FROM tbl_appointments_bin WHERE id=$id";
+    $bin_result = mysqli_query($con, $bin_query);
 
-    // Execute the query
-    if ($stmt->execute()) {
-        // Redirect back to the dashboard
-        header("Location: week.php");
-        exit();
+    if ($bin_row = mysqli_fetch_assoc($bin_result)) {
+        // Prepare the data to restore
+        $name = mysqli_real_escape_string($con, $bin_row['name']);
+        $contact = mysqli_real_escape_string($con, $bin_row['contact']);
+        $date = mysqli_real_escape_string($con, $bin_row['date']);
+        $time = mysqli_real_escape_string($con, $bin_row['time']);
+        $modified_date = mysqli_real_escape_string($con, $bin_row['modified_date']);
+        $modified_time = mysqli_real_escape_string($con, $bin_row['modified_time']);
+        $service_type = mysqli_real_escape_string($con, $bin_row['service_type']);
+        $status = '1'; // Setting status to '1' as active or restored
+        $modified_by = '1'; // Assuming restored by admin with id '1'
+
+        // Insert data back into tbl_appointments
+        $restore_query = "INSERT INTO tbl_appointments (id, name, contact, date, time, modified_date, modified_time, modified_by, service_type, status)
+                          VALUES ('$id', '$name', '$contact', '$date', '$time', '$modified_date', '$modified_time', '$modified_by', '$service_type', '$status')";
+
+        if (mysqli_query($con, $restore_query)) {
+            // Delete the record from tbl_appointments_bin
+            $delete_bin_query = "DELETE FROM tbl_appointments_bin WHERE id=$id";
+            if (mysqli_query($con, $delete_bin_query)) {
+                // Redirect to refresh the page and show updated records
+                header("Location: appointments_bin.php");
+                exit();
+            } else {
+                echo "Error deleting record from bin: " . mysqli_error($con);
+            }
+        } else {
+            echo "Error restoring record: " . mysqli_error($con);
+        }
     } else {
-        echo "Error updating status: " . $stmt->error;
+        echo "No appointment found with this ID in the bin.";
     }
-
-    $stmt->close();
 }
 
 // SQL query to count total records
-$countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '3'";
+$countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '1'";
 $countResult = mysqli_query($con, $countQuery);
 $totalCount = mysqli_fetch_assoc($countResult)['total'];
 
@@ -285,7 +293,7 @@ $result = mysqli_query($con, $query);
             </div>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 20;
+            $resultsPerPage = 7;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -294,10 +302,7 @@ $result = mysqli_query($con, $query);
             $startRow = ($currentPage - 1) * $resultsPerPage;
 
             // SQL query to count total records
-            $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments_bin 
-               WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
-               OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
-               AND status = '3'";
+            $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments_bin WHERE status = '2'";
             $countResult = mysqli_query($con, $countQuery);
             $totalCount = mysqli_fetch_assoc($countResult)['total'];
             $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
@@ -305,11 +310,11 @@ $result = mysqli_query($con, $query);
             // SQL query with JOIN to fetch the limited number of records with OFFSET
             $query = "SELECT a.*, 
             s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name
+            p.first_name, p.middle_name, p.last_name 
           FROM tbl_appointments_bin a
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
-          WHERE (DATE(a.date) BETWEEN '$start_of_week' AND '$end_of_week'  OR DATE(a.modified_date) BETWEEN '$start_of_week' AND '$end_of_week' ) AND a.status = '3'
+          WHERE a.status = '2'
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
@@ -331,7 +336,6 @@ $result = mysqli_query($con, $query);
                         <?php endif; ?>
             </div>
         </div>
-        <!-- Table -->
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -339,6 +343,8 @@ $result = mysqli_query($con, $query);
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
+                    <th>Modified_Date</th>
+                    <th>Modified_Time</th>
                     <th>Type Of Service</th>
                     <th>Actions</th>
                 </tr>
@@ -347,38 +353,51 @@ $result = mysqli_query($con, $query);
                 <?php
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
-                        // Prepare data for display
-                        $dateToDisplay = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
-                        $timeToDisplay = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
-                        $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+                        // Check if modified_date and modified_time are empty or invalid
+                        $modified_date = ($row['modified_date'] != '0000-00-00' && !empty($row['modified_date'])) ? $row['modified_date'] : 'N/A';
+                        $modified_time = ($row['modified_time'] != '00:00:00' && !empty($row['modified_time'])) ? $row['modified_time'] : 'N/A';
+
+                        // Default date and time display
+                        $dateToDisplay = !empty($row['date']) ? $row['date'] : '';
+                        $timeToDisplay = !empty($row['time']) ? $row['time'] : '';
+
+                        // Format time to HH:MM AM/PM
+                        $timeToDisplayFormatted = !empty($timeToDisplay) ? date("h:i A", strtotime($timeToDisplay)) : '';
+                        $timeToDisplayFormattedd = !empty($modified_time) ? date("h:i A", strtotime($modified_time)) : '';
 
                         echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplayFormatted}</td>
-                        <td>{$row['service_name']}</td>
-                        <td>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                            <form method='POST' action='' style='display:inline;'>
-                                <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
-                                style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                            </form>";
-
-                        if ($row['status'] != 'finished') {
+                <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                <td>{$row['contact']}</td>
+                <td>{$dateToDisplay}</td>
+                <td>{$timeToDisplayFormatted}</td>
+                <td>{$modified_date}</td>
+                <td>{$timeToDisplayFormattedd}</td>
+                <td>{$row['service_name']}</td>
+                <td>
+                    <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
+                    style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                    <form method='POST' action='' style='display:inline;'>
+                        <input type='hidden' name='id' value='{$row['id']}'>
+                    </form>";
+                        if ($row['status'] != 'Restore') {
                             echo "<form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='finish' value='Finish' 
-                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                        </form>";
+                        <input type='hidden' name='id' value='{$row['id']}'>
+                        <input type='submit' name='restore' value='Restore' 
+                        style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                    </form>";
+                        }
+                        if ($row['status'] != 'Delete') {
+                            echo "<form method='POST' action='' style='display:inline;'>
+                    <input type='hidden' name='id' value='{$row['id']}'>
+                    <input type='submit' name='delete' value='Delete' 
+                    style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                </form>";
                         }
 
                         echo "</td></tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='6'>No records found</td></tr>";
+                    echo "<tr><td colspan='8'>No records found</td></tr>";
                 }
                 ?>
             </tbody>
@@ -495,6 +514,7 @@ $result = mysqli_query($con, $query);
                 }
             </script>
         </div>
+    </div>
 </body>
 
 </html>
