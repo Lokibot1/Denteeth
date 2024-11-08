@@ -444,10 +444,10 @@ if (isset($_POST['update'])) {
               <h3>OUR LOCATION</h3>
             </div>
           </div>
-        <<div class="form-cont">
+          <div class="form-cont">
   <h3>BOOK AN APPOINTMENT HERE</h3>
   <div class="form">
-    <form method="POST" action="" id="appointmentForm" onsubmit="showNotification(event)">
+    <form method="POST" action="" id="appointmentForm">
       <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
       <div class="name-fields">
         <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
@@ -475,19 +475,16 @@ if (isset($_POST['update'])) {
         <option value="10">Restoration</option>
         <option value="11">Root Canal Treatment</option>
       </select><br>
-      <button id="bookBtn" class="bookBtn">BOOK</button>
-      <div class="popup-overlay" id="termsPopup">
-  <div class="popup">
-    <div class="popup-header">
-      <h2>Terms and Conditions</h2>
-      <button class="close-btn" id="closePopup">&times;</button>
-    </div>
-    <div class="popup-content">
-    <p>
-      Welcome to <strong>EHM Dental Clinic</strong>. By using our website, you agree to comply with and be bound by
-      the following terms and conditions. Please read them carefully before using our services.
-    </p>
-    <p><strong>1. Acceptance of Terms</strong><br>
+      <button type="button" id="bookBtn" class="bookBtn">BOOK</button>
+    <!-- Terms and Conditions Popup -->
+    <div class="popup-overlay" id="termsPopup" style="display: none;">
+      <div class="popup">
+        <div class="popup-header">
+          <h2>Terms and Conditions</h2>
+          <button class="close-btn" id="closePopup">&times;</button>
+        </div>
+        <div class="popup-content">
+        <p><strong>1. Acceptance of Terms</strong><br>
       By accessing and using our website, you confirm that you accept these Terms and Conditions in full. If you
       disagree with these terms, please do not use our website or book any appointments through it.
     </p>
@@ -550,42 +547,58 @@ if (isset($_POST['update'])) {
       <strong>12. Contact Information of the Clinic</strong><br>
       Phone: 09088975285 | Telephone: 87030319 | Address: 191 Kaingin Rd, Quezon City, 1100 Metro Manila
       </p>
+        </div>
+        <div class="popup-buttons">
+        <input type="submit" name="update" value="Accept" class="bookBtn "id="acceptBtn">
+        </div>
       </div>
-    <div class="popup-buttons">
-    <input type="submit" name="update" value="Accept" class="bookBtn "id="acceptBtn">
+    </div>
+    </form>
+
+    <div id="notification" class="notification" style="display: none;">
+      <p>Your appointment has been successfully booked!</p>
+      <button onclick="closeNotification()">OK</button>
     </div>
   </div>
 </div>
 
-<div id="notification" class="notification" style="display: none;">
-  <p>Your appointment has been successfully booked!</p>
-  <button onclick="closeNotification()">OK</button>
-</div>
-    </form>
-  </div>
-</div>
 <script>
-document.getElementById('bookBtn').addEventListener('click', function(event) {
-    event.preventDefault();
-    document.getElementById('termsPopup').style.display = 'block';
-});
+  document.getElementById('bookBtn').addEventListener('click', function(event) {
+    if (validateForm()) {
+      document.getElementById('termsPopup').style.display = 'block';
+    } else {
+      alert("Please fill out all fields before booking.");
+    }
+  });
 
-document.getElementById('closePopup').addEventListener('click', function() {
+  document.getElementById('closePopup').addEventListener('click', function() {
     document.getElementById('termsPopup').style.display = 'none';
-});
+  });
 
-document.getElementById('acceptBtn').addEventListener('click', function() {
+  document.getElementById('acceptBtn').addEventListener('click', function() {
     document.getElementById('termsPopup').style.display = 'none';
     showNotification();
-});
+  });
 
-function showNotification() {
+  function showNotification() {
     document.getElementById("notification").style.display = "block";
-}
+  }
 
-function closeNotification() {
+  function closeNotification() {
     document.getElementById("notification").style.display = "none";
-}
+  }
+
+  function validateForm() {
+    const form = document.getElementById('appointmentForm');
+    const inputs = form.querySelectorAll('input[required], select[required]');
+    
+    for (const input of inputs) {
+      if (!input.value) {
+        return false; 
+      }
+    }
+    return true; 
+  }
 // Set min and max date for current week
 window.onload = function () {
 // Get today's date
