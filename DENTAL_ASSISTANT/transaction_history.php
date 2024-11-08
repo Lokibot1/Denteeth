@@ -138,8 +138,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
+        <a href="dental_assistant_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
     </nav>
-
     <aside class="sidebar">
         <ul>
             <br>

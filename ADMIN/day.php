@@ -47,7 +47,7 @@ if (isset($_POST['update'])) {
 }
 
 
-if (isset($_POST['accept'])) {
+if (isset($_POST['finish'])) {
     // Check if the connection exists
     if (!$con) {
         die("Connection failed: " . mysqli_connect_error());
@@ -57,8 +57,8 @@ if (isset($_POST['accept'])) {
     $id = $_POST['id'];
 
     // Prepare the query to update the status to 'finished' using a prepared statement
-    $stmt = $con->prepare("UPDATE tbl_appointments SET status = ?, modified_by = '1' WHERE id = ?");
-    $status = 3; // Assuming '3' represents finished
+    $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
+    $status = 4; // Assuming '4' represents finished
     $stmt->bind_param("ii", $status, $id);
 
     // Execute the query
@@ -291,7 +291,7 @@ $result = mysqli_query($con, $query);
             </div>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 20;
+            $resultsPerPage = 7;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -353,8 +353,8 @@ $result = mysqli_query($con, $query);
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         // Check if modified_date and modified_time are empty
-                        $modified_date = !'0000-00-00' && !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
-                        $modified_time = !'00:00:00' && !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+                        $modified_date = !'' && !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                        $modified_time = !'' && !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
                         $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';

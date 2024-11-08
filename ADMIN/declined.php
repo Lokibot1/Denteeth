@@ -297,7 +297,7 @@ $result = mysqli_query($con, $query);
             </div>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 20;
+            $resultsPerPage = 7;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -359,8 +359,8 @@ $result = mysqli_query($con, $query);
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         // Check if modified_date and modified_time are empty
-                        $modified_date = !'0000-00-00' && !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
-                        $modified_time = !'00:00:00' && !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+                        $modified_date = !'' && !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                        $modified_time = !'' && !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
                         $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';

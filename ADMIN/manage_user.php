@@ -258,64 +258,95 @@ if (isset($_POST['delete'])) {
                 ?>
             </div>
 
-            <div class="content-box">
-                <h2>Manage Users</h2>
-                <button id="openModalBtn" class="add-user-btn">Add New User</button>
+            <?php
+            // Set the number of results per page
+            $resultsPerPage = 6;
 
-                <!-- Modal for adding and editing users -->
-                <div id="userModal" class="modal">
-                    <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <h2 id="modalTitle">Add New User</h2>
-                        <form id="userForm" method="POST" action="">
-                            <input type="hidden" name="id" id="userId">
-                            <label>Username:</label>
-                            <input type="text" name="username" id="username" required><br>
-                            <label>Password:</label>
-                            <input type="password" name="password" id="password" required><br>
-                            <label for="role">Select Role:</label>
-                            <select id="role" name="role">
-                                <option value="">--Select Service Type--</option>
-                                <option value="1">Admin</option>
-                                <option value="2">Doctor</option>
-                                <option value="3">Dental Assistant</option>
-                            </select>
-                            <button type="submit" id="submitBtn">Add User</button>
-                        </form>
-                    </div>
+            // Get the current page number from query parameters, default to 1
+            $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+
+            // Calculate the starting row for the SQL query
+            $startRow = ($currentPage - 1) * $resultsPerPage;
+
+            // SQL query to count total records
+            $countQuery = "SELECT COUNT(*) as total FROM tbl_users";
+            $countResult = mysqli_query($con, $countQuery);
+            $totalCount = mysqli_fetch_assoc($countResult)['total'];
+            $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
+            
+            // SQL query to fetch the limited number of records with OFFSET
+            $query = "SELECT a.*, 
+                        s.role AS acc_role 
+                        FROM tbl_users a
+                        JOIN tbl_role s ON a.role = s.id
+            
+            LIMIT $resultsPerPage OFFSET $startRow";
+            $result = mysqli_query($con, $query);
+            ?>
+
+            <!-- Pagination Navigation -->
+            <div class="pagination-container">
+                <?php if ($currentPage > 1): ?>
+                    <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
+                        < </a>
+                        <?php endif; ?>
+
+                        <?php if ($currentPage < $totalPages): ?>
+                            <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">></a>
+                        <?php endif; ?>
+            </div>
+
+            <!-- Users Management Section -->
+            <h2>Manage Users</h2>
+            <button id="openModalBtn" class="add-user-btn">Add New User</button>
+
+            <!-- Modal for Adding and Editing Users -->
+            <div id="userModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 id="modalTitle">Add New User</h2>
+                    <form id="userForm" method="POST" action="">
+                        <input type="hidden" name="id" id="userId">
+                        <label>Username:</label>
+                        <input type="text" name="username" id="username" required><br>
+                        <label>Password:</label>
+                        <input type="password" name="password" id="password" required><br>
+                        <label for="role">Select Role:</label>
+                        <select id="role" name="role">
+                            <option value="">--Select Service Type--</option>
+                            <option value="1">Admin</option>
+                            <option value="2">Doctor</option>
+                            <option value="3">Dental Assistant</option>
+                        </select>
+                        <button type="submit" id="submitBtn">Add User</button>
+                    </form>
                 </div>
+            </div>
 
-                <!-- Users Table -->
-                <table>
+            <!-- Display Table -->
+                <table class="table table-bordered">
                     <tr>
                         <th>Username</th>
                         <th>Password</th>
                         <th>Role</th>
-                        <th>Actions</th>
                     </tr>
                     <?php
-                    // Fetch and display users
-                    $query = "SELECT a.*, 
-                        s.role AS acc_role 
-                        FROM tbl_users a
-                        JOIN tbl_role s ON a.role = s.id";
-                    $result = mysqli_query($con, $query);
-
+                    // Fetch and display user data
                     while ($row = mysqli_fetch_assoc($result)) {
                         echo "<tr>
-                <td>{$row['username']}</td>
-                <td>{$row['password']}</td>
-                <td>{$row['acc_role']}</td>
-                <td>
-                    <button type='button' onclick='openModal({$row['id']}, \"{$row['username']}\", \"{$row['password']}\", \"{$row['acc_role']}\")'
-                    style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                    <form method='POST' action='' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\"
-                        style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                    </form>
-                </td>
-              </tr>";
+            <td>{$row['username']}</td>
+            <td>{$row['password']}</td>
+            <td>{$row['acc_role']}</td>
+            <td>
+                <button type='button' onclick='openModal({$row['id']}, \"{$row['username']}\", \"{$row['password']}\", \"{$row['acc_role']}\")'
+                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                <form method='POST' action='' style='display:inline;'>
+                    <input type='hidden' name='id' value='{$row['id']}'>
+                    <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\"
+                    style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                </form>
+            </td>
+          </tr>";
                     }
                     ?>
                 </table>
@@ -357,7 +388,7 @@ if (isset($_POST['delete'])) {
                         }
                     }
                 </script>
-            </div>
+        </div>
 </body>
 
 </html>

@@ -42,7 +42,7 @@ if (!$con) {
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        </a>
+        <a href="dental_assistant_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
     </nav>
     <div>
         <aside class="sidebar">

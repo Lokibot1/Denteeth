@@ -53,6 +53,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stmt->close();
 }
 
+if (isset($_POST['delete'])) {
+    // Get the ID from the form data
+    $id = $_POST['id'];
+
+    // Fetch the transaction data to transfer to the bin
+    $appointment_query = "SELECT * FROM tbl_transaction_history WHERE id=$id";
+    $appointment_result = mysqli_query($con, $appointment_query);
+
+    if ($appointment_row = mysqli_fetch_assoc($appointment_result)) {
+        // Extract data to be transferred
+        $id = $_POST['id'];  // Get the ID of the record
+        $name = mysqli_real_escape_string($con, $appointment_row['name']);
+        $contact = mysqli_real_escape_string($con, $appointment_row['contact']);
+        $service_type = mysqli_real_escape_string($con, $appointment_row['service_type']);
+        $date = mysqli_real_escape_string($con, $appointment_row['date']);
+        $time = mysqli_real_escape_string($con, $appointment_row['time']);
+        $bill = mysqli_real_escape_string($con, $appointment_row['bill']);
+        $change_amount = mysqli_real_escape_string($con, $appointment_row['change_amount']);
+        $outstanding_balance = mysqli_real_escape_string($con, $appointment_row['outstanding_balance']);
+        
+        // Set the current date and time for deleted_at
+        $deleted_at = date('Y-m-d H:i:s');
+
+        // Insert into tbl_transaction_history_bin including the deleted_at field
+        $insert_bin_query = "
+            INSERT INTO tbl_transaction_history_bin (id, name, contact, service_type, date, time, bill, change_amount, outstanding_balance, deleted_at)
+            VALUES ('$id', '$name', '$contact', '$service_type', '$date', '$time', '$bill', '$change_amount', '$outstanding_balance', '$deleted_at')
+        ";
+
+        // Execute the insert query
+        if (mysqli_query($con, $insert_bin_query)) {
+            // Delete the transaction from tbl_transaction_history
+            $delete_appointment_query = "DELETE FROM tbl_transaction_history WHERE id=$id";
+
+            // Execute the delete query
+            if (mysqli_query($con, $delete_appointment_query)) {
+                // Redirect to the same page after deleting
+                header("Location: yourPage.php"); // Replace with your actual page
+                exit();
+            } else {
+                echo "Error deleting transaction record: " . mysqli_error($con);
+            }
+        } else {
+            echo "Error transferring transaction record to bin: " . mysqli_error($con);
+        }
+    } else {
+        echo "No transaction found with this ID.";
+    }
+}
+
 // Clear the form submitted flag after page reload
 if (isset($_SESSION['form_submitted'])) {
     unset($_SESSION['form_submitted']);
@@ -249,7 +299,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
             <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 20;
+            $resultsPerPage = 6;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;

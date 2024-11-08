@@ -238,12 +238,9 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
-
-            <h2>Transaction History</h2>
-            <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 20;
+            $resultsPerPage = 8;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -305,23 +302,20 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         // Check if modified_date and modified_time are empty
-                        $dateToDisplay = !empty($row['date']) ? $row['date'] : $row['date'];
-                        $timeToDisplay = !empty($row['time']) ? $row['time'] : $row['time'];
-
-                        // Format time to HH:MM AM/PM
-                        $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+                        $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
+                        $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                         echo "<tr>
                         <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
                         <td>{$row['service_name']}</td>
                         <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplayFormatted}</td>
+                        <td>{$timeToDisplay}</td>
                         <td>{$row['bill']}</td>
                         <td>{$row['change_amount']}</td>
                         <td>{$row['outstanding_balance']}</td>
                         <td>
-                                <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
+                                <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$row['date']}\", \"{$row['time']}\", \"{$row['service_name']}\")' 
                                 style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
                                 <form method='POST' action='' style='display:inline;'>
                                     <input type='hidden' name='id' value='{$row['id']}'>
