@@ -234,7 +234,7 @@ $result = mysqli_query($con, $query);
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 20;
+            $resultsPerPage = 7;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
