@@ -318,8 +318,8 @@ $result = mysqli_query($con, $query);
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         // Check if modified_date and modified_time are empty
-                        $modified_date = !'' &&!empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
-                        $modified_time = !'' &&!empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+                        $modified_date = !'' && !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                        $modified_time = !'' && !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
                         $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
@@ -381,8 +381,8 @@ $result = mysqli_query($con, $query);
                     <input type="text" name="middle_name" id="modal-middle-name" required>
                     <br>
                     <label for="contact">Contact:</label>
-                    <input type="text" name="contact" id="modal-contact" required>
-                    <br>
+                    <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
+                        maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
                     <label for="date">Date:</label>
                     <input type="date" name="modified_date" id="modal-modified_date" required>
                     <br>
