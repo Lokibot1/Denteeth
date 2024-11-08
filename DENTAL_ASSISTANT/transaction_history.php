@@ -240,7 +240,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 
         <?php
         // Set the number of results per page
-        $resultsPerPage = 20;
+        $resultsPerPage = 6;
 
         // Get the current page number from query parameters, default to 1
         $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -367,8 +367,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 </select>
                 <br>
                 <label for="modal-contact">Contact:</label>
-                <input type="text" name="contact" id="modal-contact" required>
-                <br>
+                <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
+                    maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
                 <label for="service_type">Type Of Service:</label>
                 <select name="service_type" id="modal-service_type" required>
                     <option value="">--Select Service Type--</option>
