@@ -91,7 +91,7 @@ $con->close();
 
 <body>
   <nav>
-  <a href="../Home_page.php#Services">
+    <a href="../Home_page.php#Services">
       <div class="logo">
         <h1>EHM Dental Clinic</h1>
       </div>
@@ -128,7 +128,8 @@ $con->close();
               <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Initial" required>
             </div>
             <label for="contact">Contact:</label>
-            <input type="text" name="contact" id="modal-contact" required><br>
+            <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number" maxlength="11"
+              required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
 
             <label for="date">Date:</label>
             <input type="date" name="date" id="modal-date" required><br>

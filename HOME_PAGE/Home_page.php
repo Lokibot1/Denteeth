@@ -444,10 +444,10 @@ if (isset($_POST['update'])) {
               <h3>OUR LOCATION</h3>
             </div>
           </div>
-          <<div class="form-cont">
+          <div class="form-cont">
             <h3>BOOK AN APPOINTMENT HERE</h3>
             <div class="form">
-              <form method="POST" action="" id="appointmentForm" onsubmit="showNotification(event)">
+              <form method="POST" action="" id="appointmentForm">
                 <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
                 <div class="name-fields">
                   <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
@@ -477,19 +477,15 @@ if (isset($_POST['update'])) {
                   <option value="10">Restoration</option>
                   <option value="11">Root Canal Treatment</option>
                 </select><br>
-                <button id="bookBtn" class="bookBtn">BOOK</button>
-                <div class="popup-overlay" id="termsPopup">
+                <button type="button" id="bookBtn" class="bookBtn">BOOK</button>
+                <!-- Terms and Conditions Popup -->
+                <div class="popup-overlay" id="termsPopup" style="display: none;">
                   <div class="popup">
                     <div class="popup-header">
                       <h2>Terms and Conditions</h2>
                       <button class="close-btn" id="closePopup">&times;</button>
                     </div>
                     <div class="popup-content">
-                      <p>
-                        Welcome to <strong>EHM Dental Clinic</strong>. By using our website, you agree to comply with
-                        and be bound by
-                        the following terms and conditions. Please read them carefully before using our services.
-                      </p>
                       <p><strong>1. Acceptance of Terms</strong><br>
                         By accessing and using our website, you confirm that you accept these Terms and Conditions in
                         full. If you
@@ -579,69 +575,85 @@ if (isset($_POST['update'])) {
                     </div>
                   </div>
                 </div>
-
-                <div id="notification" class="notification" style="display: none;">
-                  <p>Your appointment has been successfully booked!</p>
-                  <button onclick="closeNotification()">OK</button>
-                </div>
               </form>
+
+              <div id="notification" class="notification" style="display: none;">
+                <p>Your appointment has been successfully booked!</p>
+                <button onclick="closeNotification()">OK</button>
+              </div>
             </div>
+          </div>
+
+          <script>
+            document.getElementById('bookBtn').addEventListener('click', function (event) {
+              if (validateForm()) {
+                document.getElementById('termsPopup').style.display = 'block';
+              } else {
+                alert("Please fill out all fields before booking.");
+              }
+            });
+
+            document.getElementById('closePopup').addEventListener('click', function () {
+              document.getElementById('termsPopup').style.display = 'none';
+            });
+
+            document.getElementById('acceptBtn').addEventListener('click', function () {
+              document.getElementById('termsPopup').style.display = 'none';
+              showNotification();
+            });
+
+            function showNotification() {
+              document.getElementById("notification").style.display = "block";
+            }
+
+            function closeNotification() {
+              document.getElementById("notification").style.display = "none";
+            }
+
+            function validateForm() {
+              const form = document.getElementById('appointmentForm');
+              const inputs = form.querySelectorAll('input[required], select[required]');
+
+              for (const input of inputs) {
+                if (!input.value) {
+                  return false;
+                }
+              }
+              return true;
+            }
+            // Set min and max date for current week
+            window.onload = function () {
+              // Get today's date
+              const today = new Date();
+              // Calculate the start (today) and end (six days from today) of the current week
+              const firstDay = new Date(today); // Start of the week (today)
+              const lastDay = new Date(firstDay);
+              lastDay.setDate(firstDay.getDate() + 6); // End of the week (six days from today)
+              // Set min and max for the date input
+              document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
+              document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
+              // Format date as YYYY-MM-DD
+              function formatDate(date) {
+                const year = date.getFullYear();
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                return `${year}-${month}-${day}`;
+              }
+              // Display the moving week in a console or a designated HTML element
+              const weekDays = [];
+              for (let i = 0; i < 7; i++) {
+                const currentDay = new Date(firstDay);
+                currentDay.setDate(firstDay.getDate() + i); // Get each day of the week
+                weekDays.push(formatDate(currentDay)); // Format and add to array
+              }
+              // Set min and max time dynamically
+              document.getElementById('modal-time').setAttribute('min', '09:00');
+              document.getElementById('modal-time').setAttribute('max', '18:00');
+              // Example output: Display the moving week in the console
+              console.log(weekDays.join(' ')); // You can also display this in the UI instead
+            }
+          </script>
         </div>
-        <script>
-          document.getElementById('bookBtn').addEventListener('click', function (event) {
-            event.preventDefault();
-            document.getElementById('termsPopup').style.display = 'block';
-          });
-
-          document.getElementById('closePopup').addEventListener('click', function () {
-            document.getElementById('termsPopup').style.display = 'none';
-          });
-
-          document.getElementById('acceptBtn').addEventListener('click', function () {
-            document.getElementById('termsPopup').style.display = 'none';
-            showNotification();
-          });
-
-          function showNotification() {
-            document.getElementById("notification").style.display = "block";
-          }
-
-          function closeNotification() {
-            document.getElementById("notification").style.display = "none";
-          }
-          // Set min and max date for current week
-          window.onload = function () {
-            // Get today's date
-            const today = new Date();
-            // Calculate the start (today) and end (six days from today) of the current week
-            const firstDay = new Date(today); // Start of the week (today)
-            const lastDay = new Date(firstDay);
-            lastDay.setDate(firstDay.getDate() + 6); // End of the week (six days from today)
-            // Set min and max for the date input
-            document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
-            document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
-            // Format date as YYYY-MM-DD
-            function formatDate(date) {
-              const year = date.getFullYear();
-              const month = (date.getMonth() + 1).toString().padStart(2, '0');
-              const day = date.getDate().toString().padStart(2, '0');
-              return `${year}-${month}-${day}`;
-            }
-            // Display the moving week in a console or a designated HTML element
-            const weekDays = [];
-            for (let i = 0; i < 7; i++) {
-              const currentDay = new Date(firstDay);
-              currentDay.setDate(firstDay.getDate() + i); // Get each day of the week
-              weekDays.push(formatDate(currentDay)); // Format and add to array
-            }
-            // Set min and max time dynamically
-            document.getElementById('modal-time').setAttribute('min', '09:00');
-            document.getElementById('modal-time').setAttribute('max', '18:00');
-            // Example output: Display the moving week in the console
-            console.log(weekDays.join(' ')); // You can also display this in the UI instead
-          }
-        </script>
-    </div>
     </div>
     </center>
     </div>
