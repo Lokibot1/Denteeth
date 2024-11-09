@@ -50,6 +50,19 @@ nav .logo:hover {
     background-color: #ff0000;
 }
 
+.trash {
+    width: 100px;
+    height: 40px;
+    font-size: 30px;
+    font-weight: bold;
+    float: right;
+    margin: -54px 80px;
+    color: white;
+    cursor: pointer;
+    border: #ff0000;
+    transition: transform 0.3s;
+}
+
 /* Sidebar */
 .sidebar {
     position: fixed;
@@ -359,17 +372,4 @@ textarea {
 .close {
     float: right;
     cursor: pointer;
-}
-
-.trash {
-    width: 100px;
-    height: 40px;
-    font-size: 30px;
-    font-weight: bold;
-    float: right;
-    margin: -54px 80px;
-    color: white;
-    cursor: pointer;
-    border: #ff0000;
-    transition: transform 0.3s;
 }

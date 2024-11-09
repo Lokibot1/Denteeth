@@ -39,10 +39,11 @@ if (!$con) {
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
         </a>
+        <a href="admin_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        <a href="dental_assistant_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
+        
     </nav>
     <div>
         <aside class="sidebar">

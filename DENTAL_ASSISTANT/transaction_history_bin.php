@@ -264,8 +264,9 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                         <?php endif; ?>
             </div>
         </div>
+        <br><br>
         <!-- Table -->
-        <table class="table table-bordered centered-table">
+        <table>
             <thead>
                 <tr>
                     <th>Name</th>
