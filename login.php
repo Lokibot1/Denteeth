@@ -1,5 +1,7 @@
 <?php
 session_start();
+$error_message = '';
+$username_value = '';
 
 include("dbcon.php");
 // Check connection
@@ -29,21 +31,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Redirect based on role
             if ($role == '2') {
                 header("Location: DOCTOR/doctor_dashboard.php");
-            } else if ($role == '3') {
+            } elseif ($role == '3') {
                 header("Location: DENTAL_ASSISTANT/dental_assistant_dashboard.php");
-            } else if ($role == "1") {
+            } elseif ($role == "1") {
                 header("Location: ADMIN/admin_dashboard.php");
             }
             exit();
         } else {
-            echo "Invalid password.";
+            $error_message = "Invalid username or password.";
         }
-    } else {
-        echo "No user found with this username.";
-    }
 
     $stmt->close();
     $con->close();
+    }
 }
 ?>
 
@@ -75,23 +75,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h1>EHM Dental Clinic</h1>
         </div>
     </a>
-    <a id="back" href="../login.php">
-        →
-    </a>
 </nav>
 
 <center>
-    <div class="login">
-        <div class="form">
-            <h1>LOG IN</h1>
-            <form action="login.php" method="POST">
-                <label for="username"></label>
-                <input type="text" id="username" name="username" placeholder="Username" required><br><br>
-                <label for="password"></label>
-                <input type="password" id="password" name="password" placeholder="Password" required><br><br>
-                <button type="submit">SIGN IN</button>
-            </form>
-        </div>
+<div class="login">
+    <div class="form">
+        <h1>LOG IN</h1>
+        <form action="login.php" method="POST" oninput="hideErrorMessage()">
+            <label for="username"></label>
+            <input type="text" id="username" name="username" placeholder="Username" required><br><br>
+            <label for="password"></label>
+            <input type="password" id="password" name="password" placeholder="Password" required><br><br>
+
+            <?php if (!empty($error_message)): ?>
+                <p id="error-message" style="color: red; margin-bottom: 30px;"><?php echo $error_message; ?></p>
+            <?php endif; ?>
+
+            <button type="submit">SIGN IN</button>
+        </form>
+    </div>
+
+    <script>
+    function hideErrorMessage() {
+    const errorMessage = document.getElementById('error-message');
+    if (errorMessage) {
+        errorMessage.style.display = 'none';
+    }
+}
+
+    window.onload = function() {
+    const errorMessage = document.getElementById('error-message');
+    if (errorMessage) {
+        errorMessage.style.display = 'block';
+    }
+};
+
+</script>
 
         <div id="s-bx">
             <div class="blk">
