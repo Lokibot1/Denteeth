@@ -46,6 +46,60 @@ if (isset($_POST['update'])) {
     }
 }
 
+if (isset($_POST['submit'])) {
+    // Get and sanitize the posted data
+    $id = intval($_POST['id']); // Get the appointment ID
+    $recommendation = mysqli_real_escape_string($con, $_POST['recommendation']);
+    $price = floatval($_POST['price']); // Get the price
+
+    // Fetch appointment details from the database
+    $fetch_query = "SELECT * FROM tbl_appointments WHERE id = $id";
+    $result = mysqli_query($con, $fetch_query);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $appointment = mysqli_fetch_assoc($result);
+
+        // Insert the appointment data into the tbl_archives table
+        $archive_query = "INSERT INTO tbl_archives (name, contact, date, time, modified_date, modified_time, service_type, recommendation, price, status)
+                          VALUES ('{$appointment['name']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['modified_date']}', '{$appointment['modified_time']}', '{$appointment['service_type']}', '{$recommendation}', '{$price}', '1')";
+
+        if (!mysqli_query($con, $archive_query)) {
+            die("Error inserting into tbl_archives: " . mysqli_error($con));
+        }
+
+        // Update the appointment status to 'finished' in tbl_appointments
+        $update_status_query = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
+        if (!mysqli_query($con, $update_status_query)) {
+            die("Error updating appointment status: " . mysqli_error($con));
+        }
+
+        // Handle additional services using the new connection
+        if (isset($_POST['additional_services'])) {
+            $additional_services_ids = array_map('intval', $_POST['additional_services']); // Sanitize input
+            $values = [];
+
+            // Prepare the values for the insert query
+            foreach ($additional_services_ids as $service_id) {
+                $values[] = "($service_id)"; // Prepare each value for insertion
+            }
+
+            // Create the insert query for additional services
+            if (!empty($values)) {
+                $insert_additional_service_query = "INSERT INTO tbl_additional_service_types (additional_service_type_1) VALUES " . implode(',', $values);
+
+                if (!mysqli_query($additional_services_con, $insert_additional_service_query)) {
+                    die("Error inserting additional services: " . mysqli_error($additional_services_con));
+                }
+            }
+        }
+
+        // Redirect back to appointments page
+        header("Location: appointments.php");
+        exit();
+    } else {
+        die("Appointment not found.");
+    }
+}
 
 if (isset($_POST['finish'])) {
     // Check if the connection exists
@@ -133,16 +187,15 @@ $result = mysqli_query($con, $query);
         <aside class="sidebar">
             <ul>
                 <br>
-                <a class="active" href="doctor_dashboard.php">
+                <a href="doctor_dashboard.php">
                     <h3>DOCTOR <br>DASHBOARD</h3>
                 </a>
                 <br>
                 <br>
                 <hr>
                 <br>
-                <li><a href="day.php">Appointment for the day</a></li>
-                <li><a href="week.php">Appointment for the week</a></li>
-                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
+                <li><a href="week.php">Appointment for the next week</a></li>
                 <li><a href="services.php">Services</a></li>
             </ul>
         </aside>
@@ -256,6 +309,7 @@ $result = mysqli_query($con, $query);
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
           WHERE a.status = '3'
+          ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
@@ -305,23 +359,22 @@ $result = mysqli_query($con, $query);
                         <td>{$timeToDisplayFormatted}</td>
                         <td>{$row['service_name']}</td>
                         <td>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplayFormatted}\", \"{$row['service_name']}\")' 
+                            <!-- Update Button -->
+                            <button type='button' onclick='openUpdateModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
                             style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+
+                            <!-- Decline Button -->
                             <form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                                 <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
                                 style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                            </form>";
+                            </form>
 
-                        if ($row['status'] != 'finished') {
-                            echo "<form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='finish' value='Finish' 
-                            style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                        </form>";
-                        }
-
-                        echo "</td></tr>";
+                            <!-- Finish Button -->
+                            <button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Finish</button>
+                        </td>
+                    </tr>";
                     }
                 } else {
                     echo "<tr><td colspan='6'>No records found</td></tr>";
@@ -330,6 +383,122 @@ $result = mysqli_query($con, $query);
             </tbody>
         </table>
         <br><br>
+
+        <!-- Modal Structure -->
+        <div id="finishModal" class="modal" style="display: none;">
+            <div class="modal-content"
+                style="width: 500px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+                <span class="close" style="float: right; cursor: pointer; " onclick="closeModal()">&times;</span>
+                <h3 style="text-align: center;">Service Completion</h3>
+                <hr>
+                <!-- Display Selected Information -->
+                <div id="modalDetails">
+                    <p><strong>Name:</strong> <span id="modalName"></span></p>
+                    <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
+                    <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
+                    <p><strong>Current Service:</strong> <span id="modalService"></span></p>
+                </div>
+                <hr>
+                <button id="addServiceButton" onclick="addServiceDropdown()">Add More Services</button>
+                <div id="servicesContainer"></div>
+                <form id="newServiceForm" method="POST" action="">
+                    <input type="hidden" name="id" value="">
+                    <label for="recommendation">Recommendation:</label>
+                    <textarea id="recommendation" name="recommendation"
+                        placeholder="Enter your recommendation here..."></textarea>
+                    <div id="totalPriceContainer">
+                        <p><strong>Total Price: ₱</strong><span id="totalPrice">0</span></p>
+                    </div>
+                    <input type="number" id="price" name="price" style="display: none;" readonly>
+                    <button type="submit" name="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- JavaScript for Modal and Dropdown -->
+        <script>
+            let totalPrice = 0; // Track the total price of selected services
+            const servicePrices = {
+                1: 30000, 2: 30000, 3: 2000, 4: 100000, 5: 20000,
+                6: 30000, 7: 1500, 8: 2000, 9: 280000, 10: 40000, 11: 40000
+            };
+
+            function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
+                // Populate modal details
+                document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
+                document.getElementById('modalContact').innerText = contact;
+                document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
+                document.getElementById('modalService').innerText = service;
+
+                const serviceId = getServiceIdFromName(service);
+                const servicePrice = servicePrices[serviceId] || 0;
+                document.getElementById('price').value = servicePrice;
+                totalPrice += servicePrice;
+                document.getElementById('totalPrice').innerText = totalPrice;
+
+                // Set the hidden input value for ID
+                document.querySelector("#newServiceForm input[name='id']").value = id;
+
+                document.getElementById('finishModal').style.display = 'block';
+            }
+
+            function closeModal() {
+                document.getElementById('finishModal').style.display = 'none';
+            }
+
+            function getServiceIdFromName(serviceName) {
+                const services = {
+                    "All Porcelain Veneers & Zirconia": 1,
+                    "Crown & Bridge": 2,
+                    "Dental Cleaning": 3,
+                    "Dental Implants": 4,
+                    "Dental Whitening": 5,
+                    "Dentures": 6,
+                    "Extraction": 7,
+                    "Full Exam & X-Ray": 8,
+                    "Orthodontic Braces": 9,
+                    "Restoration": 10,
+                    "Root Canal Treatment": 11
+                };
+                return services[serviceName] || null;
+            }
+
+            function addServiceDropdown() {
+                const servicesContainer = document.getElementById('servicesContainer');
+                const newServiceDiv = document.createElement('div');
+                const serviceSelect = document.createElement('select');
+                const services = [
+                    { value: 1, label: "All Porcelain Veneers & Zirconia" },
+                    { value: 2, label: "Crown & Bridge" },
+                    { value: 3, label: "Dental Cleaning" },
+                    { value: 4, label: "Dental Implants" },
+                    { value: 5, label: "Dental Whitening" },
+                    { value: 6, label: "Dentures" },
+                    { value: 7, label: "Extraction" },
+                    { value: 8, label: "Full Exam & X-Ray" },
+                    { value: 9, label: "Orthodontic Braces" },
+                    { value: 10, label: "Restoration" },
+                    { value: 11, label: "Root Canal Treatment" }
+                ];
+
+                services.forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.value;
+                    option.innerText = service.label;
+                    serviceSelect.appendChild(option);
+                });
+
+                serviceSelect.addEventListener('change', function () {
+                    const serviceId = parseInt(this.value);
+                    const servicePrice = servicePrices[serviceId];
+                    totalPrice += servicePrice;
+                    document.getElementById('totalPrice').innerText = totalPrice;
+                });
+
+                newServiceDiv.appendChild(serviceSelect);
+                servicesContainer.appendChild(newServiceDiv);
+            }
+        </script>
         <!-- Edit Modal -->
         <div id="editModal" class="modal">
             <div class="modal-content">
@@ -378,6 +547,7 @@ $result = mysqli_query($con, $query);
                     <input type="submit" name="update" value="Save">
                 </form>
             </div>
+
             <script>
                 // Open the modal and populate it with data
                 function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {

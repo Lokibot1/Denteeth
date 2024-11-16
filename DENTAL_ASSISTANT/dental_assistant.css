@@ -79,7 +79,8 @@ nav .logo:hover {
     color: #ffff;
     text-shadow: none;
 }
-.sidebar h3:hover{
+
+.sidebar h3:hover {
     color: #FF9F00;
     text-shadow: 0px 0px 9px #FF9F00;
     transition: color .3s, text-shadow .3s;
@@ -220,14 +221,16 @@ textarea {
     font-size: 24px;
     float: right;
 }
-.bill-fields{
+
+.bill-fields {
     display: flex;
-    gap: 305px; 
+    gap: 305px;
     align-items: center;
 }
-.bill-inputs{
+
+.bill-inputs {
     display: flex;
-    gap: 30px; 
+    gap: 30px;
     align-items: center;
 }
 
@@ -372,4 +375,41 @@ textarea {
 .close {
     float: right;
     cursor: pointer;
+}
+
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid #ccc;
+    background-color: #f1f1f1;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    background-color: #ccc;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-top: none;
 }

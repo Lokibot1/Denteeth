@@ -72,11 +72,11 @@ if (isset($_POST['delete'])) {
         $deleted_at = date('Y-m-d H:i:s');
 
         // Insert into tbl_appointments_bin including the deleted_at field
-        $insert_bin_query = "INSERT INTO tbl_appointments_bin (id, name, contact, date, time, modified_date, modified_time, service_type, status, deleted_at)
+        $insert_archives_query = "INSERT INTO tbl_bin (id, name, contact, date, time, modified_date, modified_time, service_type, status, deleted_at)
                              VALUES ('$id', '$name', '$contact', '$date', '$time', '$modified_date', '$modified_time', '$service_type', '$status', '$deleted_at')";
 
         // Execute the insert query
-        if (mysqli_query($con, $insert_bin_query)) {
+        if (mysqli_query($con, $insert_archives_query)) {
             // Delete the appointment from tbl_appointments
             $delete_appointment_query = "DELETE FROM tbl_appointments WHERE id=$id";
 
@@ -89,7 +89,7 @@ if (isset($_POST['delete'])) {
                 echo "Error deleting appointment record: " . mysqli_error($con);
             }
         } else {
-            echo "Error transferring appointment record to bin: " . mysqli_error($con);
+            echo "Error transferring appointment record to Archives: " . mysqli_error($con);
         }
     } else {
         echo "No appointment found with this ID.";
@@ -150,13 +150,13 @@ $result = mysqli_query($con, $query);
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        <a href="dental_assistant_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
+        <a href="archives.php"><i class="fas fa-trash trash"></i></a>
     </nav>
     <div>
         <aside class="sidebar">
             <ul>
                 <br>
-                <a href="dental_assistant_dashboard.php">
+                <a class="active" href="dental_assistant_dashboard.php">
                     <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
                 </a>
                 <br>
@@ -164,10 +164,10 @@ $result = mysqli_query($con, $query);
                 <hr>
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
-                <li><a href="day.php">Appointment for the day</a></li>
-                <li><a href="week.php">Appointment for the week</a></li>
-                <li><a class="active" href="declined.php">Declined Appointment</a></li>
-                <li><a href="transaction_history.php">Transaction History</a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
+                <li><a href="week.php">Appointment for the next week</a></li>
+                <li><a href="declined.php">Declined Appointment</a></li>
+                <li><a href="billing.php">Billing Approval </a></li>
             </ul>
         </aside>
     </div>
@@ -300,6 +300,7 @@ $result = mysqli_query($con, $query);
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
           WHERE a.status = '2'
+          ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
