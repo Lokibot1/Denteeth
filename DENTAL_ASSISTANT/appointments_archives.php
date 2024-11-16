@@ -52,13 +52,13 @@ if (isset($_POST['delete'])) {
     // Get the ID from the form data
     $id = $_POST['id'];
 
-    // Delete the appointment permanently from tbl_appointments_bin
-    $delete_bin_query = "DELETE FROM tbl_appointments_bin WHERE id=$id";
+    // Delete the appointment permanently from tbl_archives
+    $delete_bin_query = "DELETE FROM tbl_archives WHERE id=$id";
 
     // Execute the delete query
     if (mysqli_query($con, $delete_bin_query)) {
         // Redirect to the same page after deleting
-        header("Location: appointments_bin.php");
+        header("Location: archives.php");
         exit();
     } else {
         echo "Error permanently deleting appointment record from bin: " . mysqli_error($con);
@@ -69,8 +69,8 @@ if (isset($_POST['delete'])) {
 if (isset($_POST['restore'])) {
     $id = $_POST['id'];
 
-    // Fetch the appointment data from tbl_appointments_bin
-    $bin_query = "SELECT * FROM tbl_appointments_bin WHERE id=$id";
+    // Fetch the appointment data from tbl_archives
+    $bin_query = "SELECT * FROM tbl_archives WHERE id=$id";
     $bin_result = mysqli_query($con, $bin_query);
 
     if ($bin_row = mysqli_fetch_assoc($bin_result)) {
@@ -90,11 +90,11 @@ if (isset($_POST['restore'])) {
                           VALUES ('$id', '$name', '$contact', '$date', '$time', '$service_type', '$status')";
 
         if (mysqli_query($con, $restore_query)) {
-            // Delete the record from tbl_appointments_bin
-            $delete_bin_query = "DELETE FROM tbl_appointments_bin WHERE id=$id";
+            // Delete the record from tbl_archives
+            $delete_bin_query = "DELETE FROM tbl_archives WHERE id=$id";
             if (mysqli_query($con, $delete_bin_query)) {
                 // Redirect to refresh the page and show updated records
-                header("Location: appointments_bin.php");
+                header("Location: archives.php");
                 exit();
             } else {
                 echo "Error deleting record from bin: " . mysqli_error($con);
@@ -152,130 +152,30 @@ $result = mysqli_query($con, $query);
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        </a>
+        <a href="dental_assistant_dashboard.php"><i class="fa fa-arrow-left trash"></i></a>
     </nav>
     <div>
         <aside class="sidebar">
             <ul>
                 <br>
-                <a class="active" href="dental_assistant_dashboard.php">
-                    <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
+                <a class="active" href="archives.php">
+                    <h3>DENTAL ASSISTANT<br>ARCHIVES</h3>
                 </a>
                 <br>
                 <br>
                 <hr>
                 <br>
-                <li><a href="appointments_bin.php">Appointments Bin</a></a></li>
-                <li><a href="transaction_history_bin.php">Transaction History Bin</a></li>
+                <li><a href="appointments_archives.php">Appointments Archives</a></a></li>
+                <li><a href="bin.php">Appointments Bin</a></li>
             </ul>
         </aside>
     </div>
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-            <div class="round-box">
-                <p>APPOINTMENT TODAY:</p>
-                <?php
-                include("../dbcon.php");
-
-                // Set the default time zone to Hong Kong
-                date_default_timezone_set('Asia/Hong_Kong');
-
-                // Check database connection
-                if (!$con) {
-                    die("Connection failed: " . mysqli_connect_error());
-                }
-
-                // Get current date
-                $today = date('Y-m-d');
-
-                // Query to count appointments for today
-                $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM tbl_appointments 
-                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
-
-
-                $result_today = mysqli_query($con, $sql_today);
-
-                // Check for SQL errors
-                if (!$result_today) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_today = mysqli_fetch_assoc($result_today);
-                $appointments_today = $row_today['total_appointments_today'];
-
-                echo $appointments_today ? $appointments_today : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM tbl_appointments 
-                                WHERE status = '1'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                echo $pending_appointments ? $pending_appointments : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
-                <p>APPOINTMENT FOR THE WEEK:</p>
-                <?php
-                // Get the start and end date of the current week
-                $start_of_week = date('Y-m-d', strtotime('monday this week'));
-                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-                // Query to count appointments for the current week
-                $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                 FROM tbl_appointments 
-                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
-                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
-                 AND status = '3'";
-
-                $result_week = mysqli_query($con, $sql_week);
-
-                // Check for SQL errors
-                if (!$result_week) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_week = mysqli_fetch_assoc($result_week);
-                $appointments_for_week = $row_week['total_appointments_week'];
-
-                echo $appointments_for_week ? $appointments_for_week : 'No data available';
-                ?>
-            </div>
-            <div class="round-box">
-                <p>DECLINED APPOINTMENTS:</p>
-                <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '2'";
-                $result_finished = mysqli_query($con, $sql_finished);
-
-                // Check for SQL errors
-                if (!$result_finished) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
-
-                echo $finished_appointments ? $finished_appointments : 'No data available';
-                ?>
-            </div>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 7;
+            $resultsPerPage = 10;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -283,38 +183,96 @@ $result = mysqli_query($con, $query);
             // Calculate the starting row for the SQL query
             $startRow = ($currentPage - 1) * $resultsPerPage;
 
-            // SQL query to count total records
-            $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments_bin WHERE status = '2'";
+            // Capture filter values from GET parameters
+            $filterName = isset($_GET['name']) ? $_GET['name'] : '';
+            $filterStatus = isset($_GET['status']) ? $_GET['status'] : '';
+            $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
+
+            // SQL query to count total records with filtering
+            $countQuery = "SELECT COUNT(*) as total FROM tbl_archives a
+               JOIN tbl_service_type s ON a.service_type = s.id
+               JOIN tbl_patient p ON a.id = p.id
+               JOIN tbl_status t ON a.status = t.id
+               WHERE a.status IN ('1', '2', '3', '4')";
+
+            // Add name filter if specified
+            if ($filterName) {
+                $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
+            }
+
+            // Add status filter if specified
+            if ($filterStatus) {
+                $countQuery .= " AND a.status = '$filterStatus'";
+            }
+
+            // Add date filter if specified
+            if ($filterDate) {
+                $countQuery .= " AND a.date = '$filterDate'";
+            }
+
             $countResult = mysqli_query($con, $countQuery);
             $totalCount = mysqli_fetch_assoc($countResult)['total'];
             $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
             
-            // SQL query with JOIN to fetch the limited number of records with OFFSET
+            // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
             s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name 
-          FROM tbl_appointments_bin a
+            p.first_name, p.middle_name, p.last_name, 
+            t.status     
+          FROM tbl_archives a
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
-          WHERE a.status = '2'
-          LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
+          JOIN tbl_status t ON a.status = t.id
+          WHERE a.status IN ('1', '2', '3', '4')";
+
+            // Add name filter if specified
+            if ($filterName) {
+                $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
+            }
+
+            // Add status filter if specified
+            if ($filterStatus) {
+                $query .= " AND a.status = '$filterStatus'";
+            }
+
+            // Add date filter if specified
+            if ($filterDate) {
+                $query .= " AND a.date = '$filterDate'";
+            }
+
+            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
-            ?>
-            <br><br>
+            ?><br><br><br><br>
 
-            <!-- HTML Table -->
+            <!-- HTML Form for Filters -->
+            <form method="GET" action="">
+                <input type="text" name="name" placeholder="Search by name"
+                    value="<?php echo htmlspecialchars($filterName); ?>" />
+
+                <select name="status">
+                    <option value="">All Statuses</option>
+                    <option value="1" <?php echo $filterStatus == '1' ? 'selected' : ''; ?>>Pending</option>
+                    <option value="2" <?php echo $filterStatus == '2' ? 'selected' : ''; ?>>Declined</option>
+                    <option value="3" <?php echo $filterStatus == '3' ? 'selected' : ''; ?>>Approved</option>
+                    <option value="4" <?php echo $filterStatus == '4' ? 'selected' : ''; ?>>Finished</option>
+                </select>
+
+                <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
+
+                <button type="submit">Filter</button>
+            </form>
+            <!-- Pagination -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
+                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
+                        class="pagination-btn">
                         < </a>
                         <?php endif; ?>
 
                         <?php if ($currentPage < $totalPages): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn"> > </a>
-                        <?php endif; ?>
-
-                        <?php if ($totalCount > 15): ?>
+                            <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
+                                class="pagination-btn"> > </a>
                         <?php endif; ?>
             </div>
         </div>
@@ -351,23 +309,7 @@ $result = mysqli_query($con, $query);
                         <td>{$modified_time}</td>
                         <td>{$row['service_name']}</td>
                 <td>
-                    </form>";
-                        if ($row['status'] != 'Restore') {
-                            echo "<form method='POST' action='' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='restore' value='Restore' 
-                        style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                    </form>";
-                        }
-                        if ($row['status'] != 'Delete') {
-                            echo "<form method='POST' action='' style='display:inline;'>
-                    <input type='hidden' name='id' value='{$row['id']}'>
-                    <input type='submit' name='delete' value='Delete' 
-                    style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                </form>";
-                        }
-
-                        echo "</td></tr>";
+                    </td></tr>";
                     }
                 } else {
                     echo "<tr><td colspan='8'>No records found</td></tr>";

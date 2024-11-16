@@ -162,16 +162,15 @@ $con->close();
         <aside class="sidebar">
             <ul>
                 <br>
-                <a class="active" href="doctor_dashboard.php">
+                <a href="doctor_dashboard.php">
                     <h3>DOCTOR <br>DASHBOARD</h3>
                 </a>
                 <br>
                 <br>
                 <hr>
                 <br>
-                <li><a href="day.php">Appointment for the day</a></li>
-                <li><a href="week.php">Appointment for the week</a></li>
-                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
+                <li><a href="week.php">Appointment for the next week</a></li>
                 <li><a href="services.php">Services</a></li>
             </ul>
         </aside>

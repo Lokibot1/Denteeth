@@ -47,7 +47,7 @@ if (isset($_POST['update'])) {
 }
 
 
-if (isset($_POST['accept'])) {
+if (isset($_POST['approve'])) {
     // Check if the connection exists
     if (!$con) {
         die("Connection failed: " . mysqli_connect_error());
@@ -127,24 +127,24 @@ $result = mysqli_query($con, $query);
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        <a href="dental_assistant_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
+        <a href="archives.php"><i class="fas fa-trash trash"></i></a>
     </nav>
     <div>
         <aside class="sidebar">
             <ul>
                 <br>
-                <a href="dental_assistant_dashboard.php">
+                <a class="active" href="dental_assistant_dashboard.php">
                     <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
                 </a>
                 <br>
                 <br>
                 <hr>
                 <br>
-                <li><a class="active" href="pending.php">Pending Appointments</a></a></li>
-                <li><a href="day.php">Appointment for the day</a></li>
-                <li><a href="week.php">Appointment for the week</a></li>
+                <li><a href="pending.php">Pending Appointments</a></a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
+                <li><a href="week.php">Appointment for the next week</a></li>
                 <li><a href="declined.php">Declined Appointment</a></li>
-                <li><a href="transaction_history.php">Transaction History</a></li>
+                <li><a href="billing.php">Billing Approval </a></li>
             </ul>
         </aside>
     </div>
@@ -276,8 +276,9 @@ $result = mysqli_query($con, $query);
           FROM tbl_appointments a
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
-          JOIN tbl_status t ON a.status = t.id
+          JOIN tbl_status t ON a.status = t.id  
           WHERE a.status = '1'
+          ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
@@ -339,10 +340,10 @@ $result = mysqli_query($con, $query);
                             <input type='hidden' name='id' value='{$row['id']}'>
                         </form>";
 
-                        if ($row['status'] != 'Accept') {
+                        if ($row['status'] != 'Approve') {
                             echo "<form method='POST' action='' style='display:inline;'>
                         <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='accept' value='Accept' 
+                        <input type='submit' name='approve' value='Approve' 
                         style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                     </form>";
                         }
