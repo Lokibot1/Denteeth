@@ -135,7 +135,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="doctor_dashboard.css">
+    <link rel="stylesheet" href="doctor.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -330,15 +330,17 @@ $result = mysqli_query($con, $query);
                             <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">></a>
                         <?php endif; ?>
             </div>
-
+            <br>
             <div class="tab">
-                <button class="tablinks" onclick="openTab(event, 'Day')">Day</button>
-                <button class="tablinks" onclick="openTab(event, 'Week')">Week</button>
+                <button class="tablinks" onclick="openTab(event, 'Day')">Today</button>
+                <button class="tablinks" onclick="openTab(event, 'Week')">This Week</button>
+                <button class="tablinks" onclick="openTab(event, 'Week')">Next Week</button>
             </div>
 
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: block;">
-                <h3>Day</h3>
+                <h3>Today</h3>
+                <br>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -396,7 +398,8 @@ $result = mysqli_query($con, $query);
 
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: none;">
-                <h3>Week</h3>
+                <h3>This Week</h3>
+                <br>
                 <table class="table table-bordered">
                     <thead>
                         <tr>

@@ -161,7 +161,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="doctor_dashboard.css">
+    <link rel="stylesheet" href="doctor.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -386,11 +386,11 @@ $result = mysqli_query($con, $query);
 
         <!-- Modal Structure -->
         <div id="finishModal" class="modal" style="display: none;">
-            <div class="modal-content"
-                style="width: 500px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-                <span class="close" style="float: right; cursor: pointer; " onclick="closeModal()">&times;</span>
-                <h3 style="text-align: center;">Service Completion</h3>
-                <hr>
+            <div class="modal-content">
+                <span class="close" style="float: right; cursor: pointer; display: block; " onclick="closeModal()">&times;</span>
+                <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
+                <br>
+                <hr> 
                 <!-- Display Selected Information -->
                 <div id="modalDetails">
                     <p><strong>Name:</strong> <span id="modalName"></span></p>
@@ -399,6 +399,7 @@ $result = mysqli_query($con, $query);
                     <p><strong>Current Service:</strong> <span id="modalService"></span></p>
                 </div>
                 <hr>
+                <br>
                 <button id="addServiceButton" onclick="addServiceDropdown()">Add More Services</button>
                 <div id="servicesContainer"></div>
                 <form id="newServiceForm" method="POST" action="">
@@ -407,10 +408,11 @@ $result = mysqli_query($con, $query);
                     <textarea id="recommendation" name="recommendation"
                         placeholder="Enter your recommendation here..."></textarea>
                     <div id="totalPriceContainer">
-                        <p><strong>Total Price: ₱</strong><span id="totalPrice">0</span></p>
+                        <p><strong>Total Price: ₱</strong><span style="font-weight: bold; font-size: 25px;" id="totalPrice">0</span></p>
+                    <br>
                     </div>
                     <input type="number" id="price" name="price" style="display: none;" readonly>
-                    <button type="submit" name="submit">Submit</button>
+                    <button type="submit" name="submit">Proceed to Dental Assistant</button>
                 </form>
             </div>
         </div>
@@ -443,6 +445,7 @@ $result = mysqli_query($con, $query);
             }
 
             function closeModal() {
+                console.log('closeModal triggered');
                 document.getElementById('finishModal').style.display = 'none';
             }
 

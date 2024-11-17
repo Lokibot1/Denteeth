@@ -426,9 +426,24 @@ if (isset($_POST['update'])) {
           </div>
         </a>
       </div>
-
     </div>
   </section>
+  <script>
+    document.querySelectorAll('.img-box a').forEach(link => {
+    link.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent immediate navigation
+        const targetUrl = this.href;
+        
+        // Add fade-out animation
+        document.getElementById('crvs-container').classList.add('fade-out');
+        
+        // Delay navigation until animation ends
+        setTimeout(() => {
+            window.location.href = targetUrl;
+        }, 500); // Adjust this to match CSS animation duration
+    });
+});
+  </script>
   <section id="Appointment">
     <div class="Appointment">
       <center>
@@ -478,7 +493,6 @@ if (isset($_POST['update'])) {
                   <option value="11">Root Canal Treatment</option>
                 </select><br>
                 <button type="button" id="bookBtn" class="bookBtn">BOOK</button>
-                
                 <!-- Terms and Conditions Popup -->
                 <div class="popup-overlay" id="termsPopup" style="display: none;">
                   <div class="popup">
@@ -522,7 +536,7 @@ if (isset($_POST['update'])) {
                         service.
                         In order to schedule an appointment, we collect the following personal information:
                         <br>Full Name:
-                        <br>Contact Number:
+                        <br>Contact Number: 
                         <br>Email Address:
                       </p>
                       <p>
@@ -578,11 +592,10 @@ if (isset($_POST['update'])) {
                 </div>
               </form>
 
-              <!--- notif ng sucessfully booked --->
               <div id="notification" class="notification" style="display: none;">
                 <p>Your appointment has been successfully booked!</p>
                 <button onclick="closeNotification()">OK</button>
-              </div>
+              </div> 
             </div>
           </div>
 

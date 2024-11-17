@@ -45,7 +45,20 @@ nav .logo:hover {
     height: 100vh;
     width: 100%;
   }
-  
+  .img-container {
+    animation: transitionIn 1.0s;
+}
+
+@keyframes transitionIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
   .container {
     width: 80%;
     margin: 0 auto;
