@@ -318,21 +318,24 @@ $result = mysqli_query($con, $query);
                 <!-- Day Pagination -->
                 <?php if ($currentPage > 1): ?>
                     <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
-                        << /a>
+                        < </a>
                         <?php endif; ?>
                         <?php if ($currentPage < $totalPagesDay): ?>
                             <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">></a>
                         <?php endif; ?>
             </div>
+            <br><br>
 
             <div class="tab">
-                <button class="tablinks" onclick="openTab(event, 'Day')">Day</button>
-                <button class="tablinks" onclick="openTab(event, 'Week')">Week</button>
+                <button class="tablinks" onclick="openTab(event, 'Day')">Today</button>
+                <button class="tablinks" onclick="openTab(event, 'Week')">This Week</button>
+                <button class="tablinks" onclick="openTab()">Next Week</button>
             </div>
 
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: block;">
                 <h3>Today</h3>
+                <br>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -380,6 +383,7 @@ $result = mysqli_query($con, $query);
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: none;">
                 <h3>This Week</h3>
+                <br>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
