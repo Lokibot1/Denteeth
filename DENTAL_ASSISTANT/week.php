@@ -300,7 +300,7 @@ $result = mysqli_query($con, $query);
             $result = mysqli_query($con, $query);
             ?>
 
-            <br><br>
+            <br><br><br>
 
             <!-- HTML Table -->
             <div class="pagination-container">
