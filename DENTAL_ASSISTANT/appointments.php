@@ -107,7 +107,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="dental.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -142,7 +142,7 @@ $result = mysqli_query($con, $query);
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
                 <li><a href="appointments.php">Approved Appointments</a></li>
-                <li><a href="week.php">Appointment for the next week</a></li>
+                <li><a href="week.php">Appointment for next week</a></li>
                 <li><a href="declined.php">Declined Appointment</a></li>
                 <li><a href="billing.php">Billing Approval </a></li>
             </ul>
@@ -332,7 +332,7 @@ $result = mysqli_query($con, $query);
 
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: block;">
-                <h3>Day</h3>
+                <h3>Today</h3>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -379,7 +379,7 @@ $result = mysqli_query($con, $query);
 
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: none;">
-                <h3>Week</h3>
+                <h3>This Week</h3>
                 <table class="table table-bordered">
                     <thead>
                         <tr>

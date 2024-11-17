@@ -478,6 +478,7 @@ if (isset($_POST['update'])) {
                   <option value="11">Root Canal Treatment</option>
                 </select><br>
                 <button type="button" id="bookBtn" class="bookBtn">BOOK</button>
+                
                 <!-- Terms and Conditions Popup -->
                 <div class="popup-overlay" id="termsPopup" style="display: none;">
                   <div class="popup">
@@ -577,6 +578,7 @@ if (isset($_POST['update'])) {
                 </div>
               </form>
 
+              <!--- notif ng sucessfully booked --->
               <div id="notification" class="notification" style="display: none;">
                 <p>Your appointment has been successfully booked!</p>
                 <button onclick="closeNotification()">OK</button>

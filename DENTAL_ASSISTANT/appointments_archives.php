@@ -132,12 +132,13 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="dental.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
     <title>Dental Assistant Dashboard</title>
 </head>
 
@@ -246,7 +247,7 @@ $result = mysqli_query($con, $query);
             ?><br><br><br><br>
 
             <!-- HTML Form for Filters -->
-            <form method="GET" action="">
+            <form method="GET" action="" class="search-form">
                 <input type="text" name="name" placeholder="Search by name"
                     value="<?php echo htmlspecialchars($filterName); ?>" />
 
@@ -260,8 +261,9 @@ $result = mysqli_query($con, $query);
 
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
 
-                <button type="submit">Filter</button>
+                <span class="material-symbols-outlined" type = "submit">search</span>
             </form>
+
             <!-- Pagination -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
@@ -275,6 +277,8 @@ $result = mysqli_query($con, $query);
                                 class="pagination-btn"> > </a>
                         <?php endif; ?>
             </div>
+            <br><br><br>
+
         </div>
         <table class="table table-bordered">
             <thead>
