@@ -165,7 +165,6 @@ $result = mysqli_query($con, $query);
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
                 <li><a href="appointments.php">Approved Appointments</a></li>
-                <li><a href="week.php">Appointment for next week</a></li>
                 <li><a href="declined.php">Declined Appointment</a></li>
                 <li><a href="billing.php">Billing Approval </a></li>
             </ul>

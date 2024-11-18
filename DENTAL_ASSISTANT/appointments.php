@@ -142,7 +142,6 @@ $result = mysqli_query($con, $query);
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
                 <li><a href="appointments.php">Approved Appointments</a></li>
-                <li><a href="week.php">Appointment for next week</a></li>
                 <li><a href="declined.php">Declined Appointment</a></li>
                 <li><a href="billing.php">Billing Approval </a></li>
             </ul>
@@ -255,7 +254,7 @@ $result = mysqli_query($con, $query);
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 7;
+            $resultsPerPage = 6;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -267,7 +266,15 @@ $result = mysqli_query($con, $query);
             $today = date('Y-m-d');
 
             // SQL query to count total records for Day
-            $countQueryDay = "SELECT COUNT(*) as total FROM tbl_appointments WHERE (DATE(date) = CURDATE() OR DATE(modified_date) = CURDATE()) AND status = '3'";
+            $countQueryDay = "SELECT COUNT(*) as total FROM tbl_appointments 
+                    WHERE (
+                     (modified_date IS NOT NULL AND 
+                    DATE(modified_date) = CURDATE()) 
+                  OR 
+                  (modified_date IS NULL AND 
+                    DATE(date) = CURDATE())
+                    )
+            AND status = '3'";
             $countResultDay = mysqli_query($con, $countQueryDay);
             $totalCountDay = mysqli_fetch_assoc($countResultDay)['total'];
             $totalPagesDay = ceil($totalCountDay / $resultsPerPage); // Calculate total pages for Day
@@ -277,23 +284,48 @@ $result = mysqli_query($con, $query);
             $end_of_week = date('Y-m-d', strtotime('next Saturday')); // Get the end of the week
             
             $countQueryWeek = "SELECT COUNT(*) as total FROM tbl_appointments 
-                    WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
-                    OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                    WHERE (
+                    (modified_date IS NOT NULL AND 
+                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
+                        )
                     AND status = '3'";
             $countResultWeek = mysqli_query($con, $countQueryWeek);
             $totalCountWeek = mysqli_fetch_assoc($countResultWeek)['total'];
             $totalPagesWeek = ceil($totalCountWeek / $resultsPerPage); // Calculate total pages for Week
             
+            $countQueryNextWeek = "SELECT COUNT(*) as total FROM tbl_appointments 
+                    WHERE (
+                    (modified_date IS NOT NULL AND 
+                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
+                    )
+                    AND status = '3'";
+            $countResultNextWeek = mysqli_query($con, $countQueryNextWeek);
+            $totalCountNextWeek = mysqli_fetch_assoc($countResultNextWeek)['total'];
+            $totalPagesNextWeek = ceil($totalCountNextWeek / $resultsPerPage); // Calculate total pages for Week
+            
             // SQL query for Day with JOIN to fetch the limited number of records with OFFSET
             $queryDay = "SELECT a.*, 
                 s.service_type AS service_name, 
                 p.first_name, p.middle_name, p.last_name 
-              FROM tbl_appointments a
-              JOIN tbl_service_type s ON a.service_type = s.id
-              JOIN tbl_patient p ON a.id = p.id
-              WHERE (DATE(a.date) = '$today' OR DATE(a.modified_date) = '$today') AND a.status = '3'
-              ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
-              LIMIT $resultsPerPage OFFSET $startRow";
+            FROM tbl_appointments a
+            JOIN tbl_service_type s ON a.service_type = s.id
+            JOIN tbl_patient p ON a.id = p.id  -- corrected join condition
+            WHERE (
+                  (a.modified_date IS NOT NULL AND 
+                    DATE(a.modified_date) = CURDATE()) 
+                  OR 
+                  (a.modified_date IS NULL AND 
+                    DATE(a.date) = CURDATE())
+            )
+            AND a.status = '3'
+            ORDER BY  a.time DESC, a.modified_time DESC
+            LIMIT $resultsPerPage OFFSET $startRow";
 
             // SQL query for Week with JOIN to fetch the limited number of records with OFFSET
             $queryWeek = "SELECT a.*, 
@@ -301,41 +333,65 @@ $result = mysqli_query($con, $query);
                       p.first_name, p.middle_name, p.last_name 
               FROM tbl_appointments a
               JOIN tbl_service_type s ON a.service_type = s.id
-              JOIN tbl_patient p ON a.id = p.id  -- corrected join condition (assuming the link should be `a.patient_id = p.id`)
-              WHERE ((WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) AND DATE(a.date) != CURDATE()) 
-              OR (WEEK(DATE(a.modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(a.modified_date) != CURDATE())) 
+              JOIN tbl_patient p ON a.id = p.id  -- corrected join condition
+              WHERE (
+                    (a.modified_date IS NOT NULL AND 
+                     WEEK(DATE(a.modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(a.modified_date) != CURDATE())
+                    OR 
+                    (a.date IS NOT NULL AND 
+                     WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) AND DATE(a.date) > CURDATE())
+              )
               AND a.status = '3'
               ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
               LIMIT $resultsPerPage OFFSET $startRow";
 
+            $queryNextWeek = "SELECT a.*, 
+            s.service_type AS service_name, 
+                      p.first_name, p.middle_name, p.last_name 
+              FROM tbl_appointments a
+              JOIN tbl_service_type s ON a.service_type = s.id
+              JOIN tbl_patient p ON a.id = p.id  -- corrected join condition
+              WHERE (
+                (a.modified_date IS NOT NULL AND 
+                WEEK(DATE(a.modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(a.modified_date) != CURDATE())
+                OR 
+                (a.date IS NOT NULL AND 
+                WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(a.date) > CURDATE())
+                )
+              AND a.status = '3'
+              ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+              LIMIT $resultsPerPage OFFSET $startRow";
+
+
+            $resultNextWeek = mysqli_query($con, $queryNextWeek);
             $resultWeek = mysqli_query($con, $queryWeek);
             $resultDay = mysqli_query($con, $queryDay);
+
+            // Default tab is 'Day'
+            $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'Day';
             ?>
 
-            <!-- HTML Table and Tab structure -->
-
-            <div class="pagination-container">
-                <!-- Day Pagination -->
-                <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
-                        < </a>
-                        <?php endif; ?>
-                        <?php if ($currentPage < $totalPagesDay): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">></a>
-                        <?php endif; ?>
-            </div>
-            <br><br>
-
+            <!-- Tab structure -->
             <div class="tab">
-                <button class="tablinks" onclick="openTab(event, 'Day')">Today</button>
-                <button class="tablinks" onclick="openTab(event, 'Week')">This Week</button>
-                <button class="tablinks" onclick="openTab()">Next Week</button>
+                <button class="tablinks" onclick="switchTab('Day')">Today</button>
+                <button class="tablinks" onclick="switchTab('Week')">This Week</button>
+                <button class="tablinks" onclick="switchTab('NextWeek')">Next Week</button>
             </div>
 
             <!-- Tab content for Day -->
-            <div id="Day" class="tabcontent" style="display: block;">
+            <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
                 <h3>Today</h3>
-                <br>
+
+                <!-- Pagination for Day -->
+                <div class="pagination-container">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?page=<?php echo $currentPage - 1; ?>&tab=Day" class="pagination-btn">&lt;</a>
+                    <?php endif; ?>
+                    <?php if ($currentPage < $totalPagesDay): ?>
+                        <a href="?page=<?php echo $currentPage + 1; ?>&tab=Day" class="pagination-btn">&gt;</a>
+                    <?php endif; ?>
+                </div>
+
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -381,9 +437,18 @@ $result = mysqli_query($con, $query);
             </div>
 
             <!-- Tab content for Week -->
-            <div id="Week" class="tabcontent" style="display: none;">
+            <div id="Week" class="tabcontent" style="display: <?php echo $activeTab == 'Week' ? 'block' : 'none'; ?>;">
                 <h3>This Week</h3>
-                <br>
+                <!-- Pagination for Week -->
+                <div class="pagination-container">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?page=<?php echo $currentPage - 1; ?>&tab=Week" class="pagination-btn">&lt;</a>
+                    <?php endif; ?>
+                    <?php if ($currentPage < $totalPagesWeek): ?>
+                        <a href="?page=<?php echo $currentPage + 1; ?>&tab=Week" class="pagination-btn">&gt;</a>
+                    <?php endif; ?>
+                </div>
+
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -424,6 +489,66 @@ $result = mysqli_query($con, $query);
                             echo "<tr><td colspan='8'>No records found</td></tr>";
                         }
                         ?>
+                    </tbody>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Tab content for Next Week -->
+            <div id="NextWeek" class="tabcontent"
+                style="display: <?php echo $activeTab == 'NextWeek' ? 'block' : 'none'; ?>;">
+                <h3>Next Week</h3>
+                <!-- Pagination for Week -->
+                <div class="pagination-container">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?page=<?php echo $currentPage - 1; ?>&tab=NextWeek" class="pagination-btn">&lt;</a>
+                    <?php endif; ?>
+                    <?php if ($currentPage < $totalPagesNextWeek): ?>
+                        <a href="?page=<?php echo $currentPage + 1; ?>&tab=NextWeek" class="pagination-btn">&gt;</a>
+                    <?php endif; ?>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Modified_Date</th>
+                            <th>Modified_Time</th>
+                            <th>Type Of Service</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (mysqli_num_rows($resultNextWeek) > 0) {
+                            while ($row = mysqli_fetch_assoc($resultNextWeek)) {
+                                $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                                $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+                                $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
+                                $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
+
+                                echo "<tr>
+                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td>{$dateToDisplay}</td>
+                        <td>{$timeToDisplay}</td>
+                        <td>{$modified_date}</td>
+                        <td>{$modified_time}</td>
+                        <td>{$row['service_name']}</td>
+                        <td>
+                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                        </td>
+                    </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='8'>No records found</td></tr>";
+                        }
+                        ?>
+                    </tbody>
                     </tbody>
                 </table>
             </div>
@@ -511,6 +636,12 @@ $result = mysqli_query($con, $query);
                     document.getElementById(tabName).style.display = "block";
                     evt.currentTarget.classList.add("active");
                 }
+                function switchTab(tabName) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', tabName); // Update 'tab' parameter
+                    window.location.href = url.toString(); // Reload with updated URL
+                }
+
             </script>
 
         </div>

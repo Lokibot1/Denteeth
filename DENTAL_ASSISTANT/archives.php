@@ -28,7 +28,8 @@ if (!$con) {
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
     <title>Dental Assistant Dashboard</title>
 </head>
 
@@ -81,10 +82,10 @@ if (!$con) {
 
             // SQL query to count total records with filtering
             $countQuery = "SELECT COUNT(*) as total FROM tbl_archives a
-               JOIN tbl_service_type s ON a.service_type = s.id
-               JOIN tbl_patient p ON a.id = p.id
-               JOIN tbl_status t ON a.status = t.id
-               WHERE a.status IN ('1', '2', '3', '4')";
+    JOIN tbl_service_type s ON a.service_type = s.id
+    JOIN tbl_patient p ON a.id = p.id
+    JOIN tbl_status t ON a.completion = t.id
+    WHERE a.completion IN ('1', '2', '3')";
 
             // Add name filter if specified
             if ($filterName) {
@@ -93,7 +94,7 @@ if (!$con) {
 
             // Add status filter if specified
             if ($filterStatus) {
-                $countQuery .= " AND a.status = '$filterStatus'";
+                $countQuery .= " AND a.completion = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -107,14 +108,14 @@ if (!$con) {
             
             // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
-            s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name, 
-            t.status     
-          FROM tbl_archives a
-          JOIN tbl_service_type s ON a.service_type = s.id
-          JOIN tbl_patient p ON a.id = p.id
-          JOIN tbl_status t ON a.status = t.id
-          WHERE a.status IN ('1', '2', '3', '4')";
+    s.service_type AS service_name, 
+    p.first_name, p.middle_name, p.last_name, 
+    t.status     
+    FROM tbl_archives a
+    JOIN tbl_service_type s ON a.service_type = s.id
+    JOIN tbl_patient p ON a.id = p.id
+    JOIN tbl_status t ON a.completion = t.id
+    WHERE a.completion IN ('1', '2', '3')";
 
             // Add name filter if specified
             if ($filterName) {
@@ -123,7 +124,7 @@ if (!$con) {
 
             // Add status filter if specified
             if ($filterStatus) {
-                $query .= " AND a.status = '$filterStatus'";
+                $query .= " AND a.completion = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -131,10 +132,11 @@ if (!$con) {
                 $query .= " AND a.date = '$filterDate'";
             }
 
-            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
+            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to results per page
             
             $result = mysqli_query($con, $query);
-            ?><br><br><br><br>
+            ?>
+            <br><br><br><br>
 
             <!-- HTML Form for Filters -->
             <form method="GET" action="" class="search-form">
@@ -151,7 +153,7 @@ if (!$con) {
 
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
 
-                <span class="material-symbols-outlined" type = "submit">search</span>
+                <span class="material-symbols-outlined" type="submit">search</span>
             </form>
             <!-- Pagination -->
             <div class="pagination-container">

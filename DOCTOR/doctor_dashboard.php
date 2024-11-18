@@ -60,7 +60,7 @@ if (isset($_POST['submit'])) {
         $appointment = mysqli_fetch_assoc($result);
 
         // Insert the appointment data into the tbl_archives table
-        $archive_query = "INSERT INTO tbl_archives (name, contact, date, time, modified_date, modified_time, service_type, recommendation, price, status)
+        $archive_query = "INSERT INTO tbl_archives (name, contact, date, time, modified_date, modified_time, service_type, recommendation, price, completion)
                           VALUES ('{$appointment['name']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['modified_date']}', '{$appointment['modified_time']}', '{$appointment['service_type']}', '{$recommendation}', '{$price}', '1')";
 
         if (!mysqli_query($con, $archive_query)) {

@@ -58,7 +58,6 @@ if (!$con) {
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
                 <li><a href="appointments.php">Approved Appointments</a></li>
-                <li><a href="week.php">Appointment for next week</a></li>
                 <li><a href="declined.php">Declined Appointment</a></li>
                 <li><a href="billing.php">Billing Approval </a></li>
             </ul>
@@ -186,7 +185,7 @@ if (!$con) {
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 17;
+            $resultsPerPage = 14;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
