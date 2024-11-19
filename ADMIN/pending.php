@@ -150,21 +150,19 @@ $result = mysqli_query($con, $query);
         <aside class="sidebar">
             <ul>
                 <br>
-                <a href="admin_dashboard.php">
+                <a class="active" href="admin_dashboard.php">
                     <h3>ADMIN<br>DASHBOARD</h3>
                 </a>
                 <br>
                 <br>
                 <hr>
                 <br>
-                <li><a class="active" href="pending.php">Pending Appointments</a></a></li>
-                <li><a href="day.php">Appointment for the day</a></li>
-                <li><a href="week.php">Appointment for the week</a></li>
+                <li><a href="pending.php">Pending Appointments</a></a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
                 <li><a href="declined.php">Decline Appointments</a></a></li>
-                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="billing.php">Billing Approval</a></li>
                 <li><a href="services.php">Services</a></li>
                 <li><a href="manage_user.php">Manage Users</a></li>
-                <li><a href="transaction_history.php">Transaction History</a></li>
             </ul>
         </aside>
     </div>
@@ -423,12 +421,16 @@ $result = mysqli_query($con, $query);
                     <label for="date">Date:</label>
                     <input type="date" name="modified_date" id="modal-modified_date" required>
                     <br>
-                    <p>
-                        <label for="time">Time:</label>
-                        <input type="time" name="modified_time" id="modal-modified_time" min="09:00" max="18:00"
-                            required>
-                        CLINIC HOURS 9:00 AM TO 6:00 PM
-                    </p>
+                    <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
+                    <select name="modified_time" id="modal-modified_time" required>
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="10:30 AM">10:30 AM</option>
+                        <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="01:30 PM">01:30 PM</option>
+                        <option value="03:00 PM">03:00 PM</option>
+                        <option value="04:30 PM">04:30 PM</option>
+                    </select>
                     <label for="service_type">Type Of Service:</label>
                     <select name="service_type" id="modal-service_type" required>
                         <option value="">--Select Service Type--</option>

@@ -56,13 +56,11 @@ if (!$con) {
                 <hr>
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
-                <li><a href="day.php">Appointment for the day</a></li>
-                <li><a href="week.php">Appointment for the week</a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
                 <li><a href="declined.php">Decline Appointments</a></a></li>
-                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="billing.php">Billing Approval</a></li>
                 <li><a href="services.php">Services</a></li>
                 <li><a href="manage_user.php">Manage Users</a></li>
-                <li><a href="transaction_history.php">Transaction History</a></li>
             </ul>
         </aside>
     </div>

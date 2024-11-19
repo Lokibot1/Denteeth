@@ -118,7 +118,7 @@ if (isset($_POST['delete'])) {
         <aside class="sidebar">
             <ul>
                 <br>
-                <a href="admin_dashboard.php">
+                <a class="active" href="admin_dashboard.php">
                     <h3>ADMIN<br>DASHBOARD</h3>
                 </a>
                 <br>
@@ -126,13 +126,11 @@ if (isset($_POST['delete'])) {
                 <hr>
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
-                <li><a href="day.php">Appointment for the day</a></li>
-                <li><a href="week.php">Appointment for the week</a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
                 <li><a href="declined.php">Decline Appointments</a></a></li>
-                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="billing.php">Billing Approval</a></li>
                 <li><a href="services.php">Services</a></li>
-                <li><a class="active" href="manage_user.php">Manage Users</a></li>
-                <li><a href="transaction_history.php">Transaction History</a></li>
+                <li><a href="manage_user.php">Manage Users</a></li>
             </ul>
         </aside>
     </div>
@@ -324,16 +322,16 @@ if (isset($_POST['delete'])) {
             </div>
 
             <!-- Display Table -->
-                <table class="table table-bordered">
-                    <tr>
-                        <th>Username</th>
-                        <th>Password</th>
-                        <th>Role</th>
-                    </tr>
-                    <?php
-                    // Fetch and display user data
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        echo "<tr>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Username</th>
+                    <th>Password</th>
+                    <th>Role</th>
+                </tr>
+                <?php
+                // Fetch and display user data
+                while ($row = mysqli_fetch_assoc($result)) {
+                    echo "<tr>
             <td>{$row['username']}</td>
             <td>{$row['password']}</td>
             <td>{$row['acc_role']}</td>
@@ -347,47 +345,47 @@ if (isset($_POST['delete'])) {
                 </form>
             </td>
           </tr>";
-                    }
-                    ?>
-                </table>
-                <br><br>
+                }
+                ?>
+            </table>
+            <br><br>
 
-                <script>
-                    // Get modal elements
-                    var modal = document.getElementById("userModal");
-                    var openModalBtn = document.getElementById("openModalBtn");
-                    var closeModalSpan = document.getElementsByClassName("close")[0];
+            <script>
+                // Get modal elements
+                var modal = document.getElementById("userModal");
+                var openModalBtn = document.getElementById("openModalBtn");
+                var closeModalSpan = document.getElementsByClassName("close")[0];
 
-                    // Open modal for adding a new user
-                    openModalBtn.onclick = function () {
-                        document.getElementById("modalTitle").innerText = "Add New User";
-                        document.getElementById("userForm").reset();
-                        document.getElementById("userId").value = ""; // Reset hidden ID
-                        modal.style.display = "block";
-                    }
+                // Open modal for adding a new user
+                openModalBtn.onclick = function () {
+                    document.getElementById("modalTitle").innerText = "Add New User";
+                    document.getElementById("userForm").reset();
+                    document.getElementById("userId").value = ""; // Reset hidden ID
+                    modal.style.display = "block";
+                }
 
-                    // Open modal for editing a user
-                    function openModal(id, username, password, role, created_at) {
-                        document.getElementById("modalTitle").innerText = "Edit User";
-                        document.getElementById("userId").value = id;
-                        document.getElementById("username").value = username;
-                        document.getElementById("password").value = password; // Consider hashing in backend
-                        document.getElementById("role").value = role;
-                        modal.style.display = "block";
-                    }
+                // Open modal for editing a user
+                function openModal(id, username, password, role, created_at) {
+                    document.getElementById("modalTitle").innerText = "Edit User";
+                    document.getElementById("userId").value = id;
+                    document.getElementById("username").value = username;
+                    document.getElementById("password").value = password; // Consider hashing in backend
+                    document.getElementById("role").value = role;
+                    modal.style.display = "block";
+                }
 
-                    // Close modal
-                    closeModalSpan.onclick = function () {
+                // Close modal
+                closeModalSpan.onclick = function () {
+                    modal.style.display = "none";
+                }
+
+                // Close modal when clicking outside
+                window.onclick = function (event) {
+                    if (event.target == modal) {
                         modal.style.display = "none";
                     }
-
-                    // Close modal when clicking outside
-                    window.onclick = function (event) {
-                        if (event.target == modal) {
-                            modal.style.display = "none";
-                        }
-                    }
-                </script>
+                }
+            </script>
         </div>
 </body>
 

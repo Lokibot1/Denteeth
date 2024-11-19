@@ -39,7 +39,7 @@ if (isset($_POST['update'])) {
     // Execute both queries
     if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
         // Redirect to the same page after updating
-        header("Location: dental_assistant_dashboard.php");
+        header("Location: declined.php");
         exit();
     } else {
         echo "Error updating record: " . mysqli_error($con);
@@ -72,11 +72,11 @@ if (isset($_POST['delete'])) {
         $deleted_at = date('Y-m-d H:i:s');
 
         // Insert into tbl_appointments_bin including the deleted_at field
-        $insert_bin_query = "INSERT INTO tbl_appointments_bin (id, name, contact, date, time, modified_date, modified_time, modified_by, service_type, status, deleted_at)
-                             VALUES ('$id', '$name', '$contact', '$date', '$time', '$modified_date', '$modified_time', '1', '$service_type', '$status', '$deleted_at')";
+        $insert_archives_query = "INSERT INTO tbl_bin (id, name, contact, date, time, modified_date, modified_time, service_type, status, deleted_at)
+                             VALUES ('$id', '$name', '$contact', '$date', '$time', '$modified_date', '$modified_time', '$service_type', '$status', '$deleted_at')";
 
         // Execute the insert query
-        if (mysqli_query($con, $insert_bin_query)) {
+        if (mysqli_query($con, $insert_archives_query)) {
             // Delete the appointment from tbl_appointments
             $delete_appointment_query = "DELETE FROM tbl_appointments WHERE id=$id";
 
@@ -89,7 +89,7 @@ if (isset($_POST['delete'])) {
                 echo "Error deleting appointment record: " . mysqli_error($con);
             }
         } else {
-            echo "Error transferring appointment record to bin: " . mysqli_error($con);
+            echo "Error transferring appointment record to Archives: " . mysqli_error($con);
         }
     } else {
         echo "No appointment found with this ID.";
@@ -98,7 +98,7 @@ if (isset($_POST['delete'])) {
 
 if (isset($_POST['restore'])) {
     $id = $_POST['id'];
-    $deleteQuery = "UPDATE tbl_appointments SET status = '1', modified_by = '1' WHERE id = $id";
+    $deleteQuery = "UPDATE tbl_appointments SET status = '1' WHERE id = $id";
     mysqli_query($con, $deleteQuery);
 
     // Redirect to refresh the page and show updated records
@@ -156,7 +156,7 @@ $result = mysqli_query($con, $query);
         <aside class="sidebar">
             <ul>
                 <br>
-                <a href="admin_dashboard.php">
+                <a class="active" href="admin_dashboard.php">
                     <h3>ADMIN<br>DASHBOARD</h3>
                 </a>
                 <br>
@@ -164,13 +164,11 @@ $result = mysqli_query($con, $query);
                 <hr>
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
-                <li><a href="day.php">Appointment for the day</a></li>
-                <li><a href="week.php">Appointment for the week</a></li>
-                <li><a class="active" href="declined.php">Decline Appointments</a></a></li>
-                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
+                <li><a href="declined.php">Decline Appointments</a></a></li>
+                <li><a href="billing.php">Billing Approval</a></li>
                 <li><a href="services.php">Services</a></li>
                 <li><a href="manage_user.php">Manage Users</a></li>
-                <li><a href="transaction_history.php">Transaction History</a></li>
             </ul>
         </aside>
     </div>
@@ -295,9 +293,10 @@ $result = mysqli_query($con, $query);
                 echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
+
             <?php
             // Set the number of results per page
-            $resultsPerPage = 7;
+            $resultsPerPage = 6;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -319,11 +318,11 @@ $result = mysqli_query($con, $query);
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
           WHERE a.status = '2'
+          ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
-            ?>
-            <br><br>
+            ?><br>
 
             <!-- HTML Table -->
             <div class="pagination-container">
@@ -374,23 +373,23 @@ $result = mysqli_query($con, $query);
                         <td>{$modified_time}</td>
                         <td>{$row['service_name']}</td>
                         <td>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                            <form method='POST' action='' style='display:inline;'>
-                                <input type='hidden' name='id' value='{$row['id']}'>
-                             </form>";
+                        <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                        style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                        <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                        </form>";
                         if ($row['status'] != 'Restore') {
                             echo "<form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                                 <input type='submit' name='restore' value='Restore' 
-                                style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                             </form>";
                         }
                         if ($row['status'] != 'Delete') {
                             echo "<form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='delete' value='Delete' 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                         </form>";
                         }
 
@@ -421,17 +420,21 @@ $result = mysqli_query($con, $query);
                     <input type="text" name="middle_name" id="modal-middle-name" required>
                     <br>
                     <label for="contact">Contact:</label>
-                    <input type="text" name="contact" id="modal-contact" required>
-                    <br>
+                    <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
+                        maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
                     <label for="date">Date:</label>
                     <input type="date" name="modified_date" id="modal-modified_date" required>
                     <br>
-                    <p>
-                        <label for="time">Time:</label>
-                        <input type="time" name="modified_time" id="modal-modified_time" min="09:00" max="18:00"
-                            required>
-                        CLINIC HOURS 9:00 AM TO 6:00 PM
-                    </p>
+                    <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
+                    <select name="modified_time" id="modal-modified_time" required>
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="10:30 AM">10:30 AM</option>
+                        <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="01:30 PM">01:30 PM</option>
+                        <option value="03:00 PM">03:00 PM</option>
+                        <option value="04:30 PM">04:30 PM</option>
+                    </select>
                     <label for="service_type">Type Of Service:</label>
                     <select name="service_type" id="modal-service_type" required>
                         <option value="">--Select Service Type--</option>

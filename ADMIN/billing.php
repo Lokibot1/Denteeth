@@ -4,7 +4,7 @@ session_start();
 
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -120,12 +120,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
-    <title>Dental Assistant Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+    <title>Admin Dashboard</title>
 </head>
 
 <body>
@@ -139,25 +140,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        <a href="archives.php"><i class="fas fa-trash trash"></i></a>
+        <a href="admin_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
     </nav>
-    <aside class="sidebar">
-        <ul>
-            <br>
-            <a class="active" href="dental_assistant_dashboard.php">
-                <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
-            </a>
-            <br>
-            <br>
-            <hr>
-            <br>
-            <li><a href="pending.php">Pending Appointments</a></a></li>
-            <li><a href="appointments.php">Approved Appointments</a></li>
-            <li><a href="declined.php">Declined Appointment</a></li>
-            <li><a href="billing.php">Billing Approval</a></li>
-        </ul>
-    </aside>
-
+    <div>
+        <aside class="sidebar">
+            <ul>
+                <br>
+                <a class="active" href="admin_dashboard.php">
+                    <h3>ADMIN<br>DASHBOARD</h3>
+                </a>
+                <br>
+                <br>
+                <hr>
+                <br>
+                <li><a href="pending.php">Pending Appointments</a></a></li>
+                <li><a href="appointments.php">Approved Appointments</a></li>
+                <li><a href="declined.php">Decline Appointments</a></a></li>
+                <li><a href="billing.php">Billing Approval</a></li>
+                <li><a href="services.php">Services</a></li>
+                <li><a href="manage_user.php">Manage Users</a></li>
+            </ul>
+        </aside>
+    </div>
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
@@ -180,12 +184,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
-                              WHERE (
-                                (modified_date IS NOT NULL AND 
-                                DATE(modified_date) = CURDATE()) 
-                                OR (modified_date IS NULL AND 
-                                DATE(date) = CURDATE())
-                                ) AND status = '3'";
+                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
 
 
                 $result_today = mysqli_query($con, $sql_today);
@@ -198,11 +197,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_today = mysqli_fetch_assoc($result_today);
                 $appointments_today = $row_today['total_appointments_today'];
 
-                if ($appointments_today) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
+                echo $appointments_today ? $appointments_today : 'No data available';
                 ?>
             </div>
             <div class="round-box">
@@ -222,15 +217,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_pending = mysqli_fetch_assoc($result_pending);
                 $pending_appointments = $row_pending['total_pending_appointments'];
 
-                if ($pending_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$pending_appointments</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
+                echo $pending_appointments ? $pending_appointments : 'No data available';
                 ?>
             </div>
             <div class="round-box">
-                <p>APPOINTMENT FOR THIS WEEK:</p>
+                <p>APPOINTMENT FOR THE WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
                 $start_of_week = date('Y-m-d', strtotime('monday this week'));
@@ -239,13 +230,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
                  FROM tbl_appointments 
-                 WHERE (
-                    (modified_date IS NOT NULL AND 
-                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
-                    OR 
-                    (date IS NOT NULL AND 
-                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
-                        )
+                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
+                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
                  AND status = '3'";
 
                 $result_week = mysqli_query($con, $sql_week);
@@ -258,11 +244,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_week = mysqli_fetch_assoc($result_week);
                 $appointments_for_week = $row_week['total_appointments_week'];
 
-                if ($appointments_for_week) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
+                echo $appointments_for_week ? $appointments_for_week : 'No data available';
                 ?>
             </div>
             <div class="round-box">
@@ -280,11 +262,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_finished = mysqli_fetch_assoc($result_finished);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
-                if ($finished_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
+                echo $finished_appointments ? $finished_appointments : 'No data available';
+                ?>
+            </div>
+            <div class="round-box">
+                <p>FINISHED APPOINTMENTS:</p>
+                <?php
+                // Query to count finished appointments
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
+                $result_finished = mysqli_query($con, $sql_finished);
+
+                // Check for SQL errors
+                if (!$result_finished) {
+                    die("Query failed: " . mysqli_error($con));
                 }
+
+                $row_finished = mysqli_fetch_assoc($result_finished);
+                $finished_appointments = $row_finished['total_finished_appointments'];
+
+                echo $finished_appointments ? $finished_appointments : 'No data available';
                 ?>
             </div>
 
@@ -456,11 +452,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                         <label for="date">Date:</label>
                         <input type="date" name="date" id="modal-date" required>
                         <br>
-                        <p>
-                            <label for="time">Time: <br> CLINIC HOURS 9:00 AM TO 6:00 PM</label>
-                            <input type="time" name="time" id="modal-time" min="09:00" max="18:00" required>
-
-                        </p>
+                        <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
+                        <select name="modified_time" id="modal-modified_time" required>
+                            <option value="09:00 AM">09:00 AM</option>
+                            <option value="10:30 AM">10:30 AM</option>
+                            <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
+                            <option value="12:00 PM">12:00 PM</option>
+                            <option value="01:30 PM">01:30 PM</option>
+                            <option value="03:00 PM">03:00 PM</option>
+                            <option value="04:30 PM">04:30 PM</option>
+                        </select>
                         <div class="bill-fields">
                             <label for="modal-bill">Bill:</label>
                             <label for="modal-change">Change Amount:</label>
