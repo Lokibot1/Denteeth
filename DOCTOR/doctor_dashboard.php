@@ -202,7 +202,7 @@ $result = mysqli_query($con, $query);
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-        <div class="round-box">
+            <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
                 include("../dbcon.php");
@@ -329,7 +329,15 @@ $result = mysqli_query($con, $query);
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
           WHERE a.status = '3'
-          ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+          ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END DESC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
@@ -526,99 +534,99 @@ $result = mysqli_query($con, $query);
         </script>
         <!-- Edit Modal -->
         <div id="editModal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <form method="POST" action="">
-                        <h1>EDIT DETAILS</h1><br>
-                        <input type="hidden" name="id" id="modal-id">
-                        <br>
-                        <label for="modal-first-name">First Name:</label>
-                        <input type="text" name="first_name" id="modal-first-name" required>
-                        <br>
-                        <label for="modal-last-name">Last Name:</label>
-                        <input type="text" name="last_name" id="modal-last-name" required>
-                        <br>
-                        <label for="modal-middle-name">Middle Name:</label>
-                        <input type="text" name="middle_name" id="modal-middle-name" required>
-                        <br>
-                        <label for="contact">Contact:</label>
-                        <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
-                            maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
-                        <label for="date">Date:</label>
-                        <input type="date" name="modified_date" id="modal-modified_date" required>
-                        <br>
-                        <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
-                        <select name="modified_time" id="modal-modified_time" required>
-                            <option value="09:00 AM">09:00 AM</option>
-                            <option value="10:30 AM">10:30 AM</option>
-                            <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
-                            <option value="12:00 PM">12:00 PM</option>
-                            <option value="01:30 PM">01:30 PM</option>
-                            <option value="03:00 PM">03:00 PM</option>
-                            <option value="04:30 PM">04:30 PM</option>
-                        </select>
-                        <label for="service_type">Type Of Service:</label>
-                        <select name="service_type" id="modal-service_type" required>
-                            <option value="">--Select Service Type--</option>
-                            <option value="1">All Porcelain Veneers & Zirconia</option>
-                            <option value="2">Crown & Bridge</option>
-                            <option value="3">Dental Cleaning</option>
-                            <option value="4">Dental Implants</option>
-                            <option value="5">Dental Whitening</option>
-                            <option value="6">Dentures</option>
-                            <option value="7">Extraction</option>
-                            <option value="8">Full Exam & X-Ray</option>
-                            <option value="9">Orthodontic Braces</option>
-                            <option value="10">Restoration</option>
-                            <option value="11">Root Canal Treatment</option>
-                        </select>
-                        <br>
-                        <input type="submit" name="update" value="Save">
-                    </form>
-                </div>
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()">&times;</span>
+                <form method="POST" action="">
+                    <h1>EDIT DETAILS</h1><br>
+                    <input type="hidden" name="id" id="modal-id">
+                    <br>
+                    <label for="modal-first-name">First Name:</label>
+                    <input type="text" name="first_name" id="modal-first-name" required>
+                    <br>
+                    <label for="modal-last-name">Last Name:</label>
+                    <input type="text" name="last_name" id="modal-last-name" required>
+                    <br>
+                    <label for="modal-middle-name">Middle Name:</label>
+                    <input type="text" name="middle_name" id="modal-middle-name" required>
+                    <br>
+                    <label for="contact">Contact:</label>
+                    <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
+                        maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
+                    <label for="date">Date:</label>
+                    <input type="date" name="modified_date" id="modal-modified_date" required>
+                    <br>
+                    <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
+                    <select name="modified_time" id="modal-modified_time" required>
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="10:30 AM">10:30 AM</option>
+                        <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="01:30 PM">01:30 PM</option>
+                        <option value="03:00 PM">03:00 PM</option>
+                        <option value="04:30 PM">04:30 PM</option>
+                    </select>
+                    <label for="service_type">Type Of Service:</label>
+                    <select name="service_type" id="modal-service_type" required>
+                        <option value="">--Select Service Type--</option>
+                        <option value="1">All Porcelain Veneers & Zirconia</option>
+                        <option value="2">Crown & Bridge</option>
+                        <option value="3">Dental Cleaning</option>
+                        <option value="4">Dental Implants</option>
+                        <option value="5">Dental Whitening</option>
+                        <option value="6">Dentures</option>
+                        <option value="7">Extraction</option>
+                        <option value="8">Full Exam & X-Ray</option>
+                        <option value="9">Orthodontic Braces</option>
+                        <option value="10">Restoration</option>
+                        <option value="11">Root Canal Treatment</option>
+                    </select>
+                    <br>
+                    <input type="submit" name="update" value="Save">
+                </form>
             </div>
-
-            <script>
-                // Open the modal and populate it with data
-                function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
-                    document.getElementById('modal-id').value = id;
-                    document.getElementById('modal-first-name').value = first_name;
-                    document.getElementById('modal-middle-name').value = middle_name;
-                    document.getElementById('modal-last-name').value = last_name;
-                    document.getElementById('modal-contact').value = contact;
-                    document.getElementById('modal-modified_date').value = modified_date;
-                    document.getElementById('modal-modified_time').value = modified_time;
-                    document.getElementById('modal-service_type').value = service_type;
-                    document.getElementById('editModal').style.display = 'block';
-                }
-
-                // Close the modal
-                function closeModal() {
-                    document.getElementById('editModal').style.display = 'none';
-                }
-
-                // Switch between tabs
-                function openTab(evt, tabName) {
-                    var i, tabcontent, tablinks;
-                    tabcontent = document.getElementsByClassName("tabcontent");
-                    for (i = 0; i < tabcontent.length; i++) {
-                        tabcontent[i].style.display = "none";
-                    }
-                    tablinks = document.getElementsByClassName("tablinks");
-                    for (i = 0; i < tablinks.length; i++) {
-                        tablinks[i].classList.remove("active");
-                    }
-                    document.getElementById(tabName).style.display = "block";
-                    evt.currentTarget.classList.add("active");
-                }
-                function switchTab(tabName) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', tabName); // Update 'tab' parameter
-                    window.location.href = url.toString(); // Reload with updated URL
-                }
-
-            </script>
         </div>
+
+        <script>
+            // Open the modal and populate it with data
+            function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
+                document.getElementById('modal-id').value = id;
+                document.getElementById('modal-first-name').value = first_name;
+                document.getElementById('modal-middle-name').value = middle_name;
+                document.getElementById('modal-last-name').value = last_name;
+                document.getElementById('modal-contact').value = contact;
+                document.getElementById('modal-modified_date').value = modified_date;
+                document.getElementById('modal-modified_time').value = modified_time;
+                document.getElementById('modal-service_type').value = service_type;
+                document.getElementById('editModal').style.display = 'block';
+            }
+
+            // Close the modal
+            function closeModal() {
+                document.getElementById('editModal').style.display = 'none';
+            }
+
+            // Switch between tabs
+            function openTab(evt, tabName) {
+                var i, tabcontent, tablinks;
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
+                }
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].classList.remove("active");
+                }
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.classList.add("active");
+            }
+            function switchTab(tabName) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabName); // Update 'tab' parameter
+                window.location.href = url.toString(); // Reload with updated URL
+            }
+
+        </script>
+    </div>
 </body>
 
 </html>

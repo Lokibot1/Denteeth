@@ -57,12 +57,12 @@ $restorationData = fetchService($con, 'Restoration');
 $rootData = fetchService($con, 'Root Canal Treatment');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $description = $_POST['service_description'];
-    $partial_price_min = $_POST['partial_price_min'];
-    $partial_price_max = $_POST['partial_price_max'];
-    $complete_price_min = $_POST['complete_price_min'];
-    $complete_price_max = $_POST['complete_price_max'];
-    $service_name = $_POST['service_name'] ?? ''; // Retrieve service name
+    $description = $_POST['service_description'] ?? null;
+    $partial_price_min = $_POST['partial_price_min'] ?? null;
+    $partial_price_max = $_POST['partial_price_max'] ?? null;
+    $complete_price_min = $_POST['complete_price_min'] ?? null;
+    $complete_price_max = $_POST['complete_price_max'] ?? null;
+    $service_name = $_POST['service_name'] ?? null;
 
     if (empty($service_name)) {
         echo "Service name is required.";
@@ -70,59 +70,107 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Handle image upload
-    $target_dir = "C:/xampp/htdocs/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/";
-    $target_file = $target_dir . basename($_FILES["service_image"]["name"]);
-    $uploadOk = 1;
-    $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-    // Check if the file is an actual image
-    $check = getimagesize($_FILES["service_image"]["tmp_name"]);
-    if ($check !== false) {
+    $target_file = null; // Initialize target_file as null
+    if (!empty($_FILES["service_image"]["tmp_name"])) {
+        $target_dir = "C:/xampp/htdocs/DENTAL/HOME_PAGE/SERVICES/SERVICES_IMAGES/";
+        $target_file = $target_dir . basename($_FILES["service_image"]["name"]);
         $uploadOk = 1;
-    } else {
-        echo "File is not an image.";
-        $uploadOk = 0;
-    }
+        $imageFileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
 
-    // Check file size (limit 500KB)
-    if ($_FILES["service_image"]["size"] > 500000) {
-        echo "Sorry, your file is too large.";
-        $uploadOk = 0;
-    }
-
-    // Allow only certain file formats
-    if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
-        $uploadOk = 0;
-    }
-
-    if ($uploadOk == 0) {
-        echo "Sorry, your file was not uploaded.";
-    } else {
-        // Create the target directory if it doesn't exist
-        if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0777, true);
+        // Check if the file is an actual image
+        $check = getimagesize($_FILES["service_image"]["tmp_name"]);
+        if ($check !== false) {
+            $uploadOk = 1;
+        } else {
+            echo "File is not an image.";
+            $uploadOk = 0;
         }
 
-        // Move the uploaded file
-        if (move_uploaded_file($_FILES["service_image"]["tmp_name"], $target_file)) {
-            // Prepare and bind an update statement
-            $stmt = $con->prepare("UPDATE tbl_services SET service_image = ?, service_description = ?, partial_price_min = ?, partial_price_max = ?, complete_price_min = ?, complete_price_max = ? WHERE service_name = ?");
-            $stmt->bind_param("ssdddss", $target_file, $description, $partial_price_min, $partial_price_max, $complete_price_min, $complete_price_max, $service_name);
+        // Check file size (limit 500KB)
+        if ($_FILES["service_image"]["size"] > 500000) {
+            echo "Sorry, your file is too large.";
+            $uploadOk = 0;
+        }
 
-            // Execute the statement
-            if ($stmt->execute()) {
-                // Redirect to prevent form resubmission
-                header("Location: services.php");
-                exit();
-            } else {
-                echo "Error: " . $stmt->error;
+        // Allow only certain file formats
+        if (!in_array($imageFileType, ['jpg', 'jpeg', 'png', 'gif'])) {
+            echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $uploadOk = 0;
+        }
+
+        if ($uploadOk == 0) {
+            echo "Sorry, your file was not uploaded.";
+            $target_file = null;
+        } else {
+            // Create the target directory if it doesn't exist
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
             }
 
-            $stmt->close();
-        } else {
-            echo "Sorry, there was an error uploading your file.";
+            // Move the uploaded file
+            if (!move_uploaded_file($_FILES["service_image"]["tmp_name"], $target_file)) {
+                echo "Sorry, there was an error uploading your file.";
+                $target_file = null;
+            }
         }
+    }
+
+    // Build dynamic SQL query based on non-empty inputs
+    $updates = [];
+    $params = [];
+    $types = "";
+
+    if ($target_file) {
+        $updates[] = "service_image = ?";
+        $params[] = $target_file;
+        $types .= "s";
+    }
+    if (!empty($description)) {
+        $updates[] = "service_description = ?";
+        $params[] = $description;
+        $types .= "s";
+    }
+    if (!empty($partial_price_min)) {
+        $updates[] = "partial_price_min = ?";
+        $params[] = $partial_price_min;
+        $types .= "d";
+    }
+    if (!empty($partial_price_max)) {
+        $updates[] = "partial_price_max = ?";
+        $params[] = $partial_price_max;
+        $types .= "d";
+    }
+    if (!empty($complete_price_min)) {
+        $updates[] = "complete_price_min = ?";
+        $params[] = $complete_price_min;
+        $types .= "d";
+    }
+    if (!empty($complete_price_max)) {
+        $updates[] = "complete_price_max = ?";
+        $params[] = $complete_price_max;
+        $types .= "d";
+    }
+
+    // Only update if there are fields to update
+    if (!empty($updates)) {
+        $params[] = $service_name;
+        $types .= "s";
+
+        $sql = "UPDATE tbl_services SET " . implode(", ", $updates) . " WHERE service_name = ?";
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param($types, ...$params);
+
+        // Execute the statement
+        if ($stmt->execute()) {
+            // Redirect to prevent form resubmission
+            header("Location: services.php");
+            exit();
+        } else {
+            echo "Error: " . $stmt->error;
+        }
+        $stmt->close();
+    } else {
+        echo "No fields to update.";
     }
 }
 
