@@ -180,8 +180,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
-                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
-
+                              WHERE (
+                                (modified_date IS NOT NULL AND 
+                                DATE(modified_date) = CURDATE()) 
+                                OR (modified_date IS NULL AND 
+                                DATE(date) = CURDATE())
+                                ) AND status = '3'";
 
 
                 $result_today = mysqli_query($con, $sql_today);
@@ -194,7 +198,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_today = mysqli_fetch_assoc($result_today);
                 $appointments_today = $row_today['total_appointments_today'];
 
-                echo $appointments_today ? $appointments_today : 'No data available';
+                if ($appointments_today) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -214,11 +222,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_pending = mysqli_fetch_assoc($result_pending);
                 $pending_appointments = $row_pending['total_pending_appointments'];
 
-                echo $pending_appointments ? $pending_appointments : 'No data available';
+                if ($pending_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$pending_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
-                <p>APPOINTMENT FOR THE WEEK:</p>
+                <p>APPOINTMENT FOR THIS WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
                 $start_of_week = date('Y-m-d', strtotime('monday this week'));
@@ -227,8 +239,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
                  FROM tbl_appointments 
-                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
-                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
+                        )
                  AND status = '3'";
 
                 $result_week = mysqli_query($con, $sql_week);
@@ -241,7 +258,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_week = mysqli_fetch_assoc($result_week);
                 $appointments_for_week = $row_week['total_appointments_week'];
 
-                echo $appointments_for_week ? $appointments_for_week : 'No data available';
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -259,13 +280,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_finished = mysqli_fetch_assoc($result_finished);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
-                echo $finished_appointments ? $finished_appointments : 'No data available';
+                if ($finished_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 7;
+            $resultsPerPage = 6;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
