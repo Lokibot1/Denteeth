@@ -333,7 +333,7 @@ $result = mysqli_query($con, $query);
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
-            ?><br><br>
+            ?><br>
 
             <!-- HTML Table -->
 

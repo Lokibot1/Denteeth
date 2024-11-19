@@ -107,7 +107,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental.css">
+    <link rel="stylesheet" href="dental_assistant.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -395,14 +395,13 @@ $result = mysqli_query($con, $query);
             // Default tab is 'Day'
             $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'Day';
             ?>
-
             <!-- Tab structure -->
             <div class="tab">
                 <button class="tablinks" onclick="switchTab('Day')">Today</button>
                 <button class="tablinks" onclick="switchTab('Week')">This Week</button>
                 <button class="tablinks" onclick="switchTab('NextWeek')">Next Week</button>
             </div>
-
+            <br>
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
                 <h3>Today</h3>
