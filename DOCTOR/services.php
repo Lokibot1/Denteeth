@@ -170,7 +170,6 @@ $con->close();
                 <hr>
                 <br>
                 <li><a href="appointments.php">Approved Appointments</a></li>
-                <li><a href="week.php">Appointment for the next week</a></li>
                 <li><a href="services.php">Services</a></li>
             </ul>
         </aside>
@@ -197,8 +196,12 @@ $con->close();
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
-                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
-
+                              WHERE (
+                                (modified_date IS NOT NULL AND 
+                                DATE(modified_date) = CURDATE()) 
+                                OR (modified_date IS NULL AND 
+                                DATE(date) = CURDATE())
+                                ) AND status = '3'";
 
 
                 $result_today = mysqli_query($con, $sql_today);
@@ -211,11 +214,15 @@ $con->close();
                 $row_today = mysqli_fetch_assoc($result_today);
                 $appointments_today = $row_today['total_appointments_today'];
 
-                echo $appointments_today ? $appointments_today : 'No data available';
+                if ($appointments_today) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
-                <p>APPOINTMENT FOR THE WEEK:</p>
+                <p>APPOINTMENT FOR THIS WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
                 $start_of_week = date('Y-m-d', strtotime('monday this week'));
@@ -224,8 +231,13 @@ $con->close();
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
                  FROM tbl_appointments 
-                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
-                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
+                        )
                  AND status = '3'";
 
                 $result_week = mysqli_query($con, $sql_week);
@@ -238,7 +250,11 @@ $con->close();
                 $row_week = mysqli_fetch_assoc($result_week);
                 $appointments_for_week = $row_week['total_appointments_week'];
 
-                echo $appointments_for_week ? $appointments_for_week : 'No data available';
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -256,9 +272,14 @@ $con->close();
                 $row_finished = mysqli_fetch_assoc($result_finished);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
-                echo $finished_appointments ? $finished_appointments : 'No data available';
+                if ($finished_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
+
             <h1>Services</h1>
             <div id="crvs-container">
                 <!-- Img-box and Modal for Orthodontic Braces -->

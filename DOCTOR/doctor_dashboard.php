@@ -195,7 +195,6 @@ $result = mysqli_query($con, $query);
                 <hr>
                 <br>
                 <li><a href="appointments.php">Approved Appointments</a></li>
-                <li><a href="week.php">Appointment for the next week</a></li>
                 <li><a href="services.php">Services</a></li>
             </ul>
         </aside>
@@ -203,7 +202,7 @@ $result = mysqli_query($con, $query);
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-            <div class="round-box">
+        <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
                 include("../dbcon.php");
@@ -222,8 +221,12 @@ $result = mysqli_query($con, $query);
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
-                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
-
+                              WHERE (
+                                (modified_date IS NOT NULL AND 
+                                DATE(modified_date) = CURDATE()) 
+                                OR (modified_date IS NULL AND 
+                                DATE(date) = CURDATE())
+                                ) AND status = '3'";
 
 
                 $result_today = mysqli_query($con, $sql_today);
@@ -236,11 +239,15 @@ $result = mysqli_query($con, $query);
                 $row_today = mysqli_fetch_assoc($result_today);
                 $appointments_today = $row_today['total_appointments_today'];
 
-                echo $appointments_today ? $appointments_today : 'No data available';
+                if ($appointments_today) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
-                <p>APPOINTMENT FOR THE WEEK:</p>
+                <p>APPOINTMENT FOR THIS WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
                 $start_of_week = date('Y-m-d', strtotime('monday this week'));
@@ -249,8 +256,13 @@ $result = mysqli_query($con, $query);
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
                  FROM tbl_appointments 
-                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
-                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
+                        )
                  AND status = '3'";
 
                 $result_week = mysqli_query($con, $sql_week);
@@ -263,7 +275,11 @@ $result = mysqli_query($con, $query);
                 $row_week = mysqli_fetch_assoc($result_week);
                 $appointments_for_week = $row_week['total_appointments_week'];
 
-                echo $appointments_for_week ? $appointments_for_week : 'No data available';
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -281,7 +297,11 @@ $result = mysqli_query($con, $query);
                 $row_finished = mysqli_fetch_assoc($result_finished);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
-                echo $finished_appointments ? $finished_appointments : 'No data available';
+                if ($finished_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
 
@@ -360,7 +380,7 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <!-- Update Button -->
-                            <button type='button' onclick='openUpdateModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
                             style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
 
                             <!-- Decline Button -->
@@ -387,10 +407,11 @@ $result = mysqli_query($con, $query);
         <!-- Modal Structure -->
         <div id="finishModal" class="modal" style="display: none;">
             <div class="modal-content">
-                <span class="close" style="float: right; cursor: pointer; display: block; " onclick="closeModal()">&times;</span>
+                <span class="close" style="float: right; cursor: pointer; display: block; "
+                    onclick="closeModal()">&times;</span>
                 <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
                 <br>
-                <hr> 
+                <hr>
                 <!-- Display Selected Information -->
                 <div id="modalDetails">
                     <p><strong>Name:</strong> <span id="modalName"></span></p>
@@ -408,8 +429,9 @@ $result = mysqli_query($con, $query);
                     <textarea id="recommendation" name="recommendation"
                         placeholder="Enter your recommendation here..."></textarea>
                     <div id="totalPriceContainer">
-                        <p><strong>Total Price: ₱</strong><span style="font-weight: bold; font-size: 25px;" id="totalPrice">0</span></p>
-                    <br>
+                        <p><strong>Total Price: ₱</strong><span style="font-weight: bold; font-size: 25px;"
+                                id="totalPrice">0</span></p>
+                        <br>
                     </div>
                     <input type="number" id="price" name="price" style="display: none;" readonly>
                     <button type="submit" name="submit">Proceed to Dental Assistant</button>
@@ -504,57 +526,61 @@ $result = mysqli_query($con, $query);
         </script>
         <!-- Edit Modal -->
         <div id="editModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <form method="POST" action="">
-                    <h1>EDIT DELAILS</h1><br>
-                    <input type="hidden" name="id" id="modal-id">
-                    <br>
-                    <label for="modal-first-name">First Name:</label>
-                    <input type="text" name="first_name" id="modal-first-name" required>
-                    <br>
-                    <label for="modal-last-name">Last Name:</label>
-                    <input type="text" name="last_name" id="modal-last-name" required>
-                    <br>
-                    <label for="modal-middle-name">Middle Name:</label>
-                    <input type="text" name="middle_name" id="modal-middle-name" required>
-                    <br>
-                    <label for="contact">Contact:</label>
-                    <input type="text" name="contact" id="modal-contact" required>
-                    <br>
-                    <label for="date">Date:</label>
-                    <input type="date" name="modified_date" id="modal-modified_date" required>
-                    <br>
-                    <p>
-                        <label for="time">Time:</label>
-                        <input type="time" name="modified_time" id="modal-modified_time" min="09:00" max="18:00"
-                            required>
-                        CLINIC HOURS 9:00 AM TO 6:00 PM
-                    </p>
-                    <label for="service_type">Type Of Service:</label>
-                    <select name="service_type" id="modal-service_type" required>
-                        <option value="">--Select Service Type--</option>
-                        <option value="1">All Porcelain Veneers & Zirconia</option>
-                        <option value="2">Crown & Bridge</option>
-                        <option value="3">Dental Cleaning</option>
-                        <option value="4">Dental Implants</option>
-                        <option value="5">Dental Whitening</option>
-                        <option value="6">Dentures</option>
-                        <option value="7">Extraction</option>
-                        <option value="8">Full Exam & X-Ray</option>
-                        <option value="9">Orthodontic Braces</option>
-                        <option value="10">Restoration</option>
-                        <option value="11">Root Canal Treatment</option>
-                    </select>
-                    <br>
-                    <input type="submit" name="update" value="Save">
-                </form>
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <form method="POST" action="">
+                        <h1>EDIT DETAILS</h1><br>
+                        <input type="hidden" name="id" id="modal-id">
+                        <br>
+                        <label for="modal-first-name">First Name:</label>
+                        <input type="text" name="first_name" id="modal-first-name" required>
+                        <br>
+                        <label for="modal-last-name">Last Name:</label>
+                        <input type="text" name="last_name" id="modal-last-name" required>
+                        <br>
+                        <label for="modal-middle-name">Middle Name:</label>
+                        <input type="text" name="middle_name" id="modal-middle-name" required>
+                        <br>
+                        <label for="contact">Contact:</label>
+                        <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
+                            maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
+                        <label for="date">Date:</label>
+                        <input type="date" name="modified_date" id="modal-modified_date" required>
+                        <br>
+                        <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
+                        <select name="modified_time" id="modal-modified_time" required>
+                            <option value="09:00 AM">09:00 AM</option>
+                            <option value="10:30 AM">10:30 AM</option>
+                            <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
+                            <option value="12:00 PM">12:00 PM</option>
+                            <option value="01:30 PM">01:30 PM</option>
+                            <option value="03:00 PM">03:00 PM</option>
+                            <option value="04:30 PM">04:30 PM</option>
+                        </select>
+                        <label for="service_type">Type Of Service:</label>
+                        <select name="service_type" id="modal-service_type" required>
+                            <option value="">--Select Service Type--</option>
+                            <option value="1">All Porcelain Veneers & Zirconia</option>
+                            <option value="2">Crown & Bridge</option>
+                            <option value="3">Dental Cleaning</option>
+                            <option value="4">Dental Implants</option>
+                            <option value="5">Dental Whitening</option>
+                            <option value="6">Dentures</option>
+                            <option value="7">Extraction</option>
+                            <option value="8">Full Exam & X-Ray</option>
+                            <option value="9">Orthodontic Braces</option>
+                            <option value="10">Restoration</option>
+                            <option value="11">Root Canal Treatment</option>
+                        </select>
+                        <br>
+                        <input type="submit" name="update" value="Save">
+                    </form>
+                </div>
             </div>
 
             <script>
                 // Open the modal and populate it with data
                 function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
-                    // Populate modal fields with the received values
                     document.getElementById('modal-id').value = id;
                     document.getElementById('modal-first-name').value = first_name;
                     document.getElementById('modal-middle-name').value = middle_name;
@@ -563,33 +589,6 @@ $result = mysqli_query($con, $query);
                     document.getElementById('modal-modified_date').value = modified_date;
                     document.getElementById('modal-modified_time').value = modified_time;
                     document.getElementById('modal-service_type').value = service_type;
-
-                    // Get today's date
-                    const today = new Date();
-
-                    // Calculate the start (today) and end (six days from today) of the current week
-                    const firstDay = new Date(today); // Start of the week (today)
-                    const lastDay = new Date(firstDay);
-                    lastDay.setDate(firstDay.getDate() + 6); // End of the week (six days from today)
-
-                    // Set min and max for the date input
-                    document.getElementById('modal-modified_date').setAttribute('min', formatDate(firstDay));
-                    document.getElementById('modal-modified_date').setAttribute('max', formatDate(lastDay));
-
-                    // Display the moving week in the console
-                    const weekDays = [];
-                    for (let i = 0; i < 7; i++) {
-                        const currentDay = new Date(firstDay);
-                        currentDay.setDate(firstDay.getDate() + i); // Get each day of the week
-                        weekDays.push(formatDate(currentDay)); // Format and add to array
-                    }
-                    console.log(weekDays.join(' ')); // You can also display this in the UI instead
-
-                    // Set time input limits
-                    document.getElementById('modal-modified_time').setAttribute('min', '09:00');
-                    document.getElementById('modal-modified_time').setAttribute('max', '18:00');
-
-                    // Show the modal
                     document.getElementById('editModal').style.display = 'block';
                 }
 
@@ -598,20 +597,26 @@ $result = mysqli_query($con, $query);
                     document.getElementById('editModal').style.display = 'none';
                 }
 
-                // Format date as YYYY-MM-DD
-                function formatDate(date) {
-                    const year = date.getFullYear();
-                    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-                    const day = date.getDate().toString().padStart(2, '0');
-                    return `${year}-${month}-${day}`;
+                // Switch between tabs
+                function openTab(evt, tabName) {
+                    var i, tabcontent, tablinks;
+                    tabcontent = document.getElementsByClassName("tabcontent");
+                    for (i = 0; i < tabcontent.length; i++) {
+                        tabcontent[i].style.display = "none";
+                    }
+                    tablinks = document.getElementsByClassName("tablinks");
+                    for (i = 0; i < tablinks.length; i++) {
+                        tablinks[i].classList.remove("active");
+                    }
+                    document.getElementById(tabName).style.display = "block";
+                    evt.currentTarget.classList.add("active");
+                }
+                function switchTab(tabName) {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', tabName); // Update 'tab' parameter
+                    window.location.href = url.toString(); // Reload with updated URL
                 }
 
-                // Close modal when clicking outside of it
-                window.onclick = function (event) {
-                    if (event.target == document.getElementById('editModal')) {
-                        closeModal();
-                    }
-                }
             </script>
         </div>
 </body>

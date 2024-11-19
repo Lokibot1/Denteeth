@@ -52,8 +52,7 @@ $rootData = fetchService($con, 'Root Canal Treatment');
 
 // Handle insert request
 if (isset($_POST['update'])) {
-  // Check if 'id' is set in POST data to avoid undefined array key warning
-  $id = isset($_POST['id']) ? $_POST['id'] : ''; // Set a default value if 'id' is not present
+  $id = isset($_POST['id']) ? $_POST['id'] : '';
   $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
   $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
   $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
@@ -62,29 +61,50 @@ if (isset($_POST['update'])) {
   $time = mysqli_real_escape_string($con, $_POST['time']);
   $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-  // Insert patient information
-  $insert_patient_query = "INSERT INTO tbl_patient (first_name, last_name, middle_name) VALUES ('$first_name', '$last_name', '$middle_name')";
+  // Check if the selected date already has 7 appointments
+  $check_appointments_query = "SELECT COUNT(*) as appointment_count FROM tbl_appointments WHERE date = '$date'";
+  $result = mysqli_query($con, $check_appointments_query);
+  $row = mysqli_fetch_assoc($result);
 
-  if (mysqli_query($con, $insert_patient_query)) {
-    // Get the ID of the newly inserted patient
-    $patient_id = mysqli_insert_id($con);
-
-    // Insert appointment information using the patient's ID as the name reference
-    $insert_appointment_query = "INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time', '$service_type')";
-
-    if (mysqli_query($con, $insert_appointment_query)) {
-      // Redirect to the same page after inserting
-      header("Location: Home_page.php");
-      exit();
-    } else {
-      echo "Error updating appointment record: " . mysqli_error($con);
-    }
+  if ($row['appointment_count'] >= 7) {
+    echo "<script>alert('The selected date is fully booked. Please choose another date.');</script>";
   } else {
-    echo "Error updating patient record: " . mysqli_error($con);
-  }
-  
-}
+    // Calculate time range for validation
+    $time_start = date("H:i:s", strtotime($time) - 90 * 60); // 90 minutes before
+    $time_end = date("H:i:s", strtotime($time) + 90 * 60); // 90 minutes after
 
+    // Check for time conflicts within the 90-minute range
+    $check_time_query = "SELECT COUNT(*) as conflict_count 
+                            FROM tbl_appointments 
+                            WHERE date = '$date' 
+                            AND time BETWEEN '$time_start' AND '$time_end'";
+    $time_result = mysqli_query($con, $check_time_query);
+    $time_row = mysqli_fetch_assoc($time_result);
+
+    if ($time_row['conflict_count'] > 0) {
+      echo "<script>alert('The selected time conflicts with another appointment. Please choose a different time.');</script>";
+    } else {
+      // Insert patient information
+      $insert_patient_query = "INSERT INTO tbl_patient (first_name, last_name, middle_name) 
+                                    VALUES ('$first_name', '$last_name', '$middle_name')";
+
+      if (mysqli_query($con, $insert_patient_query)) {
+        $patient_id = mysqli_insert_id($con);
+        $insert_appointment_query = "INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) 
+                                           VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time', '$service_type')";
+
+        if (mysqli_query($con, $insert_appointment_query)) {
+          header("Location: Home_page.php");
+          exit();
+        } else {
+          echo "Error updating appointment record: " . mysqli_error($con);
+        }
+      } else {
+        echo "Error updating patient record: " . mysqli_error($con);
+      }
+    }
+  }
+}
 ?>
 
 
@@ -431,19 +451,19 @@ if (isset($_POST['update'])) {
   </section>
   <script>
     document.querySelectorAll('.img-box a').forEach(link => {
-    link.addEventListener('click', function(event) {
+      link.addEventListener('click', function (event) {
         event.preventDefault(); // Prevent immediate navigation
         const targetUrl = this.href;
-        
+
         // Add fade-out animation
         document.getElementById('crvs-container').classList.add('fade-out');
-        
+
         // Delay navigation until animation ends
         setTimeout(() => {
-            window.location.href = targetUrl;
+          window.location.href = targetUrl;
         }, 500); // Adjust this to match CSS animation duration
+      });
     });
-});
   </script>
   <section id="Appointment">
     <div class="Appointment">
@@ -477,7 +497,15 @@ if (isset($_POST['update'])) {
                 <label for="date">Date:</label>
                 <input type="date" name="date" id="modal-date" required><br>
                 <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
-                <input type="time" name="time" id="modal-time" required>
+                <select name="time" id="modal-time" required>
+                  <option value="09:00 AM">09:00 AM</option>
+                  <option value="10:30 AM">10:30 AM</option>
+                  <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
+                  <option value="12:00 PM">12:00 PM</option>
+                  <option value="01:30 PM">01:30 PM</option>
+                  <option value="03:00 PM">03:00 PM</option>
+                  <option value="04:30 PM">04:30 PM</option>
+                </select>
                 <label for="service_type">Type Of Service:</label>
                 <select name="service_type" id="modal-service_type" required>
                   <option value="">--Select Service Type--</option>
@@ -537,7 +565,7 @@ if (isset($_POST['update'])) {
                         service.
                         In order to schedule an appointment, we collect the following personal information:
                         <br>Full Name:
-                        <br>Contact Number: 
+                        <br>Contact Number:
                         <br>Email Address:
                       </p>
                       <p>
@@ -596,7 +624,7 @@ if (isset($_POST['update'])) {
               <div id="notification" class="notification" style="display: none;">
                 <p>Your appointment has been successfully booked!</p>
                 <button onclick="closeNotification()">OK</button>
-              </div> 
+              </div>
             </div>
           </div>
 
@@ -646,6 +674,48 @@ if (isset($_POST['update'])) {
               const lastDay = new Date(firstDay);
               lastDay.setDate(firstDay.getDate() + 6); // End of the week (six days from today)
               // Set min and max for the date input
+              document.getElementById('modal-date').addEventListener('change', function () {
+                const selectedDate = this.value;
+                // Make an AJAX request to check appointment count for the selected date
+                fetch(`check_appointments.php?date=${selectedDate}`)
+                  .then(response => response.json())
+                  .then(data => {
+                    const timeOptions = document.getElementById('modal-time').options;
+                    // Reset all time options first
+                    for (let i = 0; i < timeOptions.length; i++) {
+                      timeOptions[i].disabled = false; // Enable all options initially
+                    }
+
+                    // Loop through existing appointments and disable selected time slots
+                    data.takenTimes.forEach(takenTime => {
+                      for (let i = 0; i < timeOptions.length; i++) {
+                        if (timeOptions[i].value === takenTime) {
+                          timeOptions[i].disabled = true; // Disable taken time slot
+                        }
+                      }
+                    });
+                  })
+                  .catch(error => console.error("Error:", error));
+              });
+
+                // Check for conflicts between selected date and time
+                document.getElementById('modal-time').addEventListener('change', function () {
+                  const date = document.getElementById('modal-date').value;
+                  const time = this.value;
+
+                  if (date && time) {
+                    fetch(`check_appointments.php?date=${date}&time=${time}`)
+                      .then(response => response.json())
+                      .then(data => {
+                        if (data.conflict) {
+                          alert("The selected time conflicts with another appointment. Please choose a different time.");
+                          this.value = ""; // Clear the time input
+                        }
+                      })
+                      .catch(error => console.error("Error:", error));
+                  }
+                });
+
               document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
               document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
               // Format date as YYYY-MM-DD

@@ -276,6 +276,7 @@ $result = mysqli_query($con, $query);
                 }
                 ?>
             </div>
+            
             <?php
             // Set the number of results per page
             $resultsPerPage = 6;
@@ -411,12 +412,16 @@ $result = mysqli_query($con, $query);
                     <label for="date">Date:</label>
                     <input type="date" name="modified_date" id="modal-modified_date" required>
                     <br>
-                    <p>
-                        <label for="time">Time:</label>
-                        <input type="time" name="modified_time" id="modal-modified_time" min="09:00" max="18:00"
-                            required>
-                        CLINIC HOURS 9:00 AM TO 6:00 PM
-                    </p>
+                    <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
+                    <select name="modified_time" id="modal-modified_time" required>
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="10:30 AM">10:30 AM</option>
+                        <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
+                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="01:30 PM">01:30 PM</option>
+                        <option value="03:00 PM">03:00 PM</option>
+                        <option value="04:30 PM">04:30 PM</option>
+                    </select>
                     <label for="service_type">Type Of Service:</label>
                     <select name="service_type" id="modal-service_type" required>
                         <option value="">--Select Service Type--</option>
