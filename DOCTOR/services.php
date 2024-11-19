@@ -287,10 +287,10 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
+                            <label>Estimated Price:</label>
                             <input type="number" name="partial_price_min" placeholder="Min Price" required>
                             <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -345,10 +345,7 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
-                            <input type="number" name="partial_price_min" placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -403,10 +400,7 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
-                            <input type="number" name="partial_price_min" placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -461,10 +455,10 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
+                            <label>Estimated Price:</label>
                             <input type="number" name="partial_price_min" placeholder="Min Price" required>
                             <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -519,10 +513,10 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
+                            <label>Estimated Price:</label>
                             <input type="number" name="partial_price_min" placeholder="Min Price" required>
                             <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -575,10 +569,10 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
+                            <label>Estimated Price:</label>
                             <input type="number" name="partial_price_min" placeholder="Min Price" required>
                             <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -630,10 +624,10 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
+                            <label>Estimated Price:</label>
                             <input type="number" name="partial_price_min" placeholder="Min Price" required>
                             <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -685,10 +679,7 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
-                            <input type="number" name="partial_price_min" placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -740,10 +731,10 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
+                            <label>Estimated Price:</label>
                             <input type="number" name="partial_price_min" placeholder="Min Price" required>
                             <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -795,10 +786,10 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
+                            <label>Estimated Price:</label>
                             <input type="number" name="partial_price_min" placeholder="Min Price" required>
                             <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
@@ -850,10 +841,10 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
                             <label>Description:</label>
                             <textarea name="service_description" required>Enter service details here</textarea><br>
-                            <label>Partial Price Range:</label>
+                            <label>Estimated Price:</label>
                             <input type="number" name="partial_price_min" placeholder="Min Price" required>
                             <input type="number" name="partial_price_max" placeholder="Max Price" required><br>
-                            <label>Complete Price Range:</label>
+                            <label>Total Amount:</label>
                             <input type="number" name="complete_price_min" placeholder="Min Price" required>
                             <input type="number" name="complete_price_max" placeholder="Max Price" required><br>
                             <button type="submit">Save Changes</button>
