@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -46,31 +46,55 @@ if (isset($_POST['update'])) {
     }
 }
 
+if (isset($_POST['submit'])) {
+    // Get and sanitize form data
+    $id = intval($_POST['id']); // Appointment ID
+    $recommendation = mysqli_real_escape_string($con, $_POST['recommendation']);
 
-if (isset($_POST['accept'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
+    // Get the additional services, sanitize and format them
+    $additional_services = [];
+    for ($i = 1; $i <= 5; $i++) {
+        if (isset($_POST['additional_service_type_' . $i])) {
+            $additional_services[] = intval($_POST['additional_service_type_' . $i]);
+        }
     }
 
-    // Get the appointment ID from the form
-    $id = $_POST['id'];
+    $totalPrice = floatval($_POST['price']); // Total price from the form
 
-    // Prepare the query to update the status to 'finished' using a prepared statement
-    $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
-    $status = 3; // Assuming '4' represents finished
-    $stmt->bind_param("ii", $status, $id);
+    // Fetch appointment details from the database
+    $fetch_query = "SELECT * FROM tbl_appointments WHERE id = $id";
+    $result = mysqli_query($con, $fetch_query);
 
-    // Execute the query
-    if ($stmt->execute()) {
-        // Redirect back to the dashboard
+    if ($result && mysqli_num_rows($result) > 0) {
+        $appointment = mysqli_fetch_assoc($result);
+
+        // Insert into tbl_archives
+        $additional_services_str = implode(', ', $additional_services); // Comma-separated services
+
+        $archive_query = "INSERT INTO tbl_archives 
+                          (name, contact, date, time, modified_date, modified_time, service_type, additional_service_type_1, additional_service_type_2, additional_service_type_3, additional_service_type_4, additional_service_type_5, recommendation, price, completion)
+                          VALUES 
+                          ('{$appointment['name']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['modified_date']}',
+                           '{$appointment['modified_time']}', '{$appointment['service_type']}', 
+                           '{$additional_services[0]}', '{$additional_services[1]}', '{$additional_services[2]}', '{$additional_services[3]}', '{$additional_services[4]}', 
+                           '{$recommendation}', '{$totalPrice}', '1')";
+
+        if (!mysqli_query($con, $archive_query)) {
+            die("Error inserting into tbl_archives: " . mysqli_error($con));
+        }
+
+        // Update appointment status to 'finished'
+        $update_status_query = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
+        if (!mysqli_query($con, $update_status_query)) {
+            die("Error updating appointment status: " . mysqli_error($con));
+        }
+
+        // Redirect to the appointments page
         header("Location: appointments.php");
         exit();
     } else {
-        echo "Error updating status: " . $stmt->error;
+        die("Appointment not found.");
     }
-
-    $stmt->close();
 }
 
 if (isset($_POST['decline'])) {
@@ -107,7 +131,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental.css">
+    <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -127,14 +151,14 @@ $result = mysqli_query($con, $query);
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        <a href="archives.php"><i class="fas fa-trash trash"></i></a>
+        </a>
     </nav>
     <div>
         <aside class="sidebar">
             <ul>
                 <br>
-                <a class="active" href="dental_assistant_dashboard.php">
-                    <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
+                <a class="active" href="admin_dashboard.php">
+                    <h3>ADMIN<br>DASHBOARD</h3>
                 </a>
                 <br>
                 <br>
@@ -142,8 +166,11 @@ $result = mysqli_query($con, $query);
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
                 <li><a href="appointments.php">Approved Appointments</a></li>
-                <li><a href="declined.php">Declined Appointment</a></li>
-                <li><a href="billing.php">Billing Approval </a></li>
+                <li><a href="declined.php">Decline Appointments</a></a></li>
+                <li><a href="finished.php">Finished Appointments</a></li>
+                <li><a href="services.php">Services</a></li>
+                <li><a href="manage_user.php">Manage Users</a></li>
+                <li><a href="transaction_history.php">Transaction History</a></li>
             </ul>
         </aside>
     </div>
@@ -165,7 +192,7 @@ $result = mysqli_query($con, $query);
 
                 // Get current date
                 $today = date('Y-m-d');
-                
+
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
@@ -189,30 +216,6 @@ $result = mysqli_query($con, $query);
 
                 if ($appointments_today) {
                     echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM tbl_appointments 
-                                WHERE status = '1'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                if ($pending_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$pending_appointments</span>";
                 } else {
                     echo "<span style='color: red;'>No data available</span>";
                 }
@@ -255,10 +258,10 @@ $result = mysqli_query($con, $query);
                 ?>
             </div>
             <div class="round-box">
-                <p>DECLINED APPOINTMENTS:</p>
+                <p>FINISHED APPOINTMENTS:</p>
                 <?php
                 // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '2'";
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
                 $result_finished = mysqli_query($con, $sql_finished);
 
                 // Check for SQL errors
@@ -270,7 +273,7 @@ $result = mysqli_query($con, $query);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
                 if ($finished_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
                 } else {
                     echo "<span style='color: red;'>No data available</span>";
                 }
@@ -449,9 +452,19 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                        </td>
-                    </tr>";
+                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                <form method='POST' action='' style='display:inline;'>
+                    <input type='hidden' name='id' value='{$row['id']}'>
+                    <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
+                    style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                </form>";
+
+                                if ($row['status'] != 'finished') {
+                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                    style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Finish</button>";
+                                }
+
+                                echo "</td></tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -578,6 +591,177 @@ $result = mysqli_query($con, $query);
                 </table>
             </div>
 
+            <!-- Modal Structure -->
+            <div id="finishModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeFinishModal()">&times;</span>
+                    <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
+                    <br>
+                    <hr>
+                    <div id="modalDetails">
+                        <p><strong>Name:</strong> <span id="modalName"></span></p>
+                        <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
+                        <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
+                        <p><strong>Current Service:</strong> <span id="modalService"></span></p>
+                    </div>
+                    <hr>
+                    <br>
+                    <button id="addServiceButton" onclick="addServiceDropdown()">Add More Services</button>
+                    <div id="servicesContainer"></div>
+                    <form id="newServiceForm" method="POST" action="appointments.php">
+                        <input type="hidden" name="id" value="">
+                        <input type="hidden" id="price" name="price" value="0">
+                        <label for="recommendation">Recommendation:</label>
+                        <textarea id="recommendation" name="recommendation"
+                            placeholder="Enter your recommendation here..."></textarea>
+                        <div id="totalPriceContainer">
+                            <p><strong>Total Price: ₱</strong>
+                                <span style="font-weight: bold; font-size: 25px;" id="totalPrice">0</span>
+                            </p>
+                        </div>
+                        <button type="submit" name="submit">Proceed to Dental Assistant</button>
+                    </form>
+                </div>
+            </div>
+
+            <script>
+                let totalPrice = 0;
+                const dropdownPrices = {}; // Track service prices for each dropdown
+                let dropdownCount = 0;
+
+                // Price mapping for services
+                const servicePrices = {
+                    1: 30000, 2: 30000, 3: 2000, 4: 100000, 5: 20000,
+                    6: 30000, 7: 1500, 8: 2000, 9: 280000, 10: 40000, 11: 40000
+                };
+
+                function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
+                    const modal = document.getElementById('finishModal');
+                    document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
+                    document.getElementById('modalContact').innerText = contact;
+                    document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
+                    document.getElementById('modalService').innerText = service;
+
+                    const serviceId = getServiceIdFromName(service);
+                    totalPrice = servicePrices[serviceId] || 0;
+                    document.getElementById('totalPrice').innerText = totalPrice;
+                    dropdownPrices["initial"] = totalPrice;
+
+                    // Set hidden input fields
+                    document.querySelector("#newServiceForm input[name='id']").value = id;
+                    modal.style.display = 'block';
+                }
+
+                function closeFinishModal() {
+                    const modal = document.getElementById('finishModal');
+                    modal.style.display = 'none';
+
+                    // Reset the total price
+                    totalPrice = 0;
+                    dropdownCount = 0;
+                    Object.keys(dropdownPrices).forEach(key => delete dropdownPrices[key]);
+                    document.getElementById('totalPrice').innerText = totalPrice;
+                    document.getElementById('servicesContainer').innerHTML = '';
+                }
+
+                function getServiceIdFromName(serviceName) {
+                    const services = {
+                        "All Porcelain Veneers & Zirconia": 1,
+                        "Crown & Bridge": 2,
+                        "Dental Cleaning": 3,
+                        "Dental Implants": 4,
+                        "Dental Whitening": 5,
+                        "Dentures": 6,
+                        "Extraction": 7,
+                        "Full Exam & X-Ray": 8,
+                        "Orthodontic Braces": 9,
+                        "Restoration": 10,
+                        "Root Canal Treatment": 11
+                    };
+                    return services[serviceName] || null;
+                }
+
+                function addServiceDropdown() {
+                    if (dropdownCount >= 5) {
+                        alert("You can only add up to 5 services.");
+                        return;
+                    }
+
+                    const servicesContainer = document.getElementById('servicesContainer');
+                    const newServiceDiv = document.createElement('div');
+                    newServiceDiv.classList.add('service-dropdown-container');
+
+                    const serviceSelect = document.createElement('select');
+                    const uniqueId = `dropdown-${Date.now()}`;
+
+                    // Add default option
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = "";
+                    defaultOption.innerText = "-- Select a Service --";
+                    defaultOption.disabled = true;
+                    defaultOption.selected = true;
+                    serviceSelect.appendChild(defaultOption);
+
+                    // Create the service options dynamically
+                    const services = [
+                        { value: 1, label: "All Porcelain Veneers & Zirconia" },
+                        { value: 2, label: "Crown & Bridge" },
+                        { value: 3, label: "Dental Cleaning" },
+                        { value: 4, label: "Dental Implants" },
+                        { value: 5, label: "Dental Whitening" },
+                        { value: 6, label: "Dentures" },
+                        { value: 7, label: "Extraction" },
+                        { value: 8, label: "Full Exam & X-Ray" },
+                        { value: 9, label: "Orthodontic Braces" },
+                        { value: 10, label: "Restoration" },
+                        { value: 11, label: "Root Canal Treatment" }
+                    ];
+
+                    services.forEach(service => {
+                        const option = document.createElement('option');
+                        option.value = service.value;
+                        option.innerText = service.label;
+                        serviceSelect.appendChild(option);
+                    });
+
+                    // Update price when service is selected
+                    serviceSelect.addEventListener('change', function () {
+                        const selectedService = parseInt(this.value);
+                        const previousValue = this.getAttribute('data-previous-value');
+
+                        // If a service is selected
+                        if (selectedService) {
+                            const selectedPrice = servicePrices[selectedService];
+
+                            // If there was a previous selection, subtract its price from the total
+                            if (previousValue) {
+                                totalPrice -= servicePrices[previousValue];
+                            }
+
+                            // Add the new selected service's price
+                            totalPrice += selectedPrice;
+
+                            // Update the total price
+                            document.getElementById('totalPrice').innerText = totalPrice;
+                            document.getElementById('price').value = totalPrice;
+                        } else if (!selectedService && previousValue) { // If no service is selected
+                            totalPrice -= servicePrices[previousValue];
+
+                            // Update the total price
+                            document.getElementById('totalPrice').innerText = totalPrice;
+                            document.getElementById('price').value = totalPrice;
+                        }
+
+                        // Store the current selected service in the data-attribute to keep track of the previous value
+                        this.setAttribute('data-previous-value', selectedService);
+                    });
+
+                    newServiceDiv.appendChild(serviceSelect);
+                    servicesContainer.appendChild(newServiceDiv);
+                    dropdownCount++;
+                }
+            </script>
+
             <!-- Edit Modal -->
             <div id="editModal" class="modal">
                 <div class="modal-content">
@@ -672,7 +856,6 @@ $result = mysqli_query($con, $query);
                 }
 
             </script>
-
         </div>
     </div>
 </body>

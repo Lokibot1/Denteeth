@@ -25,106 +25,16 @@ if (isset($_POST['update'])) {
     $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
+    $additional_service = mysqli_real_escape_string($con, $_POST['additional_service']);
+    $recommendation = mysqli_real_escape_string($con, $_POST['recommendation']);
+    $price = mysqli_real_escape_string($con, $_POST['price']);
 
-    // Update query for tbl_patient
-    $update_patient_query = "UPDATE tbl_patient 
-                             SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
-                             WHERE id=$id";
-
-    // Update query for tbl_appointments
-    $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
-                                 WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
-
-    // Execute both queries
-    if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-        // Redirect to the same page after updating
-        header("Location: dental_assistant_dashboard.php");
-        exit();
-    } else {
-        echo "Error updating record: " . mysqli_error($con);
-    }
+    
 }
 
-date_default_timezone_set('Asia/Hong_Kong');
-
-if (isset($_POST['delete'])) {
-    // Get the ID from the form data
-    $id = $_POST['id'];
-
-    // Delete the appointment permanently from tbl_archives
-    $delete_bin_query = "DELETE FROM tbl_archives WHERE id=$id";
-
-    // Execute the delete query
-    if (mysqli_query($con, $delete_bin_query)) {
-        // Redirect to the same page after deleting
-        header("Location: archives.php");
-        exit();
-    } else {
-        echo "Error permanently deleting appointment record from bin: " . mysqli_error($con);
-    }
-}
-
-
-if (isset($_POST['restore'])) {
-    $id = $_POST['id'];
-
-    // Fetch the appointment data from tbl_archives
-    $bin_query = "SELECT * FROM tbl_archives WHERE id=$id";
-    $bin_result = mysqli_query($con, $bin_query);
-
-    if ($bin_row = mysqli_fetch_assoc($bin_result)) {
-        // Prepare the data to restore
-        $name = mysqli_real_escape_string($con, $bin_row['name']);
-        $contact = mysqli_real_escape_string($con, $bin_row['contact']);
-        $date = mysqli_real_escape_string($con, $bin_row['date']);
-        $time = mysqli_real_escape_string($con, $bin_row['time']);
-        $modified_date = mysqli_real_escape_string($con, $bin_row['modified_date']);
-        $modified_time = mysqli_real_escape_string($con, $bin_row['modified_time']);
-        $service_type = mysqli_real_escape_string($con, $bin_row['service_type']);
-        $status = '1'; // Setting status to '1' as active or restored
-        $modified_by = '1'; // Assuming restored by admin with id '1'
-
-        // Insert data back into tbl_appointments
-        $restore_query = "INSERT INTO tbl_appointments (id, name, contact, date, time, service_type, status)
-                          VALUES ('$id', '$name', '$contact', '$date', '$time', '$service_type', '$status')";
-
-        if (mysqli_query($con, $restore_query)) {
-            // Delete the record from tbl_archives
-            $delete_bin_query = "DELETE FROM tbl_archives WHERE id=$id";
-            if (mysqli_query($con, $delete_bin_query)) {
-                // Redirect to refresh the page and show updated records
-                header("Location: archives.php");
-                exit();
-            } else {
-                echo "Error deleting record from bin: " . mysqli_error($con);
-            }
-        } else {
-            echo "Error restoring record: " . mysqli_error($con);
-        }
-    } else {
-        echo "No appointment found with this ID in the bin.";
-    }
-}
-
-// SQL query to count total records
-$countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '1'";
-$countResult = mysqli_query($con, $countQuery);
-$totalCount = mysqli_fetch_assoc($countResult)['total'];
-
-// SQL query with JOIN to fetch the limited number of records
-$query = "SELECT a.*, 
-            s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name
-          FROM tbl_appointments a
-          JOIN tbl_service_type s ON a.service_type = s.id
-          JOIN tbl_patient p ON a.id = p.id
-          WHERE a.status = '3'
-          LIMIT 15";  // Limit to 15 rows
-
-$result = mysqli_query($con, $query);
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -132,13 +42,12 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental.css">
+    <link rel="stylesheet" href="dental_assistant.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
     <title>Dental Assistant Dashboard</title>
 </head>
 
@@ -247,7 +156,7 @@ $result = mysqli_query($con, $query);
             ?><br><br><br><br>
 
             <!-- HTML Form for Filters -->
-            <form method="GET" action="" class="search-form">
+            <form method="GET" action="">
                 <input type="text" name="name" placeholder="Search by name"
                     value="<?php echo htmlspecialchars($filterName); ?>" />
 
@@ -261,9 +170,8 @@ $result = mysqli_query($con, $query);
 
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
 
-                <span class="material-symbols-outlined" type = "submit">search</span>
+                <button type="submit">Filter</button>
             </form>
-
             <!-- Pagination -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
@@ -277,50 +185,64 @@ $result = mysqli_query($con, $query);
                                 class="pagination-btn"> > </a>
                         <?php endif; ?>
             </div>
-            <br><br><br>
-
         </div>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Contact</th>
-                    <th>Date</th>
-                    <th>Time</th>
-                    <th>Modified_Date</th>
-                    <th>Modified_Time</th>
-                    <th>Type Of Service</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        // Check if modified_date and modified_time are empty
-                        $modified_date = !'' && !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
-                        $modified_time = !'' && !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+       <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Modified Date</th>
+            <th>Modified Time</th>
+            <th>Type of Service</th>
+            <th>Additional Service</th>
+            <th>Recommendation</th>
+            <th>Price</th>
+            <th>Completion Status</th>
+         
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        if (mysqli_num_rows($result) > 0) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                // Check if modified_date and modified_time are empty
+                $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
-                        $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
-                        $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
+                $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
+                $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
-                        echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplay}</td>
-                        <td>{$modified_date}</td>
-                        <td>{$modified_time}</td>
-                        <td>{$row['service_name']}</td>
-                <td>
-                    </td></tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='8'>No records found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
+                // Display additional fields
+                $additional_service = !empty($row['additional_service_type']) ? $row['additional_service_type'] : 'N/A';
+                $recommendation = !empty($row['recommendation']) ? $row['recommendation'] : 'N/A';
+                $price = isset($row['price']) ? number_format($row['price'], 2) : 'N/A';
+                $completion_status = !empty($row['completion']) ? ucfirst($row['completion']) : 'N/A';
+
+                echo "<tr>
+                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td>{$row['contact']}</td>
+                    <td>{$dateToDisplay}</td>
+                    <td>{$timeToDisplay}</td>
+                    <td>{$modified_date}</td>
+                    <td>{$modified_time}</td>
+                    <td>{$row['service_name']}</td>
+                    <td>{$additional_service}</td>
+                    <td>{$recommendation}</td>
+                    <td>₱{$price}</td>
+                    <td>{$row['status']}</td>
+                   </tr>";
+            }
+        } else {
+            echo "<tr><td colspan='8'>No records found</td></tr>";
+        }
+        ?>
+    </tbody>
+</table>
+
+
+
     </div>
     </div>
 </body>
