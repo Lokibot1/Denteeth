@@ -150,9 +150,8 @@ $result = mysqli_query($con, $query);
         </a>
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
-            <a href="admin_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
         </form>
-        </a>
+        <a href="admin_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
     </nav>
     <div>
         <aside class="sidebar">
@@ -177,7 +176,7 @@ $result = mysqli_query($con, $query);
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-            <div class="round-box">
+        <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
                 include("../dbcon.php");
@@ -209,7 +208,11 @@ $result = mysqli_query($con, $query);
                 $row_today = mysqli_fetch_assoc($result_today);
                 $appointments_today = $row_today['total_appointments_today'];
 
-                echo $appointments_today ? $appointments_today : 'No data available';
+                if ($appointments_today) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -229,7 +232,11 @@ $result = mysqli_query($con, $query);
                 $row_pending = mysqli_fetch_assoc($result_pending);
                 $pending_appointments = $row_pending['total_pending_appointments'];
 
-                echo $pending_appointments ? $pending_appointments : 'No data available';
+                if ($pending_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$pending_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -256,7 +263,11 @@ $result = mysqli_query($con, $query);
                 $row_week = mysqli_fetch_assoc($result_week);
                 $appointments_for_week = $row_week['total_appointments_week'];
 
-                echo $appointments_for_week ? $appointments_for_week : 'No data available';
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -274,7 +285,11 @@ $result = mysqli_query($con, $query);
                 $row_finished = mysqli_fetch_assoc($result_finished);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
-                echo $finished_appointments ? $finished_appointments : 'No data available';
+                if ($finished_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -292,7 +307,11 @@ $result = mysqli_query($con, $query);
                 $row_finished = mysqli_fetch_assoc($result_finished);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
-                echo $finished_appointments ? $finished_appointments : 'No data available';
+                if ($finished_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <?php
@@ -422,6 +441,7 @@ $result = mysqli_query($con, $query);
             </div>
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>Today</h3>
 
                 <!-- Pagination for Day -->
@@ -490,6 +510,7 @@ $result = mysqli_query($con, $query);
 
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: <?php echo $activeTab == 'Week' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>This Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
@@ -549,6 +570,7 @@ $result = mysqli_query($con, $query);
             <!-- Tab content for Next Week -->
             <div id="NextWeek" class="tabcontent"
                 style="display: <?php echo $activeTab == 'NextWeek' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>Next Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
@@ -852,23 +874,39 @@ $result = mysqli_query($con, $query);
                 // Switch between tabs
                 function openTab(evt, tabName) {
                     var i, tabcontent, tablinks;
-                    tabcontent = document.getElementsByClassName("tabcontent");
+    
+                // Hide all tab content
+                tabcontent = document.getElementsByClassName("tabcontent");
                     for (i = 0; i < tabcontent.length; i++) {
-                        tabcontent[i].style.display = "none";
+                    tabcontent[i].style.display = "none";
                     }
-                    tablinks = document.getElementsByClassName("tablinks");
+
+                // Remove 'active' class from all tab links
+                tablinks = document.getElementsByClassName("tablinks");
                     for (i = 0; i < tablinks.length; i++) {
-                        tablinks[i].classList.remove("active");
+                    tablinks[i].classList.remove("active");
                     }
-                    document.getElementById(tabName).style.display = "block";
-                    evt.currentTarget.classList.add("active");
-                }
-                function switchTab(tabName) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', tabName); // Update 'tab' parameter
-                    window.location.href = url.toString(); // Reload with updated URL
+
+                // Display the clicked tab's content and add 'active' class to the clicked tab
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.classList.add("active");
                 }
 
+                function switchTab(tabName) {
+                // Update the URL to reflect the selected tab without reloading
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabName); 
+                window.history.pushState({}, '', url); 
+                // Call openTab to display the selected tab content
+                openTab(event, tabName); 
+                }
+
+                // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
+                window.onload = function() {
+                    const params = new URLSearchParams(window.location.search);
+                    const activeTab = params.get('tab') || 'Day'; 
+                        openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+                };
             </script>
         </div>
     </div>

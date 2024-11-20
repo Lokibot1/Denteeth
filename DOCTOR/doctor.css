@@ -205,10 +205,19 @@ textarea {
 }
 
 .close {
-    cursor: pointer;
-    font-size: 24px;
+    color: #aaa;
     float: right;
-}
+    font-size: 28px;
+    font-weight: bold;
+    z-index: 999;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
 
 .modal-content input[type="text"],
 .modal-content input[type="time"],
@@ -333,8 +342,8 @@ textarea {
 /* Style the tab */
 .tab {
     overflow: hidden;
-    border: 1px solid none;
-    background-color: none;
+    border: none;
+    background-color: transparent;
 }
 
 /* Style the buttons inside the tab */
@@ -345,29 +354,33 @@ textarea {
     font-weight: bold;
     float: left;
     border: 0px;
-    border-radius:10px 10px;
+    border-radius: 10px 10px 0 0;
     cursor: pointer;
-    padding: 10px 10px;
+    padding: 10px 20px;
     margin-left: 10px;
-    transition: 0.3s;
-    
+    transition: all 0.3s ease-in-out;
 }
 
 /* Change background color of buttons on hover */
 .tab button:hover {
-    background-color: #094514 ;
+    background-color: #094514;
     color: #FF9F00;
 }
 
 /* Create an active/current tablink class */
 .tab button.active {
+    background-color: #094514;
     color: #FF9F00;
+    border-bottom: 3px solid #FF9F00;
+    transition: all 0.3s ease-in-out;
 }
 
 /* Style the tab content */
 .tabcontent {
     display: none;
-    padding: 6px 12px;
-    border: 0px;
-    border-top: none;
+    padding: 16px;
+    border: 1px solid #ccc;
+    background-color: #FDF3D6;
+    border-radius: 0 10px 10px 10px;
+    margin-top: -1px;
 }

@@ -107,7 +107,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="dental.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -401,9 +401,9 @@ $result = mysqli_query($con, $query);
                 <button class="tablinks" onclick="switchTab('Week')">This Week</button>
                 <button class="tablinks" onclick="switchTab('NextWeek')">Next Week</button>
             </div>
-            <br>
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>Today</h3>
 
                 <!-- Pagination for Day -->
@@ -462,6 +462,7 @@ $result = mysqli_query($con, $query);
 
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: <?php echo $activeTab == 'Week' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>This Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
@@ -521,6 +522,7 @@ $result = mysqli_query($con, $query);
             <!-- Tab content for Next Week -->
             <div id="NextWeek" class="tabcontent"
                 style="display: <?php echo $activeTab == 'NextWeek' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>Next Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
@@ -576,7 +578,6 @@ $result = mysqli_query($con, $query);
                     </tbody>
                 </table>
             </div>
-
             <!-- Edit Modal -->
             <div id="editModal" class="modal">
                 <div class="modal-content">
@@ -653,23 +654,40 @@ $result = mysqli_query($con, $query);
                 // Switch between tabs
                 function openTab(evt, tabName) {
                     var i, tabcontent, tablinks;
-                    tabcontent = document.getElementsByClassName("tabcontent");
+    
+                // Hide all tab content
+                tabcontent = document.getElementsByClassName("tabcontent");
                     for (i = 0; i < tabcontent.length; i++) {
-                        tabcontent[i].style.display = "none";
+                    tabcontent[i].style.display = "none";
                     }
-                    tablinks = document.getElementsByClassName("tablinks");
+
+                // Remove 'active' class from all tab links
+                tablinks = document.getElementsByClassName("tablinks");
                     for (i = 0; i < tablinks.length; i++) {
-                        tablinks[i].classList.remove("active");
+                    tablinks[i].classList.remove("active");
                     }
-                    document.getElementById(tabName).style.display = "block";
-                    evt.currentTarget.classList.add("active");
-                }
-                function switchTab(tabName) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', tabName); // Update 'tab' parameter
-                    window.location.href = url.toString(); // Reload with updated URL
+
+                // Display the clicked tab's content and add 'active' class to the clicked tab
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.classList.add("active");
                 }
 
+                function switchTab(tabName) {
+                // Update the URL to reflect the selected tab without reloading
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabName); // Update 'tab' parameter
+                window.history.pushState({}, '', url); // Change the URL without reloading the page
+    
+                // Call openTab to display the selected tab content
+                openTab(event, tabName); // Passing 'event' is needed for openTab function
+                }
+
+                // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
+                window.onload = function() {
+                    const params = new URLSearchParams(window.location.search);
+                    const activeTab = params.get('tab') || 'Day'; // Default to 'Day' if no tab is specified
+                        openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+                };
             </script>
 
         </div>

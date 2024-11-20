@@ -42,12 +42,14 @@ if (isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="dental.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
     <title>Dental Assistant Dashboard</title>
 </head>
 
@@ -170,7 +172,7 @@ if (isset($_POST['update'])) {
 
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
 
-                <button type="submit">Filter</button>
+                <button class="material-symbols-outlined" type="submit">search</button>
             </form>
             <!-- Pagination -->
             <div class="pagination-container">

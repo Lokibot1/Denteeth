@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-            <div class="round-box">
+        <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
                 include("../dbcon.php");
@@ -197,7 +197,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_today = mysqli_fetch_assoc($result_today);
                 $appointments_today = $row_today['total_appointments_today'];
 
-                echo $appointments_today ? $appointments_today : 'No data available';
+                if ($appointments_today) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -217,7 +221,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_pending = mysqli_fetch_assoc($result_pending);
                 $pending_appointments = $row_pending['total_pending_appointments'];
 
-                echo $pending_appointments ? $pending_appointments : 'No data available';
+                if ($pending_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$pending_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -244,7 +252,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_week = mysqli_fetch_assoc($result_week);
                 $appointments_for_week = $row_week['total_appointments_week'];
 
-                echo $appointments_for_week ? $appointments_for_week : 'No data available';
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -262,7 +274,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_finished = mysqli_fetch_assoc($result_finished);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
-                echo $finished_appointments ? $finished_appointments : 'No data available';
+                if ($finished_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
             <div class="round-box">
@@ -280,10 +296,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                 $row_finished = mysqli_fetch_assoc($result_finished);
                 $finished_appointments = $row_finished['total_finished_appointments'];
 
-                echo $finished_appointments ? $finished_appointments : 'No data available';
+                if ($finished_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
                 ?>
             </div>
-
             <?php
             // Set the number of results per page
             $resultsPerPage = 6;

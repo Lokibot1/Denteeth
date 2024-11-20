@@ -210,11 +210,12 @@ if (isset($_POST['update'])) {
       <br>
       <br>
       <div class="abtr-txt">
-        <span>We value the quality of our Dental Works</span>
+        <span>Your Trusted Partner in Dental Care Since 2011</span>
         <p>
-          At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that
-          every treatment is done with precision, using the latest technology to give you the best results.
-          Ensuring that you leave with a brighter and healthier smile.
+        Established on January 18, 2011, EHM Dental Clinic in Apolonio Samson,
+         Quezon City, is dedicated to providing exceptional dental care. With skilled 
+         professionals and modern techniques, the clinic ensures a friendly and comfortable 
+         environment for all patients.
         </p>
       </div>
     </div>
@@ -224,23 +225,31 @@ if (isset($_POST['update'])) {
         <i class="fa-regular fa-file my-icon"></i>
         <br>
         <p>
-        Our clinic is staffed with highly trained and experienced dental professionals committed to providing exceptional care. We adhere to industry standards and operate with complete legal documentation to ensure the highest level of trust and quality for our patients.
+        Our clinic is staffed with highly trained and experienced dental professionals 
+        committed to providing exceptional care. We adhere to industry standards and operate 
+        with complete legal documentation to ensure the highest level of trust and quality 
+        for our patients.
         </p>
       </div>
       <div>
         <i class="fa-solid fa-tooth my-icon"></i>
         <br>
         <p>
-        <b>Expert Care:</b> Our experienced professionals are committed to providing the highest quality dental services tailored to your unique needs. <br>
-        <b>Easy to Understand: </b>We're here to answer your questions, explain your treatment options, and ensure you have a clear understanding of your dental care.
+        <b>Expert Care:</b> Our experienced professionals are committed to providing the 
+        highest quality dental services tailored to your unique needs. <br>
+        <b>Easy to Understand: </b>We're here to answer your questions, explain your 
+        treatment options, and ensure you have a clear understanding of your dental care.
         </p>
       </div>
       <div>
         <i class="fa-solid fa-check my-icon"></i>
         <br>
         <p>
-         <b>Friendly, Caring Team:</b> Our warm and welcoming staff is here to greet you with a smile and ensure you feel right at home from the moment you step through our doors. <br>
-         <b>Calm and Relaxed Atmosphere:</b> We've created a soothing environment, so you can put your nerves at ease. Your dental health should be a stress-free experience. 
+         <b>Friendly, Caring Team:</b> Our warm and welcoming staff is here to greet you
+          with a smile and ensure you feel right at home from the moment you step through
+           our doors. <br>
+         <b>Calm and Relaxed Atmosphere:</b> We've created a soothing environment, so 
+         you can put your nerves at ease. Your dental health should be a stress-free experience. 
         </p>
       </div>
     </div>

@@ -415,8 +415,7 @@ $result = mysqli_query($con, $query);
         <!-- Modal Structure -->
         <div id="finishModal" class="modal" style="display: none;">
             <div class="modal-content">
-                <span class="close" style="float: right; cursor: pointer; display: block; "
-                    onclick="closeModal()">&times;</span>
+            <span class="close">&times;</span>
                 <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
                 <br>
                 <hr>
@@ -474,11 +473,6 @@ $result = mysqli_query($con, $query);
                 document.getElementById('finishModal').style.display = 'block';
             }
 
-            function closeModal() {
-                console.log('closeModal triggered');
-                document.getElementById('finishModal').style.display = 'none';
-            }
-
             function getServiceIdFromName(serviceName) {
                 const services = {
                     "All Porcelain Veneers & Zirconia": 1,
@@ -530,7 +524,22 @@ $result = mysqli_query($con, $query);
 
                 newServiceDiv.appendChild(serviceSelect);
                 servicesContainer.appendChild(newServiceDiv);
-            }
+                
+                const modal = document.getElementById('finishModal');
+                const closeButton = document.querySelector('.close');
+
+                function closeModal() {
+                    modal.style.display = 'none';
+                    }
+                }
+
+                closeButton.addEventListener('click', closeModal);
+
+                window.addEventListener('click', function(event) {
+                    if (event.target == modal) {
+                        closeModal();
+                    }
+                });
         </script>
         <!-- Edit Modal -->
         <div id="editModal" class="modal">
