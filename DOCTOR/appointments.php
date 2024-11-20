@@ -131,7 +131,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="doctor.css">
+    <link rel="stylesheet" href="doc.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -151,7 +151,7 @@ $result = mysqli_query($con, $query);
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        </a>
+        <a href="archives.php"><i class="fas fa-trash trash"></i></a>
     </nav>
     <div>
         <aside class="sidebar">
@@ -403,6 +403,7 @@ $result = mysqli_query($con, $query);
 
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>Today</h3>
 
                 <!-- Pagination for Day -->
@@ -471,6 +472,7 @@ $result = mysqli_query($con, $query);
 
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: <?php echo $activeTab == 'Week' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>This Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
@@ -530,6 +532,7 @@ $result = mysqli_query($con, $query);
             <!-- Tab content for Next Week -->
             <div id="NextWeek" class="tabcontent"
                 style="display: <?php echo $activeTab == 'NextWeek' ? 'block' : 'none'; ?>;">
+                <br>
                 <h3>Next Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
@@ -589,7 +592,7 @@ $result = mysqli_query($con, $query);
             <!-- Modal Structure -->
             <div id="finishModal" class="modal">
                 <div class="modal-content">
-                    <span class="close" onclick="closeFinishModal()">&times;</span>
+                    <button class="close" onclick="closeFinishModal()">&times;</button>
                     <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
                     <br>
                     <hr>
@@ -833,23 +836,39 @@ $result = mysqli_query($con, $query);
                 // Switch between tabs
                 function openTab(evt, tabName) {
                     var i, tabcontent, tablinks;
-                    tabcontent = document.getElementsByClassName("tabcontent");
+    
+                // Hide all tab content
+                tabcontent = document.getElementsByClassName("tabcontent");
                     for (i = 0; i < tabcontent.length; i++) {
-                        tabcontent[i].style.display = "none";
+                    tabcontent[i].style.display = "none";
                     }
-                    tablinks = document.getElementsByClassName("tablinks");
+
+                // Remove 'active' class from all tab links
+                tablinks = document.getElementsByClassName("tablinks");
                     for (i = 0; i < tablinks.length; i++) {
-                        tablinks[i].classList.remove("active");
+                    tablinks[i].classList.remove("active");
                     }
-                    document.getElementById(tabName).style.display = "block";
-                    evt.currentTarget.classList.add("active");
-                }
-                function switchTab(tabName) {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', tabName); // Update 'tab' parameter
-                    window.location.href = url.toString(); // Reload with updated URL
+
+                // Display the clicked tab's content and add 'active' class to the clicked tab
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.classList.add("active");
                 }
 
+                function switchTab(tabName) {
+                // Update the URL to reflect the selected tab without reloading
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabName); 
+                window.history.pushState({}, '', url); 
+                // Call openTab to display the selected tab content
+                openTab(event, tabName); 
+                }
+
+                // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
+                window.onload = function() {
+                    const params = new URLSearchParams(window.location.search);
+                    const activeTab = params.get('tab') || 'Day'; 
+                        openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+                };
             </script>
         </div>
     </div>

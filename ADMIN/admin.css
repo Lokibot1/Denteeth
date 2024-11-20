@@ -205,12 +205,13 @@ textarea {
 }
 
 .modal-content {
-    background-color: #35503F;
-    color: #FDF3D6;
+    background-color: #F9F2B4;
+    font-size: 19px;
+    color: #333;
     padding: 20px;
     border-radius: 5px;
-    max-width: 70%;
-    max-height: 90%;
+    width: 70%;
+    height: 77%;
     overflow: auto;
 }
 
@@ -246,7 +247,7 @@ textarea {
 
 .modal-content input[type="submit"],
 .modal-content button[type="submit"] {
-    background-color: #FF9F00;
+    background-color: #0A2C16;
     color: white;
     padding: 20px 20px;
     border: none;
@@ -256,7 +257,7 @@ textarea {
 }
 
 .modal-content input[type="submit"]:hover {
-    background-color: #0A2C16;
+    background-color: #FF9F00;
 }
 
 .img-box {
