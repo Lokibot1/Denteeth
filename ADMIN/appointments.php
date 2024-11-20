@@ -442,7 +442,7 @@ $result = mysqli_query($con, $query);
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>Today</h3>
+                <h3 style="color: #ffff;">Today</h3>
 
                 <!-- Pagination for Day -->
                 <div class="pagination-container">
@@ -511,7 +511,7 @@ $result = mysqli_query($con, $query);
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: <?php echo $activeTab == 'Week' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>This Week</h3>
+                <h3 style="color: #ffff;">This Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
@@ -571,7 +571,7 @@ $result = mysqli_query($con, $query);
             <div id="NextWeek" class="tabcontent"
                 style="display: <?php echo $activeTab == 'NextWeek' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>Next Week</h3>
+                <h3 style="color: #ffff;">Next Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>

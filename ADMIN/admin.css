@@ -246,6 +246,7 @@ textarea {
 }
 
 .modal-content input[type="submit"],
+.modal-content button,
 .modal-content button[type="submit"] {
     background-color: #0A2C16;
     color: white;
@@ -253,11 +254,15 @@ textarea {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    margin-bottom: 50px;
 }
-
-.modal-content input[type="submit"]:hover {
-    background-color: #FF9F00;
+.modal-content button{
+    padding: 10px 10px;
+    margin-bottom: 5px;
+}
+.modal-content input[type="submit"]:hover,
+.modal-content button:hover,
+.modal-content button[type="submit"]:hover {
+    background-color: #0abb48;
 }
 
 .img-box {
@@ -385,7 +390,6 @@ textarea {
 }
 div h3{
     margin-left: 5px;
-    color: white;
 }
 /* Style the tab */
 .tab {
