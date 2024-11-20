@@ -415,7 +415,7 @@ $result = mysqli_query($con, $query);
         <!-- Modal Structure -->
         <div id="finishModal" class="modal" style="display: none;">
             <div class="modal-content">
-            <span class="close">&times;</span>
+            <button class="close">&times;</button>
                 <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
                 <br>
                 <hr>
