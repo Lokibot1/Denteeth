@@ -385,7 +385,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
             <td>{$priceToDisplay}</td>
             <td>    
         <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                        style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                        style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>Update</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                         </form>";
@@ -393,7 +393,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
                                 echo "<form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                                 <input type='submit' name='approval' value='Approval' 
-                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                                style='background-color:green; color:white; border:none;  padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>
                             </form>";
                             }
 

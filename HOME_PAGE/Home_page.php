@@ -114,7 +114,7 @@ if (isset($_POST['update'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="Home_page.css">
+  <link rel="stylesheet" href="home.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -200,59 +200,6 @@ if (isset($_POST['update'])) {
         </div>
       </div>
     </center>
-    <h1 id="hdr-txt1">WHY EHM?</h1>
-    <div id="container">
-      <div>
-        <i class="fa-regular fa-file my-icon"></i>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-          sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          Ut enim ad minim veniam, quis nostrud exercitation ullamco
-          laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-          in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
-          mollit anim id est laborum.
-        </p>
-      </div>
-      <div>
-        <i class="fa-solid fa-tooth my-icon"></i>
-        <br>
-        <br>
-        <p>
-          At EHM Dental Clinic, we believe that “Life is fair with dental care”.
-          With our expert doctor and compassionate dental assistant, we make your dental health
-          our top priority. We are committed to provide you with personalized attention to patients
-          ensuring that you leave with the confidence of a brighter smile.
-        </p>
-      </div>
-      <div>
-        <i class="fa-solid fa-check my-icon"></i>
-        <br>
-        <br>
-        <p>
-          We understand that visiting the dentist can be a stressful
-          experience for some people. That's why we strive to create
-          a calm and gentle atmosphere that will put you at ease.
-          Our goal is to build patient confidence and establish a
-          positive rapport with our patients.
-        </p>
-      </div>
-    </div>
-    <div id="side-img">
-      <div>
-        <img src="img/side.png" alt="mirror">
-      </div>
-      <br>
-      <br>
-      <div class="s-txt">
-        <span>We value the quality of our Dental Works</span>
-        <p>
-          At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that
-          every treatment is done with precision, using the latest technology to give you the best results.
-          Ensuring that you leave with a brighter and healthier smile.
-        </p>
-      </div>
-    </div>
   </section>
   <section id="About_Us">
     <h1 class="About_Us">ABOUT US</h1>
@@ -271,35 +218,29 @@ if (isset($_POST['update'])) {
         </p>
       </div>
     </div>
-
-    <div id="abt-left">
+    <h1 id="hdr-txt1">WHY EHM?</h1>
+    <div id="container">
       <div>
-        <img src="img/abt-img2.png" alt="mirror">
-      </div>
-      <br>
-      <br>
-      <div class="abtl-txt">
-        <span>We value the quality of our Dental Works</span>
+        <i class="fa-regular fa-file my-icon"></i>
+        <br>
         <p>
-          At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that
-          every treatment is done with precision, using the latest technology to give you the best results.
-          Ensuring that you leave with a brighter and healthier smile.
+        Our clinic is staffed with highly trained and experienced dental professionals committed to providing exceptional care. We adhere to industry standards and operate with complete legal documentation to ensure the highest level of trust and quality for our patients.
         </p>
       </div>
-    </div>
-
-    <div id="abt-right">
       <div>
-        <img src="img/abt-img3.png" alt="mirror">
-      </div>
-      <br>
-      <br>
-      <div class="abtr-txt2">
-        <span>We value the quality of our Dental Works</span>
+        <i class="fa-solid fa-tooth my-icon"></i>
+        <br>
         <p>
-          At EHM Dental Clinic, we are dedicated to providing you top-quality dental care. We ensure that
-          every treatment is done with precision, using the latest technology to give you the best results.
-          Ensuring that you leave with a brighter and healthier smile.
+        <b>Expert Care:</b> Our experienced professionals are committed to providing the highest quality dental services tailored to your unique needs. <br>
+        <b>Easy to Understand: </b>We're here to answer your questions, explain your treatment options, and ensure you have a clear understanding of your dental care.
+        </p>
+      </div>
+      <div>
+        <i class="fa-solid fa-check my-icon"></i>
+        <br>
+        <p>
+         <b>Friendly, Caring Team:</b> Our warm and welcoming staff is here to greet you with a smile and ensure you feel right at home from the moment you step through our doors. <br>
+         <b>Calm and Relaxed Atmosphere:</b> We've created a soothing environment, so you can put your nerves at ease. Your dental health should be a stress-free experience. 
         </p>
       </div>
     </div>

@@ -150,6 +150,7 @@ $result = mysqli_query($con, $query);
         </a>
         <form method="POST" action="../logout.php">
             <button type="submit" class="logout-button">Logout</button>
+            <a href="admin_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
         </form>
         </a>
     </nav>
@@ -419,7 +420,6 @@ $result = mysqli_query($con, $query);
                 <button class="tablinks" onclick="switchTab('Week')">This Week</button>
                 <button class="tablinks" onclick="switchTab('NextWeek')">Next Week</button>
             </div>
-
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
                 <h3>Today</h3>
@@ -466,16 +466,16 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>Update</button>
                 <form method='POST' action='' style='display:inline;'>
                     <input type='hidden' name='id' value='{$row['id']}'>
                     <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
-                    style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                    style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>
                 </form>";
 
                                 if ($row['status'] != 'finished') {
                                     echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                    style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Finish</button>";
+                    style='background-color:green; color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>Finish</button>";
                                 }
 
                                 echo "</td></tr>";

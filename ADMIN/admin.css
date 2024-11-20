@@ -86,7 +86,7 @@ nav .logo:hover {
 }
 
 .sidebar li {
-    margin-bottom: 20px;
+    margin-bottom: 40px;
     font-size: 20px;
 }
 
@@ -126,6 +126,7 @@ hr {
     margin-right: 10px;
     margin-left: 5px;
     margin-top: 70px;
+    margin-bottom: 15px;
 }
 
 li.active a {
@@ -148,6 +149,7 @@ td {
     border: 1px solid black;
     border-collapse: collapse;
     text-align: center;
+    padding: 7px;
 }
 
 table {
@@ -378,4 +380,45 @@ textarea {
 .close {
     float: right;
     cursor: pointer;
+}
+/* Style the tab */
+.tab {
+    overflow: hidden;
+    border: 1px solid none;
+    background-color: none;
+}
+
+/* Style the buttons inside the tab */
+.tab button {
+    font-size: 17px;
+    color: #FDF3D6;
+    background-color: #0A2C16;
+    font-weight: bold;
+    float: left;
+    border: 0px;
+    border-radius:10px 10px;
+    cursor: pointer;
+    padding: 10px 10px;
+    margin-left: 10px;
+    transition: 0.3s;
+    
+}
+
+/* Change background color of buttons on hover */
+.tab button:hover {
+    background-color: #094514 ;
+    color: #FF9F00;
+}
+
+/* Create an active/current tablink class */
+.tab button.active {
+    color: #FF9F00;
+}
+
+/* Style the tab content */
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border: 0px;
+    border-top: none;
 }
