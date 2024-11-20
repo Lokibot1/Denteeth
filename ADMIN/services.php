@@ -58,10 +58,7 @@ $rootData = fetchService($con, 'Root Canal Treatment');
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = $_POST['service_description'] ?? null;
-    $partial_price_min = $_POST['partial_price_min'] ?? null;
-    $partial_price_max = $_POST['partial_price_max'] ?? null;
-    $complete_price_min = $_POST['complete_price_min'] ?? null;
-    $complete_price_max = $_POST['complete_price_max'] ?? null;
+    $price = $_POST['price'] ?? null;
     $service_name = $_POST['service_name'] ?? null;
 
     if (empty($service_name)) {
@@ -130,24 +127,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $params[] = $description;
         $types .= "s";
     }
-    if (!empty($partial_price_min)) {
-        $updates[] = "partial_price_min = ?";
-        $params[] = $partial_price_min;
-        $types .= "d";
-    }
-    if (!empty($partial_price_max)) {
-        $updates[] = "partial_price_max = ?";
-        $params[] = $partial_price_max;
-        $types .= "d";
-    }
-    if (!empty($complete_price_min)) {
-        $updates[] = "complete_price_min = ?";
-        $params[] = $complete_price_min;
-        $types .= "d";
-    }
-    if (!empty($complete_price_max)) {
-        $updates[] = "complete_price_max = ?";
-        $params[] = $complete_price_max;
+    if (!empty($price)) {
+        $updates[] = "price = ?";
+        $params[] = $price;
         $types .= "d";
     }
 
@@ -350,7 +332,7 @@ $con->close();
 
             <h1>Services</h1>
             <div id="crvs-container">
-                <!-- Img-box and Modal for All Services -->
+                <!-- Img-box and Modal for Orthodontic Braces -->
                 <div class="img-box" id="openModalBtnOrthodonticBraces">
                     <div class="img-wrapper">
                         <p>
@@ -362,78 +344,70 @@ $con->close();
                     </div>
                 </div>
 
-                <!-- Modal Template -->
-                <div id="serviceModalTemplate" class="modal">
+                <!-- Modal Template for Orthodontic Braces -->
+                <div id="serviceModalBraces" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
-                        <h2>Edit Service</h2>
-                        <form id="serviceFormTemplate" method="POST" action="services.php"
-                            enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" id="serviceNameTemplate">
-                            <label>Image Upload:</label>
-                            <input type="file" name="service_image" id="imageInputTemplate" accept="image/*"
-                                onchange="previewImage(event, 'imagePreviewTemplate')"><br>
-                            <img id="imagePreviewTemplate" src="" alt="Image Preview"
+                        <h2>Edit Orthodontic Braces</h2>
+                        <form id="serviceFormBraces" method="POST" action="services.php" enctype="multipart/form-data">
+                            <input type="hidden" name="service_name" id="serviceNameBraces">
+
+                            <label for="imageInputBraces">Image Upload:</label>
+                            <input type="file" name="service_image" id="imageInputBraces" accept="image/*"
+                                onchange="previewImage(event, 'imagePreviewBraces')"><br>
+                            <img id="imagePreviewBraces" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
-                            <label>Description:</label>
-                            <textarea name="service_description" id="serviceDescriptionTemplate"
-                                required></textarea><br>
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinTemplate"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxTemplate"
-                                placeholder="Max Price" required><br>
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinTemplate"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxTemplate"
-                                placeholder="Max Price" required><br>
+
+                            <label for="serviceDescriptionBraces">Description:</label>
+                            <textarea name="service_description" id="serviceDescriptionBraces" required></textarea><br>
+
+                            <label for="priceBraces">Start at:</label>
+                            <input type="number" name="price" id="priceBraces" placeholder="Enter Price" required><br>
+
                             <button type="submit">Save Changes</button>
                         </form>
-                        <script>
-                            // General Modal Elements and Functions for All Services
-                            var modalTemplate = document.getElementById("serviceModalTemplate");
-                            var spanTemplate = document.getElementsByClassName("close")[0];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameTemplate").value = serviceData.service_name || 'Service Name';
-                                document.getElementById("serviceDescriptionTemplate").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinTemplate").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxTemplate").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinTemplate").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxTemplate").value = serviceData.complete_price_max || '';
-                                modalTemplate.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanTemplate.onclick = function () {
-                                resetModal('serviceFormTemplate', 'imagePreviewTemplate');
-                                modalTemplate.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalTemplate) {
-                                    resetModal('serviceFormTemplate', 'imagePreviewTemplate');
-                                    modalTemplate.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modals for Each Service
-                            // This is just an example for the Orthodontic Braces, you can use similar for others
-                            document.getElementById("openModalBtnOrthodonticBraces").onclick = function () {
-                                var bracesData = <?php echo json_encode($bracesData); ?>;
-                                openServiceModal(bracesData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Orthodontic Braces
+                    const modalBraces = document.getElementById("serviceModalBraces");
+                    const spanBraces = modalBraces.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openBracesModal(serviceData) {
+                        document.getElementById("serviceNameBraces").value = serviceData.service_name || 'Orthodontic Braces';
+                        document.getElementById("serviceDescriptionBraces").value = serviceData.service_description || '';
+                        document.getElementById("priceBraces").value = serviceData.price || '';
+                        modalBraces.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetBracesModal() {
+                        document.getElementById("serviceFormBraces").reset();
+                        document.getElementById("imagePreviewBraces").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanBraces.onclick = () => {
+                        resetBracesModal();
+                        modalBraces.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalBraces) {
+                            resetBracesModal();
+                            modalBraces.style.display = "none";
+                        }
+                    };
+
+                    // Open modal for Orthodontic Braces
+                    document.getElementById("openModalBtnOrthodonticBraces").onclick = () => {
+                        const bracesData = <?php echo json_encode($bracesData); ?>;
+                        openBracesModal(bracesData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Dental Cleaning -->
                 <div class="img-box" id="openModalBtnCleaning">
@@ -447,6 +421,7 @@ $con->close();
                     </div>
                 </div>
 
+                <!-- Modal Template for Dental Cleaning -->
                 <div id="serviceModalCleaning" class="modal">
                     <div class="modal-content">
                         <span class="close">&times;</span>
@@ -455,73 +430,63 @@ $con->close();
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" id="serviceNameCleaning" value="Dental Cleaning">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputCleaning">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputCleaning" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewCleaning')"><br>
                             <img id="imagePreviewCleaning" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionCleaning">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionCleaning"
                                 required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinCleaning"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxCleaning"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinCleaning"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxCleaning"
-                                placeholder="Max Price" required><br>
+                            <label for="priceCleaning">Start at:</label>
+                            <input type="number" name="price" id="priceCleaning" placeholder="Enter Price" required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // Modal Elements
-                            var modalCleaning = document.getElementById("serviceModalCleaning");
-                            var btnCleaning = document.getElementById("openModalBtnCleaning");
-                            var spanCleaning = document.getElementsByClassName("close")[1];
-
-                            // Sample data object from PHP
-                            var cleaningData = <?php echo json_encode($cleaningData); ?>;
-
-                            // Function to populate modal with data
-                            function populateModal(data) {
-                                document.getElementById("serviceNameCleaning").value = data.service_name || 'Dental Cleaning';
-                                document.getElementById("serviceDescriptionCleaning").value = data.service_description || '';
-                                document.getElementById("partialPriceMinCleaning").value = data.partial_price_min || '';
-                                document.getElementById("partialPriceMaxCleaning").value = data.partial_price_max || '';
-                                document.getElementById("completePriceMinCleaning").value = data.complete_price_min || '';
-                                document.getElementById("completePriceMaxCleaning").value = data.complete_price_max || '';
-                            }
-
-                            // Open Modal
-                            btnCleaning.onclick = function () {
-                                if (cleaningData) {
-                                    populateModal(cleaningData);
-                                }
-                                modalCleaning.style.display = "block";
-                            }
-
-                            // Close Modal
-                            spanCleaning.onclick = function () {
-                                resetModal('serviceFormCleaning', 'imagePreviewCleaning');
-                                modalCleaning.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalCleaning) {
-                                    resetModal('serviceFormCleaning', 'imagePreviewCleaning');
-                                    modalCleaning.style.display = "none";
-                                }
-                            }
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Dental Cleaning
+                    const modalCleaning = document.getElementById("serviceModalCleaning");
+                    const spanCleaning = modalCleaning.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalCleaning(serviceData) {
+                        document.getElementById("serviceNameCleaning").value = serviceData.service_name || 'Dental Cleaning';
+                        document.getElementById("serviceDescriptionCleaning").value = serviceData.service_description || '';
+                        document.getElementById("priceCleaning").value = serviceData.price || '';
+                        modalCleaning.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalCleaning() {
+                        document.getElementById("serviceFormCleaning").reset();
+                        document.getElementById("imagePreviewCleaning").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanCleaning.onclick = () => {
+                        resetModalCleaning();
+                        modalCleaning.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalCleaning) {
+                            resetModalCleaning();
+                            modalCleaning.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Dental Cleaning
+                    document.getElementById("openModalBtnCleaning").onclick = () => {
+                        const cleaningData = <?php echo json_encode($cleaningData); ?>;
+                        openServiceModalCleaning(cleaningData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Dental Whitening -->
                 <div class="img-box" id="openModalBtnWhitening">
@@ -544,74 +509,63 @@ $con->close();
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" id="serviceNameWhitening">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputWhitening">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputWhitening" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewWhitening')"><br>
                             <img id="imagePreviewWhitening" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionWhitening">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionWhitening"
                                 required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinWhitening"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxWhitening"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinWhitening"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxWhitening"
-                                placeholder="Max Price" required><br>
-
+                            <label for="priceWhitening">Per Cycle(3):</label>
+                            <input type="number" name="price" id="priceWhitening" placeholder="Enter Price"
+                                required><br>
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for All Services
-                            var modalWhitening = document.getElementById("serviceModalWhitening");
-                            var spanWhitening = document.getElementsByClassName("close")[2];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameWhitening").value = serviceData.service_name || 'Dental Whitening';
-                                document.getElementById("serviceDescriptionWhitening").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinWhitening").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxWhitening").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinWhitening").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxWhitening").value = serviceData.complete_price_max || '';
-                                modalWhitening.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanWhitening.onclick = function () {
-                                resetModal('serviceFormWhitening', 'imagePreviewWhitening');
-                                modalWhitening.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalWhitening) {
-                                    resetModal('serviceFormWhitening', 'imagePreviewWhitening');
-                                    modalWhitening.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Dental Whitening
-                            document.getElementById("openModalBtnWhitening").onclick = function () {
-                                var whiteningData = <?php echo json_encode($whiteningData); ?>;
-                                openServiceModal(whiteningData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Dental Whitening
+                    const modalWhitening = document.getElementById("serviceModalWhitening");
+                    const spanWhitening = modalWhitening.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModal(serviceData) {
+                        document.getElementById("serviceNameWhitening").value = serviceData.service_name || 'Dental Whitening';
+                        document.getElementById("serviceDescriptionWhitening").value = serviceData.service_description || '';
+                        document.getElementById("priceWhitening").value = serviceData.price || '';
+                        modalWhitening.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalWhitening() {
+                        document.getElementById("serviceFormWhitening").reset();
+                        document.getElementById("imagePreviewWhitening").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanWhitening.onclick = () => {
+                        resetModalWhitening();
+                        modalWhitening.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalWhitening) {
+                            resetModalWhitening();
+                            modalWhitening.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Dental Whitening
+                    document.getElementById("openModalBtnWhitening").onclick = () => {
+                        const whiteningData = <?php echo json_encode($whiteningData); ?>;
+                        openServiceModal(whiteningData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Dental Implants -->
                 <div class="img-box" id="openModalBtnImplants">
@@ -632,76 +586,65 @@ $con->close();
                         <h2>Edit Dental Implants</h2>
                         <form id="serviceFormImplants" method="POST" action="services.php"
                             enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" id="serviceNameImplants">
+                            <input type="hidden" name="service_name" id="serviceNameImplants" value="Dental Implants">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputImplants">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputImplants" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewImplants')"><br>
                             <img id="imagePreviewImplants" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionImplants">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionImplants"
                                 required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinImplants"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxImplants"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinImplants"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxImplants"
-                                placeholder="Max Price" required><br>
+                            <label for="priceImplants">Start at:</label>
+                            <input type="number" name="price" id="priceImplants" placeholder="Enter Price" required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for Dental Implants
-                            var modalImplants = document.getElementById("serviceModalImplants");
-                            var spanImplants = document.getElementsByClassName("close")[3];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameImplants").value = serviceData.service_name || 'Dental Implants';
-                                document.getElementById("serviceDescriptionImplants").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinImplants").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxImplants").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinImplants").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxImplants").value = serviceData.complete_price_max || '';
-                                modalImplants.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanImplants.onclick = function () {
-                                resetModal('serviceFormImplants', 'imagePreviewImplants');
-                                modalImplants.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalImplants) {
-                                    resetModal('serviceFormImplants', 'imagePreviewImplants');
-                                    modalImplants.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Dental Implants
-                            document.getElementById("openModalBtnImplants").onclick = function () {
-                                var implantsData = <?php echo json_encode($implantsData); ?>;
-                                openServiceModal(implantsData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Dental Implants
+                    const modalImplants = document.getElementById("serviceModalImplants");
+                    const spanImplants = modalImplants.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalImplants(serviceData) {
+                        document.getElementById("serviceNameImplants").value = serviceData.service_name || 'Dental Implants';
+                        document.getElementById("serviceDescriptionImplants").value = serviceData.service_description || '';
+                        document.getElementById("priceImplants").value = serviceData.price || '';
+                        modalImplants.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalImplants() {
+                        document.getElementById("serviceFormImplants").reset();
+                        document.getElementById("imagePreviewImplants").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanImplants.onclick = () => {
+                        resetModalImplants();
+                        modalImplants.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalImplants) {
+                            resetModalImplants();
+                            modalImplants.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Dental Implants
+                    document.getElementById("openModalBtnImplants").onclick = () => {
+                        const implantsData = <?php echo json_encode($implantsData); ?>;
+                        openServiceModalImplants(implantsData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Restoration -->
                 <div class="img-box" id="openModalBtnRestoration">
@@ -722,76 +665,66 @@ $con->close();
                         <h2>Edit Restoration</h2>
                         <form id="serviceFormRestoration" method="POST" action="services.php"
                             enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" id="serviceNameRestoration">
+                            <input type="hidden" name="service_name" id="serviceNameRestoration" value="Restoration">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputRestoration">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputRestoration" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewRestoration')"><br>
                             <img id="imagePreviewRestoration" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionRestoration">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionRestoration"
                                 required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinRestoration"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxRestoration"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinRestoration"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxRestoration"
-                                placeholder="Max Price" required><br>
+                            <label for="priceRestoration">Start at:</label>
+                            <input type="number" name="price" id="priceRestoration" placeholder="Enter Price"
+                                required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for Restoration
-                            var modalRestoration = document.getElementById("serviceModalRestoration");
-                            var spanRestoration = document.getElementsByClassName("close")[4];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameRestoration").value = serviceData.service_name || 'Restoration';
-                                document.getElementById("serviceDescriptionRestoration").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinRestoration").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxRestoration").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinRestoration").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxRestoration").value = serviceData.complete_price_max || '';
-                                modalRestoration.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanRestoration.onclick = function () {
-                                resetModal('serviceFormRestoration', 'imagePreviewRestoration');
-                                modalRestoration.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalRestoration) {
-                                    resetModal('serviceFormRestoration', 'imagePreviewRestoration');
-                                    modalRestoration.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Restoration
-                            document.getElementById("openModalBtnRestoration").onclick = function () {
-                                var restorationData = <?php echo json_encode($restorationData); ?>;
-                                openServiceModal(restorationData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Restoration
+                    const modalRestoration = document.getElementById("serviceModalRestoration");
+                    const spanRestoration = modalRestoration.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalRestoration(serviceData) {
+                        document.getElementById("serviceNameRestoration").value = serviceData.service_name || 'Restoration';
+                        document.getElementById("serviceDescriptionRestoration").value = serviceData.service_description || '';
+                        document.getElementById("priceRestoration").value = serviceData.price || '';
+                        modalRestoration.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalRestoration() {
+                        document.getElementById("serviceFormRestoration").reset();
+                        document.getElementById("imagePreviewRestoration").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanRestoration.onclick = () => {
+                        resetModalRestoration();
+                        modalRestoration.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalRestoration) {
+                            resetModalRestoration();
+                            modalRestoration.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Restoration
+                    document.getElementById("openModalBtnRestoration").onclick = () => {
+                        const restorationData = <?php echo json_encode($restorationData); ?>;
+                        openServiceModalRestoration(restorationData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Extraction -->
                 <div class="img-box" id="openModalBtnExtraction">
@@ -812,76 +745,66 @@ $con->close();
                         <h2>Edit Extraction</h2>
                         <form id="serviceFormExtraction" method="POST" action="services.php"
                             enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" id="serviceNameExtraction">
+                            <input type="hidden" name="service_name" id="serviceNameExtraction" value="Extraction">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputExtraction">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputExtraction" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewExtraction')"><br>
                             <img id="imagePreviewExtraction" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionExtraction">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionExtraction"
                                 required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinExtraction"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxExtraction"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinExtraction"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxExtraction"
-                                placeholder="Max Price" required><br>
+                            <label for="priceExtraction">Start at:</label>
+                            <input type="number" name="price" id="priceExtraction" placeholder="Enter Price"
+                                required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for Extraction
-                            var modalExtraction = document.getElementById("serviceModalExtraction");
-                            var spanExtraction = document.getElementsByClassName("close")[5];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameExtraction").value = serviceData.service_name || 'Extraction';
-                                document.getElementById("serviceDescriptionExtraction").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinExtraction").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxExtraction").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinExtraction").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxExtraction").value = serviceData.complete_price_max || '';
-                                modalExtraction.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanExtraction.onclick = function () {
-                                resetModal('serviceFormExtraction', 'imagePreviewExtraction');
-                                modalExtraction.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalExtraction) {
-                                    resetModal('serviceFormExtraction', 'imagePreviewExtraction');
-                                    modalExtraction.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Extraction
-                            document.getElementById("openModalBtnExtraction").onclick = function () {
-                                var extractionData = <?php echo json_encode($extractionData); ?>;
-                                openServiceModal(extractionData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Extraction
+                    const modalExtraction = document.getElementById("serviceModalExtraction");
+                    const spanExtraction = modalExtraction.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalExtraction(serviceData) {
+                        document.getElementById("serviceNameExtraction").value = serviceData.service_name || 'Extraction';
+                        document.getElementById("serviceDescriptionExtraction").value = serviceData.service_description || '';
+                        document.getElementById("priceExtraction").value = serviceData.price || '';
+                        modalExtraction.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalExtraction() {
+                        document.getElementById("serviceFormExtraction").reset();
+                        document.getElementById("imagePreviewExtraction").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanExtraction.onclick = () => {
+                        resetModalExtraction();
+                        modalExtraction.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalExtraction) {
+                            resetModalExtraction();
+                            modalExtraction.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Extraction
+                    document.getElementById("openModalBtnExtraction").onclick = () => {
+                        const extractionData = <?php echo json_encode($extractionData); ?>;
+                        openServiceModalExtraction(extractionData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Veneers -->
                 <div class="img-box" id="openModalBtnVeneers">
@@ -901,75 +824,65 @@ $con->close();
                         <span class="close">&times;</span>
                         <h2>Edit All Porcelain Veneers & Zirconia</h2>
                         <form id="serviceFormVeneers" method="POST" action="services.php" enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" id="serviceNameVeneers">
+                            <input type="hidden" name="service_name" id="serviceNameVeneers"
+                                value="All Porcelain Veneers & Zirconia">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputVeneers">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputVeneers" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewVeneers')"><br>
                             <img id="imagePreviewVeneers" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionVeneers">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionVeneers" required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinVeneers"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxVeneers"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinVeneers"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxVeneers"
-                                placeholder="Max Price" required><br>
+                            <label for="priceVeneers">Per Unit:</label>
+                            <input type="number" name="price" id="priceVeneers" placeholder="Enter Price" required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for Veneers
-                            var modalVeneers = document.getElementById("serviceModalVeneers");
-                            var spanVeneers = document.getElementsByClassName("close")[6];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameVeneers").value = serviceData.service_name || 'All Porcelain Veneers & Zirconia';
-                                document.getElementById("serviceDescriptionVeneers").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinVeneers").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxVeneers").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinVeneers").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxVeneers").value = serviceData.complete_price_max || '';
-                                modalVeneers.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanVeneers.onclick = function () {
-                                resetModal('serviceFormVeneers', 'imagePreviewVeneers');
-                                modalVeneers.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalVeneers) {
-                                    resetModal('serviceFormVeneers', 'imagePreviewVeneers');
-                                    modalVeneers.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Veneers
-                            document.getElementById("openModalBtnVeneers").onclick = function () {
-                                var veneersData = <?php echo json_encode($veneersData); ?>;
-                                openServiceModal(veneersData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Veneers
+                    const modalVeneers = document.getElementById("serviceModalVeneers");
+                    const spanVeneers = modalVeneers.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalVeneers(serviceData) {
+                        document.getElementById("serviceNameVeneers").value = serviceData.service_name || 'All Porcelain Veneers & Zirconia';
+                        document.getElementById("serviceDescriptionVeneers").value = serviceData.service_description || '';
+                        document.getElementById("priceVeneers").value = serviceData.price || '';
+                        modalVeneers.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalVeneers() {
+                        document.getElementById("serviceFormVeneers").reset();
+                        document.getElementById("imagePreviewVeneers").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanVeneers.onclick = () => {
+                        resetModalVeneers();
+                        modalVeneers.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalVeneers) {
+                            resetModalVeneers();
+                            modalVeneers.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Veneers
+                    document.getElementById("openModalBtnVeneers").onclick = () => {
+                        const veneersData = <?php echo json_encode($veneersData); ?>;
+                        openServiceModalVeneers(veneersData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Full Exam & X-Ray -->
                 <div class="img-box" id="openModalBtnExam">
@@ -989,67 +902,64 @@ $con->close();
                         <span class="close">&times;</span>
                         <h2>Edit Full Exam & X-Ray</h2>
                         <form id="serviceFormExam" method="POST" action="services.php" enctype="multipart/form-data">
-                            <input type="hidden" name="service_name" id="serviceNameExam">
+                            <input type="hidden" name="service_name" id="serviceNameExam" value="Full Exam & X-Ray">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputExam">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputExam" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewExam')"><br>
                             <img id="imagePreviewExam" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionExam">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionExam" required></textarea><br>
 
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinExam"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxExam"
-                                placeholder="Max Price" required><br>
+                            <label for="priceExam">Price:</label>
+                            <input type="number" name="price" id="priceExam" placeholder="Enter Price" required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for Full Exam & X-Ray
-                            var modalExam = document.getElementById("serviceModalExam");
-                            var spanExam = document.getElementsByClassName("close")[7];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameExam").value = serviceData.service_name || 'Full Exam & X-Ray';
-                                document.getElementById("serviceDescriptionExam").value = serviceData.service_description || '';
-                                document.getElementById("completePriceMinExam").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxExam").value = serviceData.complete_price_max || '';
-                                modalExam.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanExam.onclick = function () {
-                                resetModal('serviceFormExam', 'imagePreviewExam');
-                                modalExam.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalExam) {
-                                    resetModal('serviceFormExam', 'imagePreviewExam');
-                                    modalExam.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Full Exam & X-Ray
-                            document.getElementById("openModalBtnExam").onclick = function () {
-                                var examData = <?php echo json_encode($examData); ?>;
-                                openServiceModal(examData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Full Exam & X-Ray
+                    const modalExam = document.getElementById("serviceModalExam");
+                    const spanExam = modalExam.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalExam(serviceData) {
+                        document.getElementById("serviceNameExam").value = serviceData.service_name || 'Full Exam & X-Ray';
+                        document.getElementById("serviceDescriptionExam").value = serviceData.service_description || '';
+                        document.getElementById("priceExam").value = serviceData.price || '';
+                        modalExam.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalExam() {
+                        document.getElementById("serviceFormExam").reset();
+                        document.getElementById("imagePreviewExam").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanExam.onclick = () => {
+                        resetModalExam();
+                        modalExam.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalExam) {
+                            resetModalExam();
+                            modalExam.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Full Exam & X-Ray
+                    document.getElementById("openModalBtnExam").onclick = () => {
+                        const examData = <?php echo json_encode($examData); ?>;
+                        openServiceModalExam(examData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Root Canal Treatment -->
                 <div class="img-box" id="openModalBtnRootCanal">
@@ -1072,74 +982,64 @@ $con->close();
                             <input type="hidden" name="service_name" id="serviceNameRootCanal"
                                 value="Root Canal Treatment">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputRootCanal">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputRootCanal" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewRootCanal')"><br>
                             <img id="imagePreviewRootCanal" src="" alt="Image Preview"
-                                style="display: none; width: 200px; margin-top: 10px;" />
+                                style="display: none; width: 200px; margin-top: 10px;">
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionRootCanal">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionRootCanal"
-                                required>Enter service details here</textarea><br>
+                                required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinRootCanal"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxRootCanal"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinRootCanal"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxRootCanal"
-                                placeholder="Max Price" required><br>
+                            <label for="priceRootCanal">Per Canal:</label>
+                            <input type="number" name="price" id="priceRootCanal" placeholder="Enter Price"
+                                required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for Root Canal Treatment
-                            var modalRootCanal = document.getElementById("serviceModalRootCanal");
-                            var spanRootCanal = document.getElementsByClassName("close")[8];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameRootCanal").value = serviceData.service_name || 'Root Canal Treatment';
-                                document.getElementById("serviceDescriptionRootCanal").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinRootCanal").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxRootCanal").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinRootCanal").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxRootCanal").value = serviceData.complete_price_max || '';
-                                modalRootCanal.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanRootCanal.onclick = function () {
-                                resetModal('serviceFormRootCanal', 'imagePreviewRootCanal');
-                                modalRootCanal.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalRootCanal) {
-                                    resetModal('serviceFormRootCanal', 'imagePreviewRootCanal');
-                                    modalRootCanal.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Root Canal Treatment
-                            document.getElementById("openModalBtnRootCanal").onclick = function () {
-                                var rootData = <?php echo json_encode($rootData); ?>;
-                                openServiceModal(rootData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Root Canal Treatment
+                    const modalRootCanal = document.getElementById("serviceModalRootCanal");
+                    const spanRootCanal = modalRootCanal.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalRootCanal(serviceData) {
+                        document.getElementById("serviceNameRootCanal").value = serviceData.service_name || 'Root Canal Treatment';
+                        document.getElementById("serviceDescriptionRootCanal").value = serviceData.service_description || '';
+                        document.getElementById("priceRootCanal").value = serviceData.price || '';
+                        modalRootCanal.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalRootCanal() {
+                        document.getElementById("serviceFormRootCanal").reset();
+                        document.getElementById("imagePreviewRootCanal").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanRootCanal.onclick = () => {
+                        resetModalRootCanal();
+                        modalRootCanal.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalRootCanal) {
+                            resetModalRootCanal();
+                            modalRootCanal.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Root Canal Treatment
+                    document.getElementById("openModalBtnRootCanal").onclick = () => {
+                        const rootData = <?php echo json_encode($rootData); ?>;
+                        openServiceModalRootCanal(rootData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Dentures -->
                 <div class="img-box" id="openModalBtnDentures">
@@ -1160,74 +1060,63 @@ $con->close();
                             enctype="multipart/form-data">
                             <input type="hidden" name="service_name" id="serviceNameDentures" value="Dentures">
 
-                            <label>Image Upload:</label>
+                            <label for="imageInputDentures">Image Upload:</label>
                             <input type="file" name="service_image" id="imageInputDentures" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewDentures')"><br>
                             <img id="imagePreviewDentures" src="" alt="Image Preview"
-                                style="display: none; width: 200px; margin-top: 10px;" />
+                                style="display: none; width: 200px; margin-top: 10px;">
 
-                            <label>Description:</label>
+                            <label for="serviceDescriptionDentures">Description:</label>
                             <textarea name="service_description" id="serviceDescriptionDentures"
-                                required>Enter service details here</textarea><br>
+                                required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinDentures"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxDentures"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinDentures"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxDentures"
-                                placeholder="Max Price" required><br>
+                            <label for="priceDentures">Start at:</label>
+                            <input type="number" name="price" id="priceDentures" placeholder="Enter Price" required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for Dentures
-                            var modalDentures = document.getElementById("serviceModalDentures");
-                            var spanDentures = document.getElementsByClassName("close")[9];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameDentures").value = serviceData.service_name || 'Dentures';
-                                document.getElementById("serviceDescriptionDentures").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinDentures").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxDentures").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinDentures").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxDentures").value = serviceData.complete_price_max || '';
-                                modalDentures.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanDentures.onclick = function () {
-                                resetModal('serviceFormDentures', 'imagePreviewDentures');
-                                modalDentures.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalDentures) {
-                                    resetModal('serviceFormDentures', 'imagePreviewDentures');
-                                    modalDentures.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Dentures
-                            document.getElementById("openModalBtnDentures").onclick = function () {
-                                var dentureData = <?php echo json_encode($dentureData); ?>;
-                                openServiceModal(dentureData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Dentures
+                    const modalDentures = document.getElementById("serviceModalDentures");
+                    const spanDentures = modalDentures.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalDentures(serviceData) {
+                        document.getElementById("serviceNameDentures").value = serviceData.service_name || 'Dentures';
+                        document.getElementById("serviceDescriptionDentures").value = serviceData.service_description || '';
+                        document.getElementById("priceDentures").value = serviceData.price || '';
+                        modalDentures.style.display = "block";
+                    }
+
+                    // Function to reset modal
+                    function resetModalDentures() {
+                        document.getElementById("serviceFormDentures").reset();
+                        document.getElementById("imagePreviewDentures").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanDentures.onclick = () => {
+                        resetModalDentures();
+                        modalDentures.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalDentures) {
+                            resetModalDentures();
+                            modalDentures.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Dentures
+                    document.getElementById("openModalBtnDentures").onclick = () => {
+                        const dentureData = <?php echo json_encode($dentureData); ?>;
+                        openServiceModalDentures(dentureData);
+                    };
+                </script>
 
                 <!-- Img-box and Modal for Crown & Bridge -->
                 <div class="img-box" id="openModalBtnCrownBridge">
@@ -1253,70 +1142,60 @@ $con->close();
                             <input type="file" name="service_image" id="imageInputCrownBridge" accept="image/*"
                                 onchange="previewImage(event, 'imagePreviewCrownBridge')"><br>
                             <img id="imagePreviewCrownBridge" src="" alt="Image Preview"
-                                style="display: none; width: 200px; margin-top: 10px;" />
+                                style="display: none; width: 200px; margin-top: 10px;">
 
                             <label>Description:</label>
                             <textarea name="service_description" id="serviceDescriptionCrownBridge"
-                                required>Enter service details here</textarea><br>
+                                required></textarea><br>
 
-                            <label>Estimated Price:</label>
-                            <input type="number" name="partial_price_min" id="partialPriceMinCrownBridge"
-                                placeholder="Min Price" required>
-                            <input type="number" name="partial_price_max" id="partialPriceMaxCrownBridge"
-                                placeholder="Max Price" required><br>
-
-                            <label>Total Amount:</label>
-                            <input type="number" name="complete_price_min" id="completePriceMinCrownBridge"
-                                placeholder="Min Price" required>
-                            <input type="number" name="complete_price_max" id="completePriceMaxCrownBridge"
-                                placeholder="Max Price" required><br>
+                            <label>Start at:</label>
+                            <input type="number" name="price" id="priceCrownBridge" placeholder="Enter Price"
+                                required><br>
 
                             <button type="submit">Save Changes</button>
                         </form>
-
-                        <script>
-                            // General Modal Elements and Functions for Crown & Bridge
-                            var modalCrownBridge = document.getElementById("serviceModalCrownBridge");
-                            var spanCrownBridge = document.getElementsByClassName("close")[10];
-
-                            // Function to handle modal population and open
-                            function openServiceModal(serviceData) {
-                                document.getElementById("serviceNameCrownBridge").value = serviceData.service_name || 'Crown & Bridge';
-                                document.getElementById("serviceDescriptionCrownBridge").value = serviceData.service_description || '';
-                                document.getElementById("partialPriceMinCrownBridge").value = serviceData.partial_price_min || '';
-                                document.getElementById("partialPriceMaxCrownBridge").value = serviceData.partial_price_max || '';
-                                document.getElementById("completePriceMinCrownBridge").value = serviceData.complete_price_min || '';
-                                document.getElementById("completePriceMaxCrownBridge").value = serviceData.complete_price_max || '';
-                                modalCrownBridge.style.display = "block";
-                            }
-
-                            // Function to reset modal
-                            function resetModal(formId, previewId) {
-                                document.getElementById(formId).reset();
-                                document.getElementById(previewId).style.display = 'none';
-                            }
-
-                            // Close Modal
-                            spanCrownBridge.onclick = function () {
-                                resetModal('serviceFormCrownBridge', 'imagePreviewCrownBridge');
-                                modalCrownBridge.style.display = "none";
-                            }
-
-                            window.onclick = function (event) {
-                                if (event.target == modalCrownBridge) {
-                                    resetModal('serviceFormCrownBridge', 'imagePreviewCrownBridge');
-                                    modalCrownBridge.style.display = "none";
-                                }
-                            }
-
-                            // Example: Open Modal for Crown & Bridge
-                            document.getElementById("openModalBtnCrownBridge").onclick = function () {
-                                var crownBridgeData = <?php echo json_encode($crownBridgeData); ?>;
-                                openServiceModal(crownBridgeData);
-                            };
-                        </script>
                     </div>
                 </div>
+
+                <script>
+                    // Modal Elements for Crown & Bridge
+                    const modalCrownBridge = document.getElementById("serviceModalCrownBridge");
+                    const spanCrownBridge = modalCrownBridge.querySelector(".close");
+
+                    // Function to handle modal population and opening
+                    function openServiceModalCrownBridge(serviceData) {
+                        document.getElementById("serviceNameCrownBridge").value = serviceData.service_name || 'Crown & Bridge';
+                        document.getElementById("serviceDescriptionCrownBridge").value = serviceData.service_description || '';
+                        document.getElementById("priceCrownBridge").value = serviceData.price || '';
+                        modalCrownBridge.style.display = "block";
+                    }
+
+                    // Function to reset modal form
+                    function resetModalCrownBridge() {
+                        document.getElementById("serviceFormCrownBridge").reset();
+                        document.getElementById("imagePreviewCrownBridge").style.display = 'none';
+                    }
+
+                    // Close modal on 'X' button click
+                    spanCrownBridge.onclick = () => {
+                        resetModalCrownBridge();
+                        modalCrownBridge.style.display = "none";
+                    };
+
+                    // Close modal when clicking outside the modal
+                    window.onclick = (event) => {
+                        if (event.target === modalCrownBridge) {
+                            resetModalCrownBridge();
+                            modalCrownBridge.style.display = "none";
+                        }
+                    };
+
+                    // Example: Open modal for Crown & Bridge
+                    document.getElementById("openModalBtnCrownBridge").onclick = () => {
+                        const crownBridgeData = <?php echo json_encode($crownBridgeData); ?>;
+                        openServiceModalCrownBridge(crownBridgeData);
+                    };
+                </script>
 
                 <script>
                     var modal = document.getElementById("serviceModalCrownBridge");
