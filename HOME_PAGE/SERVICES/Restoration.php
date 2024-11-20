@@ -26,10 +26,7 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
   $row = $result->fetch_assoc();
   $service_description = $row['service_description'];
-  $partial_price_min = number_format($row['partial_price_min'], 2);
-  $partial_price_max = number_format($row['partial_price_max'], 2);
-  $complete_price_min = number_format($row['complete_price_min'], 2);
-  $complete_price_max = number_format($row['complete_price_max'], 2);
+  $price = number_format($row['price'], 2);
   $service_image = !empty($row['service_image']) ? basename($row['service_image']) : 'default.jpg'; // Use default if image not found
 } else {
   echo "Service not found.";
@@ -111,8 +108,7 @@ $con->close();
 
     <div class="price-item">
       <h2>
-        - Estimated Price: ₱ <?php echo $partial_price_min; ?> - ₱ <?php echo $partial_price_max; ?><br><br>
-        - Total Amount: ₱ <?php echo $complete_price_min; ?> - ₱ <?php echo $complete_price_max; ?>
+        - Per Unit ₱ <?php echo $price; ?>
       </h2>
       <!-- Button to open the modal -->
       <button id="openModal" class="button" onclick="openModal()">Open Booking Form</button>
@@ -136,8 +132,16 @@ $con->close();
             <label for="date">Date:</label>
             <input type="date" name="date" id="modal-date" required><br>
 
-            <label for="time">Time: (CLINIC HOURS 9:00 AM TO 6:00 PM)</label>
-            <input type="time" name="time" id="modal-time" min="09:00" max="18:00" required>
+            <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
+            <select name="modified_time" id="modal-modified_time" required>
+              <option value="09:00 AM">09:00 AM</option>
+              <option value="10:30 AM">10:30 AM</option>
+              <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
+              <option value="12:00 PM">12:00 PM</option>
+              <option value="01:30 PM">01:30 PM</option>
+              <option value="03:00 PM">03:00 PM</option>
+              <option value="04:30 PM">04:30 PM</option>
+            </select>
 
             <label for="service_type">Type Of Service:</label>
             <input type="text" id="modal-service_type_display" value="Restoration" disabled>
