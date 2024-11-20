@@ -133,18 +133,6 @@ a:hover {
     text-shadow: 0px 0px 9px #FF9F00;
     transition: color .3s, text-shadow .3s;
 }
-.trash {
-    width: 100px;
-    height: 40px;
-    font-size: 30px;
-    font-weight: bold;
-    float: right;
-    margin: -54px 80px;
-    color: white;
-    cursor: pointer;
-    border: #ff0000;
-    transition: transform 0.3s;
-}
 
 table,
 th,
