@@ -165,7 +165,7 @@ $result = mysqli_query($con, $query);
 
                 // Get current date
                 $today = date('Y-m-d');
-                
+
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
@@ -237,6 +237,42 @@ $result = mysqli_query($con, $query);
                         )
                  AND status = '3'";
 
+                $result_week = mysqli_query($con, $sql_week);
+
+                // Check for SQL errors
+                if (!$result_week) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_week = mysqli_fetch_assoc($result_week);
+                $appointments_for_week = $row_week['total_appointments_week'];
+
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
+                ?>
+            </div>
+            <div class="round-box">
+                <p>APPOINTMENT FOR NEXT WEEK:</p>
+                <?php
+                // Get the start and end date of the current week
+                $start_of_week = date('Y-m-d', strtotime('monday this week'));
+                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
+
+                // Query to count appointments for the current week
+                $sql_week = "SELECT COUNT(*) as total_appointments_week 
+                 FROM tbl_appointments 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
+                    )
+                    AND status = '3'";
+                    
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
@@ -654,39 +690,39 @@ $result = mysqli_query($con, $query);
                 // Switch between tabs
                 function openTab(evt, tabName) {
                     var i, tabcontent, tablinks;
-    
-                // Hide all tab content
-                tabcontent = document.getElementsByClassName("tabcontent");
+
+                    // Hide all tab content
+                    tabcontent = document.getElementsByClassName("tabcontent");
                     for (i = 0; i < tabcontent.length; i++) {
-                    tabcontent[i].style.display = "none";
+                        tabcontent[i].style.display = "none";
                     }
 
-                // Remove 'active' class from all tab links
-                tablinks = document.getElementsByClassName("tablinks");
+                    // Remove 'active' class from all tab links
+                    tablinks = document.getElementsByClassName("tablinks");
                     for (i = 0; i < tablinks.length; i++) {
-                    tablinks[i].classList.remove("active");
+                        tablinks[i].classList.remove("active");
                     }
 
-                // Display the clicked tab's content and add 'active' class to the clicked tab
-                document.getElementById(tabName).style.display = "block";
-                evt.currentTarget.classList.add("active");
+                    // Display the clicked tab's content and add 'active' class to the clicked tab
+                    document.getElementById(tabName).style.display = "block";
+                    evt.currentTarget.classList.add("active");
                 }
 
                 function switchTab(tabName) {
-                // Update the URL to reflect the selected tab without reloading
-                const url = new URL(window.location.href);
-                url.searchParams.set('tab', tabName); // Update 'tab' parameter
-                window.history.pushState({}, '', url); // Change the URL without reloading the page
-    
-                // Call openTab to display the selected tab content
-                openTab(event, tabName); // Passing 'event' is needed for openTab function
+                    // Update the URL to reflect the selected tab without reloading
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', tabName); // Update 'tab' parameter
+                    window.history.pushState({}, '', url); // Change the URL without reloading the page
+
+                    // Call openTab to display the selected tab content
+                    openTab(event, tabName); // Passing 'event' is needed for openTab function
                 }
 
                 // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
-                window.onload = function() {
+                window.onload = function () {
                     const params = new URLSearchParams(window.location.search);
                     const activeTab = params.get('tab') || 'Day'; // Default to 'Day' if no tab is specified
-                        openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+                    openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
                 };
             </script>
 

@@ -253,21 +253,35 @@ $result = mysqli_query($con, $query);
                 ?>
             </div>
             <div class="round-box">
-                <p>FINISHED APPOINTMENTS:</p>
+                <p>APPOINTMENT FOR NEXT WEEK:</p>
                 <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
-                $result_finished = mysqli_query($con, $sql_finished);
+                // Get the start and end date of the current week
+                $start_of_week = date('Y-m-d', strtotime('monday this week'));
+                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
+
+                // Query to count appointments for the current week
+                $sql_week = "SELECT COUNT(*) as total_appointments_week 
+                 FROM tbl_appointments 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
+                    )
+                    AND status = '3'";
+                    
+                $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
-                if (!$result_finished) {
+                if (!$result_week) {
                     die("Query failed: " . mysqli_error($con));
                 }
 
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
+                $row_week = mysqli_fetch_assoc($result_week);
+                $appointments_for_week = $row_week['total_appointments_week'];
 
-                if ($finished_appointments) {
+                if ($appointments_for_week) {
                     echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
                 } else {
                     echo "<span style='color: red;'>No data available</span>";
