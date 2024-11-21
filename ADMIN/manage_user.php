@@ -137,7 +137,7 @@ if (isset($_POST['delete'])) {
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-        <div class="round-box">
+            <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
                 <?php
                 include("../dbcon.php");
@@ -156,7 +156,12 @@ if (isset($_POST['delete'])) {
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
-                              WHERE (DATE(date) = '$today' OR DATE(modified_date) = '$today') AND status = '3'";
+                              WHERE (
+                                (modified_date IS NOT NULL AND 
+                                DATE(modified_date) = CURDATE()) 
+                                OR (modified_date IS NULL AND 
+                                DATE(date) = CURDATE())
+                                ) AND status = '3'";
 
 
                 $result_today = mysqli_query($con, $sql_today);
@@ -201,7 +206,7 @@ if (isset($_POST['delete'])) {
                 ?>
             </div>
             <div class="round-box">
-                <p>APPOINTMENT FOR THE WEEK:</p>
+                <p>APPOINTMENT FOR THIS WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
                 $start_of_week = date('Y-m-d', strtotime('monday this week'));
@@ -210,9 +215,50 @@ if (isset($_POST['delete'])) {
                 // Query to count appointments for the current week
                 $sql_week = "SELECT COUNT(*) as total_appointments_week 
                  FROM tbl_appointments 
-                 WHERE (DATE(date) BETWEEN '$start_of_week' AND '$end_of_week' 
-                 OR DATE(modified_date) BETWEEN '$start_of_week' AND '$end_of_week') 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
+                        )
                  AND status = '3'";
+
+                $result_week = mysqli_query($con, $sql_week);
+
+                // Check for SQL errors
+                if (!$result_week) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_week = mysqli_fetch_assoc($result_week);
+                $appointments_for_week = $row_week['total_appointments_week'];
+
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
+                ?>
+            </div>
+            <div class="round-box">
+                <p>APPOINTMENT FOR NEXT WEEK:</p>
+                <?php
+                // Get the start and end date of the current week
+                $start_of_week = date('Y-m-d', strtotime('monday this week'));
+                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
+
+                // Query to count appointments for the current week
+                $sql_week = "SELECT COUNT(*) as total_appointments_week 
+                 FROM tbl_appointments 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
+                    )
+                    AND status = '3'";
 
                 $result_week = mysqli_query($con, $sql_week);
 
@@ -236,28 +282,6 @@ if (isset($_POST['delete'])) {
                 <?php
                 // Query to count finished appointments
                 $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '2'";
-                $result_finished = mysqli_query($con, $sql_finished);
-
-                // Check for SQL errors
-                if (!$result_finished) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
-
-                if ($finished_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>FINISHED APPOINTMENTS:</p>
-                <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
                 $result_finished = mysqli_query($con, $sql_finished);
 
                 // Check for SQL errors

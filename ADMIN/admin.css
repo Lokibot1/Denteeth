@@ -116,17 +116,14 @@ hr {
 .round-box {
     width: 190px;
     height: 70px;
-    border-radius: 20px 20px;
+    border-radius: 20px;  /* Apply rounded corners to all sides */
     padding: 10px;
     font-size: 15px;
     font-weight: bold;
     text-align: center;
-    display: inline-block;
+    display: inline-block;  /* Can change to block if needed */
     background-color: #CFD1F4;
-    margin-right: 10px;
-    margin-left: 5px;
-    margin-top: 70px;
-    margin-bottom: 15px;
+    margin: 70px 5px 15px 0;  /* Adjust top, left, and bottom margins in shorthand */
 }
 
 li.active a {
