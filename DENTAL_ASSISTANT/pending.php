@@ -138,7 +138,6 @@ $result = mysqli_query($con, $query);
                     <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
                 </a>
                 <br>
-                <br>
                 <hr>
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
@@ -378,8 +377,8 @@ $result = mysqli_query($con, $query);
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Modified_Date</th>
-                    <th>Modified_Time</th>
+                    <th>Reschedule Date</th>
+                    <th>Reschedule Time</th>
                     <th>Type Of Service</th>
                     <th>Actions</th>
                 </tr>

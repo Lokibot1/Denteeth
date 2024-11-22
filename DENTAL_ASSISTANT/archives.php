@@ -45,7 +45,6 @@ if (!$con) {
             <a href="dental_assistant_dashboard.php"><i class="fa fa-arrow-left trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        
     </nav>
     <div>
         <aside class="sidebar">
@@ -179,8 +178,8 @@ if (!$con) {
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Modified_Date</th>
-                        <th>Modified_Time</th>
+                        <th>Reschedule Date</th>
+                        <th>Reschedule Date</th>
                         <th>Type Of Service</th>
                         <th>Status</th>
                     </tr>

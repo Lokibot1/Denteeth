@@ -73,7 +73,6 @@ if (isset($_POST['update'])) {
                     <h3>DENTAL ASSISTANT<br>ARCHIVES</h3>
                 </a>
                 <br>
-                <br>
                 <hr>
                 <br>
                 <li><a href="appointments_archives.php">Appointments Archives</a></a></li>
@@ -194,8 +193,8 @@ if (isset($_POST['update'])) {
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Modified Date</th>
-                        <th>Modified Time</th>
+                        <th>Reschedulde Date</th>
+                        <th>Rescheduled Time</th>
                         <th>Type of Service</th>
                         <th>Recommendation</th>
                         <th>Price</th>

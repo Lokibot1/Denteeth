@@ -131,7 +131,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
             </a>
             <br>
-            <br>
             <hr>
             <br>
             <li><a href="pending.php">Pending Appointments</a></a></li>
@@ -359,8 +358,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Modified Date</th>
-                        <th>Modified Time</th>
+                        <th>Reschedule Date</th>
+                        <th>Reschedule Time</th>
                         <th>Type of Service</th>
                         <th>Status</th>
                         <th>Price</th>
@@ -409,7 +408,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <td>{$completionStatus}</td>
                     <td>{$priceToDisplay}</td>
                     <td>
-                        <button type='button' onclick='openModal(\"{$row['recommendation']}\")'
+                        <button type='button' onclick='openModal(\"{$row['note']}\")'
                             style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                             View
                         </button>
@@ -439,8 +438,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Modal Structure -->
             <div id="myModal" class="modal">
                 <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <p id="modalText">Recommendation text</p>
+                <span class="close">&times;</span>
+                    <h2 style="color: #0a0a0a;">NOTES:</h2>
+                    <br>
+                    <div class="body">
+                    <p id="modalText">note text</p>
+                    </div>
                 </div>
             </div>
 
@@ -451,8 +454,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const modalText = document.getElementById("modalText");
 
                 // Open modal function
-                function openModal(recommendation) {
-                    modalText.textContent = recommendation;
+                function openModal(note) {
+                    modalText.textContent = note;
                     modal.style.display = "block";
                 }
 

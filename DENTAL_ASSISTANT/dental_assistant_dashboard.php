@@ -52,7 +52,6 @@ if (!$con) {
                     <h3>DENTAL ASSISTANT<br>DASHBOARD</h3>
                 </a>
                 <br>
-                <br>
                 <hr>
                 <br>
                 <li><a href="pending.php">Pending Appointments</a></a></li>
@@ -227,7 +226,6 @@ if (!$con) {
                 }
                 ?>
             </div>
-
             <?php
             // Set the number of results per page
             $resultsPerPage = 11;
@@ -246,7 +244,7 @@ if (!$con) {
             
             // SQL query with JOIN to fetch the limited number of records with OFFSET
             $query = "SELECT a.*, 
-            s.service_type AS service_name,
+            s.service_type AS service_name, 
             p.first_name, p.middle_name, p.last_name,
             t.status     
           FROM tbl_appointments a
@@ -254,15 +252,7 @@ if (!$con) {
           JOIN tbl_patient p ON a.id = p.id
           JOIN tbl_status t ON a.status = t.id
           WHERE a.status IN ('1', '2', '3', '4')
-         ORDER BY 
-            CASE 
-            WHEN a.modified_date IS NOT NULL THEN a.modified_date
-            ELSE a.date
-            END DESC,
-            CASE 
-            WHEN a.modified_time IS NOT NULL THEN a.modified_time
-            ELSE a.time
-            END Asc
+          ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
@@ -293,8 +283,8 @@ if (!$con) {
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Modified_Date</th>
-                    <th>Modified_Time</th>
+                    <th>Reschedule Date</th>
+                    <th>Reschedule Time</th>
                     <th>Type Of Service</th>
                     <th>Status</th>
                 </tr>

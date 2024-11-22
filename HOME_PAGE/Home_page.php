@@ -436,8 +436,7 @@ if (isset($_POST['update'])) {
                 <div class="name-fields">
                   <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
                   <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
-                  <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Initial"
-                    required>
+                  <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Initial">
                 </div>
                 <label for="contact">Contact:</label>
                 <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
