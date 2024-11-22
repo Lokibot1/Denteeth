@@ -110,7 +110,7 @@ if (isset($_POST['update'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="home.css">
+  <link rel="stylesheet" href="Home_page.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
     integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
@@ -568,7 +568,6 @@ if (isset($_POST['update'])) {
 
               <div id="notification" class="notification" style="display: none;">
                 <p>Your appointment has been successfully booked!</p>
-                <button onclick="closeNotification()">OK</button>
               </div>
             </div>
           </div>
@@ -592,13 +591,20 @@ if (isset($_POST['update'])) {
             });
 
             function showNotification() {
-              document.getElementById("notification").style.display = "block";
-            }
+              const notification = document.getElementById('notification');
+              notification.style.display = 'block';
 
-            function closeNotification() {
-              document.getElementById("notification").style.display = "none";
-            }
+              // Start fading out after 3 seconds
+              setTimeout(() => {
+                  notification.style.opacity = '0';
+              }, 5000);
 
+              // Hide completely after fading
+              setTimeout(() => {
+                  notification.style.display = 'none';
+                  notification.style.opacity = '1'; // Reset for next use
+              }, 3500);
+          }
             function validateForm() {
               const form = document.getElementById('appointmentForm');
               const inputs = form.querySelectorAll('input[required], select[required]');

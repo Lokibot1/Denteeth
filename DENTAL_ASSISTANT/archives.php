@@ -127,6 +127,7 @@ if (!$con) {
             $result = mysqli_query($con, $query);
             ?><br><br><br>
 
+<div class="managehead">
             <!-- HTML Form for Filters -->
             <form method="GET" action="" class="search-form">
                 <input type="text" name="name" placeholder="Search by name"
@@ -147,6 +148,7 @@ if (!$con) {
                             <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
                                 class="pagination-btn"> > </a>
                         <?php endif; ?>
+            </div>
             </div>
 
             <!-- Table -->

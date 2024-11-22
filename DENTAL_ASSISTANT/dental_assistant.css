@@ -402,6 +402,16 @@ textarea {
     grid-template-columns: repeat(3, 1fr);
 }
 
+.managehead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    padding: 10px;
+}
+
+.pagination-container {
+    text-align: left;
+}
 
 .pagination-btn {
     display: inline-block;
@@ -506,3 +516,15 @@ div h3{
     background-color: #094514;
     margin-top: -1px;
 }
+.notification {
+    position: fixed;
+    top: 10px;
+    left: 45%;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    padding: 10px 20px;
+    z-index: 9999; 
+    opacity: 1;
+  }

@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         mysqli_stmt_close($deleteStmt);
 
-        echo "Record successfully transferred to transaction history and deleted from archives.";
+        echo '<div style="left: 30%;" class="notification">Record successfully transferred to transaction history and deleted from archives.</div>';
     } else {
         // Update completion to 2 in tbl_archives if not service_type = '9'
         $updateQuery = "UPDATE tbl_archives SET completion = 2 WHERE id = ?";
@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         mysqli_stmt_close($updateStmt);
 
-        echo "Completion status updated to 2 in archives.";
+        echo '<div class="notification">Payment Complete!</div>';
     }
 }
 
@@ -246,7 +246,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo "<span style='color: red;'>No data available</span>";
                 }
                 ?>
-            </div><div class="round-box">
+            </div>
+            <div class="round-box">
                 <p>APPOINTMENT FOR NEXT WEEK:</p>
                 <?php
                 // Get the start and end date of the current week

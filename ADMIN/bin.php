@@ -138,6 +138,8 @@ $result = mysqli_query($con, $query);
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
+        <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
     <title>Admin Dashboard</title>
 </head>
 
@@ -166,7 +168,7 @@ $result = mysqli_query($con, $query);
                 <hr>
                 <br>
                 <li><a href="appointments_archives.php">Archives</a></a></li>
-                <li><a href="transaction.php">Transactions</a></a></li>
+                <li><a href="transaction.php">Packages Transaction History</a></a></li>
                 <li><a href="bin.php">Appointments Bin</a></li>
             </ul>
         </aside>

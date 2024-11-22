@@ -325,6 +325,12 @@ if (isset($_POST['delete'])) {
             $result = mysqli_query($con, $query);
             ?>
 
+            <div class="managehead">
+            <div class="manage">
+            <!-- Users Management Section -->
+            <h2>Manage Users</h2>
+            <button id="openModalBtn" class="add-user-btn">Add New User</button>
+            </div>
             <!-- Pagination Navigation -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
@@ -337,10 +343,7 @@ if (isset($_POST['delete'])) {
                         <?php endif; ?>
             </div>
 
-            <!-- Users Management Section -->
-            <h2>Manage Users</h2>
-            <button id="openModalBtn" class="add-user-btn">Add New User</button>
-
+            </div>
             <!-- Modal for Adding and Editing Users -->
             <div id="userModal" class="modal">
                 <div class="modal-content">

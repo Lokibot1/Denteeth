@@ -34,7 +34,7 @@ nav .logo:hover {
     display: flex;
     justify-content: flex-end; 
     align-items: center;       
-    margin: 18px 5px;
+    margin: 18px 10px;
     gap: 10px;
 }
 
@@ -144,6 +144,66 @@ a:hover {
     color: #FF9F00;
     text-shadow: 0px 0px 9px #FF9F00;
     transition: color .3s, text-shadow .3s;
+}
+/* Search Bar */
+.search-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px; 
+    align-items: center; 
+    justify-content: flex-start; 
+    margin-bottom: 20px;
+}
+.search-button {
+    background: #0A2C16;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+}
+
+.search-button:hover {
+    background-color: #094514;
+}
+
+input[type="text"], input[type="date"], select {
+    padding: 10px;
+    font-size: 16px;
+    border: 3px solid #0A2C16;
+    border-radius: 15px;
+    outline: none;
+    transition: border-color 0.3s;
+    width: calc(100% / 4 - 10px);
+    box-sizing: border-box;
+    margin-right: 20px;
+    
+}
+
+.material-symbols-outlined {
+    all: unset;
+    font-family: "Material Symbols Outlined"; /* Ensure the font is properly loaded */
+    color: #0A2C16; /* Custom button color */
+    cursor: pointer;
+    font-size: 18px; /* Adjust for better readability */
+    padding: 10px 15px; /* Add padding for a clickable area */
+    border: none;
+    border-radius: 5px; /* Optional, for rounded edges */
+    background-color: transparent; /* Ensure no default background */
+    transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover and click effects */
+}
+
+.material-symbols-outlined:hover {
+    background-color: #d4f2e0; /* Highlight on hover */
+}
+
+.material-symbols-outlined:active {
+    transform: scale(0.95); /* Button press effect */
 }
 
 table,
@@ -347,14 +407,24 @@ textarea {
     padding: 10px;
     width: 100%;
 }
+.managehead {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; 
+    padding: 10px;
+}
+
+.pagination-container {
+    text-align: left;
+}
+
 .pagination-btn {
     display: inline-block;
     padding: 10px 15px;
-    margin: 10px;
+    margin: 0 5px;
     border: none;
     border-radius: 5px;
     background-color: #0A2C16;
-    /* Bootstrap primary color */
     color: white;
     text-decoration: none;
     transition: background-color 0.3s;
@@ -362,14 +432,7 @@ textarea {
 
 .pagination-btn:hover {
     background-color: #FF9F00;
-    /* Darker shade for hover */
 }
-
-
-.pagination-container {
-    text-align: right;
-}
-
 .modal2 {
     display: none;
     position: fixed;

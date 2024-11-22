@@ -432,13 +432,18 @@ $result = mysqli_query($con, $query);
                 <hr>
                 <form id="newServiceForm" method="POST" action="">
                     <input type="hidden" name="id" value="">
-                    <label for="note">Note:</label>
+                    <br>
+                    <label style="font-size: 20px; font-weight: bold;" for="note">Note:</label>
+                    <br>
+                    <br>
                     <textarea id="note" name="note"
                         placeholder="Enter your note here..."></textarea>
+                    <br>
                     <div id="totalPriceContainer">
                         <p><strong>Total Price: ₱</strong><span id="totalPrice"
-                                style="font-weight: bold; font-size: 25px;">0</span></p>
+                            style="font-weight: bold; font-size: 25px;">0</span></p>
                     </div>
+                    <br>
                     <input type="number" id="price" name="price" style="display: none;" readonly>
                     <button type="submit" name="submit">Proceed to Dental Assistant</button>
                 </form>
