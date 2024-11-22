@@ -30,14 +30,20 @@ nav .logo:hover {
     color: #ffff;
 }
 
+.s-buttons {
+    display: flex;
+    justify-content: flex-end; 
+    align-items: center;       
+    margin: 18px 5px;
+    gap: 10px;
+}
+
 .logout-button {
     width: 100px;
     height: 40px;
     font-size: 15px;
     font-weight: bold;
-    float: inline-end;
     background-color: rgb(196, 0, 0);
-    margin: 18px 20px;
     color: black;
     cursor: pointer;
     border: #ff0000;
@@ -51,16 +57,17 @@ nav .logo:hover {
 }
 
 .trash {
-    width: 100px;
+    width: 50px;
     height: 40px;
-    font-size: 30px;
+    font-size: 35px;
     font-weight: bold;
-    float: right;
-    margin: -54px 80px;
     color: white;
     cursor: pointer;
-    border: #ff0000;
     transition: transform 0.3s;
+}
+
+.trash:hover {
+    text-shadow: #FF9F00 2px 2px 2px;
 }
 
 /* Sidebar */
@@ -116,14 +123,14 @@ hr {
 .round-box {
     width: 190px;
     height: 70px;
-    border-radius: 20px;  /* Apply rounded corners to all sides */
+    border-radius: 20px;
     padding: 10px;
     font-size: 15px;
     font-weight: bold;
     text-align: center;
-    display: inline-block;  /* Can change to block if needed */
+    display: inline-block;  
     background-color: #CFD1F4;
-    margin: 70px 5px 15px 0;  /* Adjust top, left, and bottom margins in shorthand */
+    margin: 70px 5px 15px 10px; 
 }
 
 li.active a {

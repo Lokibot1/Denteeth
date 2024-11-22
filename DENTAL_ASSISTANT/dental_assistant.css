@@ -34,7 +34,7 @@ nav .logo:hover {
     display: flex;
     justify-content: flex-end; 
     align-items: center;       
-    margin: 18px 0px;
+    margin: 18px 5px;
     gap: 10px;
 }
 

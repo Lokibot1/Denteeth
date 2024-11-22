@@ -141,10 +141,10 @@ $result = mysqli_query($con, $query);
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
         </a>
-        <form method="POST" action="../logout.php">
+        <form method="POST" class="s-buttons" action="../logout.php">
+            <a href="archives.php"><i class="fas fa-trash trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
-        <a href="admin_dashboard_bin.php"><i class="fas fa-trash trash"></i></a>
     </nav>
     <div>
         <aside class="sidebar">

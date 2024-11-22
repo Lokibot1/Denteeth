@@ -152,7 +152,7 @@ $result = mysqli_query($con, $query);
             </div>
         </a>
         <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="archives.php"><i class="fas fa-trash trash"></i></a>
+            <a href="dental_assistant_dashboard.php"><i class="fa fa-arrow-left trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>

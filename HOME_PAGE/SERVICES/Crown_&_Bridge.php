@@ -105,7 +105,7 @@ $con->close();
 
     <div class="price-item">
       <h2>
-        - Per Unit ₱ <?php echo $price; ?>
+        - Starts at: ₱ <?php echo $price; ?>
       </h2>
       <!-- Button to open the modal -->
       <button id="openModal" class="button" onclick="openModal()">Open Booking Form</button>
