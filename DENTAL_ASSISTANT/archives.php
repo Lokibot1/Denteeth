@@ -57,7 +57,8 @@ if (!$con) {
                 <br>
                 <hr>
                 <br>
-                <li><a href="appointments_archives.php">Appointments Archives</a></a></li>
+                <li><a href="appointments_archives.php">Archives</a></a></li>
+                <li><a href="transaction.php">Transactions</a></a></li>
                 <li><a href="bin.php">Appointments Bin</a></li>
             </ul>
         </aside>
