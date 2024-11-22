@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in and is an admin
-if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1'])) {
     header("Location: ../login.php");
     exit();
 }
@@ -22,15 +22,13 @@ if (!$con) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="admin.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
-    <title>Dental Assistant Dashboard</title>
+    <title>Admin Dashboard</title>
 </head>
 
 <body>
@@ -42,7 +40,7 @@ if (!$con) {
             </div>
         </a>
         <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="dental_assistant_dashboard.php"><i class="fa fa-arrow-left trash"></i></a>
+            <a href="admin_dashboard.php"><i class="fa fa-arrow-left trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>
@@ -51,13 +49,14 @@ if (!$con) {
             <ul>
                 <br>
                 <a class="active" href="archives.php">
-                    <h3>DENTAL ASSISTANT<br>ARCHIVES</h3>
+                    <h3>ADMIN<br>ARCHIVES</h3>
                 </a>
                 <br>
                 <br>
                 <hr>
                 <br>
-                <li><a href="appointments_archives.php">Appointments Archives</a></a></li>
+                <li><a href="appointments_archives.php">Archives</a></a></li>
+                <li><a href="transaction.php">Transactions</a></a></li>
                 <li><a href="bin.php">Appointments Bin</a></li>
             </ul>
         </aside>
@@ -77,24 +76,18 @@ if (!$con) {
 
             // Capture filter values from GET parameters
             $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterStatus = isset($_GET['status']) ? $_GET['status'] : '';
             $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
 
             // SQL query to count total records with filtering
             $countQuery = "SELECT COUNT(*) as total FROM tbl_archives a
-    JOIN tbl_service_type s ON a.service_type = s.id
-    JOIN tbl_patient p ON a.id = p.id
-    JOIN tbl_status t ON a.completion = t.id
-    WHERE a.completion IN ('1', '2', '3')";
+                JOIN tbl_service_type s ON a.service_type = s.id
+                JOIN tbl_patient p ON a.name = p.id
+                JOIN tbl_status t ON a.completion = t.id
+                WHERE a.completion IN ('1', '2', '3')";
 
             // Add name filter if specified
             if ($filterName) {
                 $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add status filter if specified
-            if ($filterStatus) {
-                $countQuery .= " AND a.completion = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -108,23 +101,18 @@ if (!$con) {
             
             // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
-    s.service_type AS service_name, 
-    p.first_name, p.middle_name, p.last_name, 
-    t.status     
-    FROM tbl_archives a
-    JOIN tbl_service_type s ON a.service_type = s.id
-    JOIN tbl_patient p ON a.id = p.id
-    JOIN tbl_status t ON a.completion = t.id
-    WHERE a.completion IN ('1', '2', '3')";
+                s.service_type AS service_name, 
+                p.first_name, p.middle_name, p.last_name, 
+                t.status     
+                FROM tbl_archives a
+                JOIN tbl_service_type s ON a.service_type = s.id
+                JOIN tbl_patient p ON a.name = p.id
+                JOIN tbl_status t ON a.completion = t.id
+                WHERE a.completion IN ('1', '2', '3')";
 
             // Add name filter if specified
             if ($filterName) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add status filter if specified
-            if ($filterStatus) {
-                $query .= " AND a.completion = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -135,26 +123,16 @@ if (!$con) {
             $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to results per page
             
             $result = mysqli_query($con, $query);
-            ?>
-            <br><br><br><br>
+            ?><br><br><br>
 
             <!-- HTML Form for Filters -->
             <form method="GET" action="" class="search-form">
                 <input type="text" name="name" placeholder="Search by name"
                     value="<?php echo htmlspecialchars($filterName); ?>" />
-
-                <select name="status">
-                    <option value="">All Statuses</option>
-                    <option value="1" <?php echo $filterStatus == '1' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="2" <?php echo $filterStatus == '2' ? 'selected' : ''; ?>>Declined</option>
-                    <option value="3" <?php echo $filterStatus == '3' ? 'selected' : ''; ?>>Approved</option>
-                    <option value="4" <?php echo $filterStatus == '4' ? 'selected' : ''; ?>>Finished</option>
-                </select>
-
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
-
-                <span class="material-symbols-outlined" type="submit">search</span>
+                <button class="material-symbols-outlined" type="submit">search</button>
             </form>
+
             <!-- Pagination -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
@@ -168,7 +146,6 @@ if (!$con) {
                                 class="pagination-btn"> > </a>
                         <?php endif; ?>
             </div>
-            <br><br><br>
 
             <!-- Table -->
             <table class="table table-bordered">
@@ -178,8 +155,8 @@ if (!$con) {
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Modified_Date</th>
-                        <th>Modified_Time</th>
+                        <th>Reschedule Date</th>
+                        <th>Reschedule Date</th>
                         <th>Type Of Service</th>
                         <th>Status</th>
                     </tr>

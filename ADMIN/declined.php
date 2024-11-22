@@ -26,23 +26,41 @@ if (isset($_POST['update'])) {
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Update query for tbl_patient
-    $update_patient_query = "UPDATE tbl_patient 
-                             SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
-                             WHERE id=$id";
+    // Check for conflicts in both original date/time and modified date/time
+    $conflict_query = "
+        SELECT id 
+        FROM tbl_appointments 
+        WHERE 
+            (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
+            (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
+        AND id != $id"; // Exclude the current appointment being updated
 
-    // Update query for tbl_appointments
-    $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
-                                 WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
+    $conflict_result = mysqli_query($con, $conflict_query);
 
-    // Execute both queries
-    if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-        // Redirect to the same page after updating
-        header("Location: declined.php");
-        exit();
+    if (mysqli_num_rows($conflict_result) > 0) {
+        // Conflict found
+        echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
     } else {
-        echo "Error updating record: " . mysqli_error($con);
+        // No conflict - proceed with the update
+
+        // Update query for tbl_patient
+        $update_patient_query = "UPDATE tbl_patient 
+                                 SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
+                                 WHERE id=$id";
+
+        // Update query for tbl_appointments
+        $update_appointment_query = "UPDATE tbl_appointments 
+                                     SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '1', service_type='$service_type' 
+                                     WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
+
+        // Execute both queries
+        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+            // Redirect to the same page after updating
+            header("Location: pending.php");
+            exit();
+        } else {
+            echo "Error updating record: " . mysqli_error($con);
+        }
     }
 }
 
@@ -173,7 +191,7 @@ $result = mysqli_query($con, $query);
         </aside>
     </div>
     <!-- Main Content/Crud -->
-    <    <div class="top">
+    < <div class="top">
         <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
@@ -361,11 +379,19 @@ $result = mysqli_query($con, $query);
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
           WHERE a.status = '2'
-          ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+          ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
-            ?>
+            ?><br>
 
             <!-- HTML Table -->
             <div class="pagination-container">
@@ -390,8 +416,8 @@ $result = mysqli_query($con, $query);
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Modified_Date</th>
-                    <th>Modified_Time</th>
+                    <th>Reschedule Date</th>
+                    <th>Reschedule Time</th>
                     <th>Type Of Service</th>
                     <th>Actions</th>
                 </tr>
@@ -417,7 +443,7 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                         <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                        style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>Update</button>
+                        style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                         </form>";
@@ -425,14 +451,14 @@ $result = mysqli_query($con, $query);
                             echo "<form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                                 <input type='submit' name='restore' value='Restore' 
-                                style='background-color:green; color:white; border:none;  padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>
+                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                             </form>";
                         }
                         if ($row['status'] != 'Delete') {
                             echo "<form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='delete' value='Delete' 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                         </form>";
                         }
 
@@ -472,11 +498,11 @@ $result = mysqli_query($con, $query);
                     <select name="modified_time" id="modal-modified_time" required>
                         <option value="09:00 AM">09:00 AM</option>
                         <option value="10:30 AM">10:30 AM</option>
-                        <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
-                        <option value="12:00 PM">12:00 PM</option>
-                        <option value="01:30 PM">01:30 PM</option>
-                        <option value="03:00 PM">03:00 PM</option>
-                        <option value="04:30 PM">04:30 PM</option>
+                        <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
+                        <option value="12:30 PM">12:30 PM</option>
+                        <option value="13:30 PM">01:30 PM</option>
+                        <option value="15:00 PM">03:00 PM</option>
+                        <option value="16:30 PM">04:30 PM</option>
                     </select>
                     <label for="service_type">Type Of Service:</label>
                     <select name="service_type" id="modal-service_type" required>
@@ -560,7 +586,7 @@ $result = mysqli_query($con, $query);
                 }
             </script>
         </div>
-    </div>
+        </div>
 </body>
 
 </html>

@@ -26,76 +26,99 @@ if (isset($_POST['update'])) {
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Update query for tbl_patient
-    $update_patient_query = "UPDATE tbl_patient 
-                             SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
-                             WHERE id=$id";
+    // Check for conflicts in both original date/time and modified date/time
+    $conflict_query = "SELECT id 
+        FROM tbl_appointments 
+        WHERE 
+            (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
+            (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
+        AND id != $id"; // Exclude the current appointment being updated
 
-    // Update query for tbl_appointments
-    $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time',     service_type='$service_type' 
-                                 WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
+    $conflict_result = mysqli_query($con, $conflict_query);
 
-    // Execute both queries
-    if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-        // Redirect to the same page after updating
-        header("Location: appointments.php");
-        exit();
+    if (mysqli_num_rows($conflict_result) > 0) {
+        // Conflict found
+        echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
     } else {
-        echo "Error updating record: " . mysqli_error($con);
+        // No conflict - proceed with the update
+
+        // Update query for tbl_patient
+        $update_patient_query = "UPDATE tbl_patient 
+                                 SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
+                                 WHERE id=$id";
+
+        // Update query for tbl_appointments
+        $update_appointment_query = "UPDATE tbl_appointments 
+                                     SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '1', service_type='$service_type' 
+                                     WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
+
+        // Execute both queries
+        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+            // Redirect to the same page after updating
+            header("Location: appointments.php");
+            exit();
+        } else {
+            echo "Error updating record: " . mysqli_error($con);
+        }
     }
 }
+
 
 if (isset($_POST['submit'])) {
-    // Get and sanitize form data
+    // Get and sanitize the posted data
     $id = intval($_POST['id']); // Appointment ID
-    $recommendation = mysqli_real_escape_string($con, $_POST['recommendation']);
+    $note = mysqli_real_escape_string($con, $_POST['note']);
+    $price = floatval($_POST['price']); // Price
 
-    // Get the additional services, sanitize and format them
-    $additional_services = [];
-    for ($i = 1; $i <= 5; $i++) {
-        if (isset($_POST['additional_service_type_' . $i])) {
-            $additional_services[] = intval($_POST['additional_service_type_' . $i]);
+    // Fetch appointment details
+    $stmt = $con->prepare("SELECT * FROM tbl_appointments WHERE id = ?");
+    $stmt->bind_param("i", $id);
+
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+        if ($result && $result->num_rows > 0) {
+            $appointment = $result->fetch_assoc();
+
+            // Archive appointment data
+            $archive_stmt = $con->prepare("INSERT INTO tbl_archives 
+                (name, contact, date, time, modified_date, modified_time, service_type, note, price, completion) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '1')");
+            $archive_stmt->bind_param(
+                "ssssssssd",
+                $appointment['name'],
+                $appointment['contact'],
+                $appointment['date'],
+                $appointment['time'],
+                $appointment['modified_date'],
+                $appointment['modified_time'],
+                $appointment['service_type'],
+                $note,
+                $price
+            );
+
+            if (!$archive_stmt->execute()) {
+                die("Error inserting into tbl_archives: " . $archive_stmt->error);
+            }
+
+            // Remove the appointment from tbl_appointments
+            $delete_stmt = $con->prepare("DELETE FROM tbl_appointments WHERE id = ?");
+            $delete_stmt->bind_param("i", $id);
+
+            if (!$delete_stmt->execute()) {
+                die("Error deleting appointment: " . $delete_stmt->error);
+            }
+
+            // Redirect to appointments page
+            header("Location: appointments.php");
+            exit();
+        } else {
+            die("Error: Appointment not found.");
         }
-    }
-
-    $totalPrice = floatval($_POST['price']); // Total price from the form
-
-    // Fetch appointment details from the database
-    $fetch_query = "SELECT * FROM tbl_appointments WHERE id = $id";
-    $result = mysqli_query($con, $fetch_query);
-
-    if ($result && mysqli_num_rows($result) > 0) {
-        $appointment = mysqli_fetch_assoc($result);
-
-        // Insert into tbl_archives
-        $additional_services_str = implode(', ', $additional_services); // Comma-separated services
-
-        $archive_query = "INSERT INTO tbl_archives 
-                          (name, contact, date, time, modified_date, modified_time, service_type, additional_service_type_1, additional_service_type_2, additional_service_type_3, additional_service_type_4, additional_service_type_5, recommendation, price, completion)
-                          VALUES 
-                          ('{$appointment['name']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['modified_date']}',
-                           '{$appointment['modified_time']}', '{$appointment['service_type']}', 
-                           '{$additional_services[0]}', '{$additional_services[1]}', '{$additional_services[2]}', '{$additional_services[3]}', '{$additional_services[4]}', 
-                           '{$recommendation}', '{$totalPrice}', '1')";
-
-        if (!mysqli_query($con, $archive_query)) {
-            die("Error inserting into tbl_archives: " . mysqli_error($con));
-        }
-
-        // Update appointment status to ''
-        $update_status_query = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
-        if (!mysqli_query($con, $update_status_query)) {
-            die("Error updating appointment status: " . mysqli_error($con));
-        }
-
-        // Redirect to the appointments page
-        header("Location: appointments.php");
-        exit();
     } else {
-        die("Appointment not found.");
+        die("Error executing fetch query: " . $stmt->error);
     }
 }
+
 
 if (isset($_POST['decline'])) {
     $id = $_POST['id'];
@@ -463,10 +486,11 @@ $result = mysqli_query($con, $query);
                 <button class="tablinks" onclick="switchTab('Week')">This Week</button>
                 <button class="tablinks" onclick="switchTab('NextWeek')">Next Week</button>
             </div>
+
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3 style="color: #ffff;">Today</h3>
+                <h3 style="color: #fff;">Today</h3>
 
                 <!-- Pagination for Day -->
                 <div class="pagination-container">
@@ -510,16 +534,16 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>Update</button>
-                <form method='POST' action='' style='display:inline;'>
-                    <input type='hidden' name='id' value='{$row['id']}'>
-                    <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
-                    style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>
-                </form>";
+                             style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                            <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            </form>";
 
                                 if ($row['status'] != 'finished') {
                                     echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                    style='background-color:green; color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>Finish</button>";
+                    style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Finish</button>";
                                 }
 
                                 echo "</td></tr>";
@@ -535,7 +559,7 @@ $result = mysqli_query($con, $query);
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: <?php echo $activeTab == 'Week' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3 style="color: #ffff;">This Week</h3>
+                <h3 style="color: #fff;">This Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
@@ -578,9 +602,19 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                        </td>
-                    </tr>";
+                             style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                            <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            </form>";
+
+                                if ($row['status'] != 'finished') {
+                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                    style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Finish</button>";
+                                }
+
+                                echo "</td></tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -595,7 +629,7 @@ $result = mysqli_query($con, $query);
             <div id="NextWeek" class="tabcontent"
                 style="display: <?php echo $activeTab == 'NextWeek' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3 style="color: #ffff;">Next Week</h3>
+                <h3 style=" color: #fff;">Next Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
@@ -638,9 +672,19 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
-                        </td>
-                    </tr>";
+                             style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                            <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            </form>";
+
+                                if ($row['status'] != 'finished') {
+                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                    style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Finish</button>";
+                                }
+
+                                echo "</td></tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -651,12 +695,10 @@ $result = mysqli_query($con, $query);
                 </table>
             </div>
 
-            <!-- Modal Structure -->
-            <div id="finishModal" class="modal">
+            <div id="finishModal" class="modal" style="display: none;">
                 <div class="modal-content">
-                    <span class="close" onclick="closeFinishModal()">&times;</span>
+                    <button class="close">&times;</button>
                     <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
-                    <br>
                     <hr>
                     <div id="modalDetails">
                         <p><strong>Name:</strong> <span id="modalName"></span></p>
@@ -665,161 +707,59 @@ $result = mysqli_query($con, $query);
                         <p><strong>Current Service:</strong> <span id="modalService"></span></p>
                     </div>
                     <hr>
-                    <br>
-                    <button id="addServiceButton" onclick="addServiceDropdown()">Add More Services</button>
-                    <div id="servicesContainer"></div>
-                    <form id="newServiceForm" method="POST" action="appointments.php">
+                    <form id="newServiceForm" method="POST" action="">
                         <input type="hidden" name="id" value="">
-                        <input type="hidden" id="price" name="price" value="0">
-                        <label for="recommendation">Recommendation:</label>
-                        <textarea id="recommendation" name="recommendation"
-                            placeholder="Enter your recommendation here..."></textarea>
+                        <label for="note">Note:</label>
+                        <textarea id="note" name="note" placeholder="Enter your note here..."></textarea>
                         <div id="totalPriceContainer">
-                            <p><strong>Total Price: ₱</strong>
-                                <span style="font-weight: bold; font-size: 25px;" id="totalPrice">0</span>
-                            </p>
+                            <p><strong>Total Price: ₱</strong><span id="totalPrice"
+                                    style="font-weight: bold; font-size: 25px;">0</span></p>
                         </div>
+                        <input type="number" id="price" name="price" style="display: none;" readonly>
                         <button type="submit" name="submit">Proceed to Dental Assistant</button>
                     </form>
                 </div>
             </div>
 
             <script>
-                let totalPrice = 0;
-                const dropdownPrices = {}; // Track service prices for each dropdown
-                let dropdownCount = 0;
-
-                // Price mapping for services
                 const servicePrices = {
                     1: 30000, 2: 30000, 3: 2000, 4: 100000, 5: 20000,
                     6: 30000, 7: 1500, 8: 2000, 9: 280000, 10: 40000, 11: 40000
                 };
 
                 function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
-                    const modal = document.getElementById('finishModal');
                     document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
                     document.getElementById('modalContact').innerText = contact;
                     document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
                     document.getElementById('modalService').innerText = service;
 
-                    const serviceId = getServiceIdFromName(service);
-                    totalPrice = servicePrices[serviceId] || 0;
-                    document.getElementById('totalPrice').innerText = totalPrice;
-                    dropdownPrices["initial"] = totalPrice;
+                    const servicePrice = servicePrices[getServiceIdFromName(service)] || 0;
+                    document.getElementById('price').value = servicePrice;
+                    document.getElementById('totalPrice').innerText = servicePrice;
 
-                    // Set hidden input fields
                     document.querySelector("#newServiceForm input[name='id']").value = id;
-                    modal.style.display = 'block';
-                }
-
-                function closeFinishModal() {
-                    const modal = document.getElementById('finishModal');
-                    modal.style.display = 'none';
-
-                    // Reset the total price
-                    totalPrice = 0;
-                    dropdownCount = 0;
-                    Object.keys(dropdownPrices).forEach(key => delete dropdownPrices[key]);
-                    document.getElementById('totalPrice').innerText = totalPrice;
-                    document.getElementById('servicesContainer').innerHTML = '';
+                    document.getElementById('finishModal').style.display = 'block';
                 }
 
                 function getServiceIdFromName(serviceName) {
                     const services = {
-                        "All Porcelain Veneers & Zirconia": 1,
-                        "Crown & Bridge": 2,
-                        "Dental Cleaning": 3,
-                        "Dental Implants": 4,
-                        "Dental Whitening": 5,
-                        "Dentures": 6,
-                        "Extraction": 7,
-                        "Full Exam & X-Ray": 8,
-                        "Orthodontic Braces": 9,
-                        "Restoration": 10,
-                        "Root Canal Treatment": 11
+                        "All Porcelain Veneers & Zirconia": 1, "Crown & Bridge": 2, "Dental Cleaning": 3,
+                        "Dental Implants": 4, "Dental Whitening": 5, "Dentures": 6,
+                        "Extraction": 7, "Full Exam & X-Ray": 8, "Orthodontic Braces": 9,
+                        "Restoration": 10, "Root Canal Treatment": 11
                     };
                     return services[serviceName] || null;
                 }
 
-                function addServiceDropdown() {
-                    if (dropdownCount >= 5) {
-                        alert("You can only add up to 5 services.");
-                        return;
+                document.querySelector('.close').addEventListener('click', () => {
+                    document.getElementById('finishModal').style.display = 'none';
+                });
+
+                window.addEventListener('click', (event) => {
+                    if (event.target == document.getElementById('finishModal')) {
+                        document.getElementById('finishModal').style.display = 'none';
                     }
-
-                    const servicesContainer = document.getElementById('servicesContainer');
-                    const newServiceDiv = document.createElement('div');
-                    newServiceDiv.classList.add('service-dropdown-container');
-
-                    const serviceSelect = document.createElement('select');
-                    const uniqueId = `dropdown-${Date.now()}`;
-
-                    // Add default option
-                    const defaultOption = document.createElement('option');
-                    defaultOption.value = "";
-                    defaultOption.innerText = "-- Select a Service --";
-                    defaultOption.disabled = true;
-                    defaultOption.selected = true;
-                    serviceSelect.appendChild(defaultOption);
-
-                    // Create the service options dynamically
-                    const services = [
-                        { value: 1, label: "All Porcelain Veneers & Zirconia" },
-                        { value: 2, label: "Crown & Bridge" },
-                        { value: 3, label: "Dental Cleaning" },
-                        { value: 4, label: "Dental Implants" },
-                        { value: 5, label: "Dental Whitening" },
-                        { value: 6, label: "Dentures" },
-                        { value: 7, label: "Extraction" },
-                        { value: 8, label: "Full Exam & X-Ray" },
-                        { value: 9, label: "Orthodontic Braces" },
-                        { value: 10, label: "Restoration" },
-                        { value: 11, label: "Root Canal Treatment" }
-                    ];
-
-                    services.forEach(service => {
-                        const option = document.createElement('option');
-                        option.value = service.value;
-                        option.innerText = service.label;
-                        serviceSelect.appendChild(option);
-                    });
-
-                    // Update price when service is selected
-                    serviceSelect.addEventListener('change', function () {
-                        const selectedService = parseInt(this.value);
-                        const previousValue = this.getAttribute('data-previous-value');
-
-                        // If a service is selected
-                        if (selectedService) {
-                            const selectedPrice = servicePrices[selectedService];
-
-                            // If there was a previous selection, subtract its price from the total
-                            if (previousValue) {
-                                totalPrice -= servicePrices[previousValue];
-                            }
-
-                            // Add the new selected service's price
-                            totalPrice += selectedPrice;
-
-                            // Update the total price
-                            document.getElementById('totalPrice').innerText = totalPrice;
-                            document.getElementById('price').value = totalPrice;
-                        } else if (!selectedService && previousValue) { // If no service is selected
-                            totalPrice -= servicePrices[previousValue];
-
-                            // Update the total price
-                            document.getElementById('totalPrice').innerText = totalPrice;
-                            document.getElementById('price').value = totalPrice;
-                        }
-
-                        // Store the current selected service in the data-attribute to keep track of the previous value
-                        this.setAttribute('data-previous-value', selectedService);
-                    });
-
-                    newServiceDiv.appendChild(serviceSelect);
-                    servicesContainer.appendChild(newServiceDiv);
-                    dropdownCount++;
-                }
+                });
             </script>
 
             <!-- Edit Modal -->
@@ -849,11 +789,11 @@ $result = mysqli_query($con, $query);
                         <select name="modified_time" id="modal-modified_time" required>
                             <option value="09:00 AM">09:00 AM</option>
                             <option value="10:30 AM">10:30 AM</option>
-                            <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
-                            <option value="12:00 PM">12:00 PM</option>
-                            <option value="01:30 PM">01:30 PM</option>
-                            <option value="03:00 PM">03:00 PM</option>
-                            <option value="04:30 PM">04:30 PM</option>
+                            <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
+                            <option value="12:30 PM">12:30 PM</option>
+                            <option value="13:30 PM">01:30 PM</option>
+                            <option value="15:00 PM">03:00 PM</option>
+                            <option value="16:30 PM">04:30 PM</option>
                         </select>
                         <label for="service_type">Type Of Service:</label>
                         <select name="service_type" id="modal-service_type" required>
@@ -898,38 +838,38 @@ $result = mysqli_query($con, $query);
                 // Switch between tabs
                 function openTab(evt, tabName) {
                     var i, tabcontent, tablinks;
-    
-                // Hide all tab content
-                tabcontent = document.getElementsByClassName("tabcontent");
+
+                    // Hide all tab content
+                    tabcontent = document.getElementsByClassName("tabcontent");
                     for (i = 0; i < tabcontent.length; i++) {
-                    tabcontent[i].style.display = "none";
+                        tabcontent[i].style.display = "none";
                     }
 
-                // Remove 'active' class from all tab links
-                tablinks = document.getElementsByClassName("tablinks");
+                    // Remove 'active' class from all tab links
+                    tablinks = document.getElementsByClassName("tablinks");
                     for (i = 0; i < tablinks.length; i++) {
-                    tablinks[i].classList.remove("active");
+                        tablinks[i].classList.remove("active");
                     }
 
-                // Display the clicked tab's content and add 'active' class to the clicked tab
-                document.getElementById(tabName).style.display = "block";
-                evt.currentTarget.classList.add("active");
+                    // Display the clicked tab's content and add 'active' class to the clicked tab
+                    document.getElementById(tabName).style.display = "block";
+                    evt.currentTarget.classList.add("active");
                 }
 
                 function switchTab(tabName) {
-                // Update the URL to reflect the selected tab without reloading
-                const url = new URL(window.location.href);
-                url.searchParams.set('tab', tabName); 
-                window.history.pushState({}, '', url); 
-                // Call openTab to display the selected tab content
-                openTab(event, tabName); 
+                    // Update the URL to reflect the selected tab without reloading
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', tabName);
+                    window.history.pushState({}, '', url);
+                    // Call openTab to display the selected tab content
+                    openTab(event, tabName);
                 }
 
                 // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
-                window.onload = function() {
+                window.onload = function () {
                     const params = new URLSearchParams(window.location.search);
-                    const activeTab = params.get('tab') || 'Day'; 
-                        openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+                    const activeTab = params.get('tab') || 'Day';
+                    openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
                 };
             </script>
         </div>

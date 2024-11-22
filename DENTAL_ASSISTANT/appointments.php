@@ -27,8 +27,7 @@ if (isset($_POST['update'])) {
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
     // Check for conflicts in both original date/time and modified date/time
-    $conflict_query = "
-        SELECT id 
+    $conflict_query = "SELECT id 
         FROM tbl_appointments 
         WHERE 
             (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
