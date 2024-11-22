@@ -189,24 +189,18 @@ $result = mysqli_query($con, $query);
 
             // Capture filter values from GET parameters
             $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterStatus = isset($_GET['status']) ? $_GET['status'] : '';
             $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
 
             // SQL query to count total records with filtering
             $countQuery = "SELECT COUNT(*) as total FROM tbl_bin a
-                JOIN tbl_service_type s ON a.service_type = s.id
-                JOIN tbl_patient p ON a.id = p.id
-                JOIN tbl_status t ON a.status = t.id
-                WHERE a.status IN ('1', '2', '3', '4')";
+            JOIN tbl_service_type s ON a.service_type = s.id
+            JOIN tbl_patient p ON a.name = p.id
+            JOIN tbl_status t ON a.status = t.id
+            WHERE a.status IN ('1', '2', '3', '4')";
 
             // Add name filter if specified
             if ($filterName) {
                 $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add status filter if specified
-            if ($filterStatus) {
-                $countQuery .= " AND a.status = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -220,23 +214,18 @@ $result = mysqli_query($con, $query);
             
             // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
-                s.service_type AS service_name, 
-                p.first_name, p.middle_name, p.last_name, 
-                t.status     
-            FROM tbl_bin a
-            JOIN tbl_service_type s ON a.service_type = s.id
-            JOIN tbl_patient p ON a.id = p.id
-            JOIN tbl_status t ON a.status = t.id
-            WHERE a.status IN ('1', '2', '3', '4')";
+            s.service_type AS service_name, 
+            p.first_name, p.middle_name, p.last_name, 
+            t.status     
+        FROM tbl_bin a
+        JOIN tbl_service_type s ON a.service_type = s.id
+        JOIN tbl_patient p ON a.name = p.id
+        JOIN tbl_status t ON a.status = t.id
+        WHERE a.status IN ('1', '2', '3', '4')";
 
             // Add name filter if specified
             if ($filterName) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add status filter if specified
-            if ($filterStatus) {
-                $query .= " AND a.status = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -244,41 +233,32 @@ $result = mysqli_query($con, $query);
                 $query .= " AND a.date = '$filterDate'";
             }
 
-            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
+            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 6 rows
             
             $result = mysqli_query($con, $query);
-            ?><br><br><br><br>
+            ?><br><br><br>
 
             <!-- HTML Form for Filters -->
             <form method="GET" action="" class="search-form">
                 <input type="text" name="name" placeholder="Search by name"
                     value="<?php echo htmlspecialchars($filterName); ?>" />
-
-                <select name="status">
-                    <option value="">All Statuses</option>
-                    <option value="1" <?php echo $filterStatus == '1' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="2" <?php echo $filterStatus == '2' ? 'selected' : ''; ?>>Declined</option>
-                    <option value="3" <?php echo $filterStatus == '3' ? 'selected' : ''; ?>>Approved</option>
-                    <option value="4" <?php echo $filterStatus == '4' ? 'selected' : ''; ?>>Finished</option>
-                </select>
-
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
-
                 <span class="material-symbols-outlined" type="submit">search</span>
             </form>
+
             <!-- Pagination -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
-                        class="pagination-btn">
-                        < </a>
-                        <?php endif; ?>
+                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
+                        class="pagination-btn">&lt;</a>
+                <?php endif; ?>
 
-                        <?php if ($currentPage < $totalPages): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
-                                class="pagination-btn"> > </a>
-                        <?php endif; ?>
+                <?php if ($currentPage < $totalPages): ?>
+                    <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
+                        class="pagination-btn">&gt;</a>
+                <?php endif; ?>
             </div>
+
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -296,36 +276,37 @@ $result = mysqli_query($con, $query);
                     <?php
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
-                            // Check if modified_date and modified_time are empty
-                            $modified_date = !'' && !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
-                            $modified_time = !'' && !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+                            $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                            $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
                             $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                             $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                             echo "<tr>
-                            <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                            <td>{$row['contact']}</td>
-                            <td>{$dateToDisplay}</td>
-                            <td>{$timeToDisplay}</td>
-                            <td>{$modified_date}</td>
-                            <td>{$modified_time}</td>
-                            <td>{$row['service_name']}</td>
-                    <td>
-                        </form>";
+                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td>{$dateToDisplay}</td>
+                        <td>{$timeToDisplay}</td>
+                        <td>{$modified_date}</td>
+                        <td>{$modified_time}</td>
+                        <td>{$row['service_name']}</td>
+                        <td>";
+
+                            // Restore and Delete buttons
                             if ($row['status'] != 'Restore') {
                                 echo "<form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='restore' value='Restore' 
                             style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                        </form>";
+                            </form>";
                             }
+
                             if ($row['status'] != 'Delete') {
                                 echo "<form method='POST' action='' style='display:inline;'>
-                        <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='delete' value='Delete' 
-                        style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                    </form>";
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <input type='submit' name='delete' value='Delete' 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            </form>";
                             }
 
                             echo "</td></tr>";

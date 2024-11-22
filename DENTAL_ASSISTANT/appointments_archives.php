@@ -25,7 +25,7 @@ if (isset($_POST['update'])) {
     $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
-    $recommendation = mysqli_real_escape_string($con, $_POST['recommendation']);
+    $note = mysqli_real_escape_string($con, $_POST['note']);
     $price = mysqli_real_escape_string($con, $_POST['price']);
 
 
@@ -87,7 +87,7 @@ if (isset($_POST['update'])) {
         <div class="content-box">
             <?php
             // Set the number of results per page
-            $resultsPerPage = 20;
+            $resultsPerPage = 9;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -97,7 +97,6 @@ if (isset($_POST['update'])) {
 
             // Capture filter values from GET parameters
             $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterCompletion = isset($_GET['completion']) ? $_GET['completion'] : '';
             $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
 
             // SQL query to count total records with filtering
@@ -111,11 +110,6 @@ if (isset($_POST['update'])) {
             // Add name filter if specified
             if ($filterName) {
                 $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add completion filter if specified
-            if ($filterCompletion) {
-                $countQuery .= " AND a.completion = '$filterCompletion'";
             }
 
             // Add date filter if specified
@@ -142,11 +136,6 @@ if (isset($_POST['update'])) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
             }
 
-            // Add completion filter if specified
-            if ($filterCompletion) {
-                $query .= " AND a.completion = '$filterCompletion'";
-            }
-
             // Add date filter if specified
             if ($filterDate) {
                 $query .= " AND a.date = '$filterDate'";
@@ -155,23 +144,13 @@ if (isset($_POST['update'])) {
             $query .= " LIMIT $resultsPerPage OFFSET $startRow";
 
             $result = mysqli_query($con, $query);
-            ?><br><br><br><br>
+            ?><br><br><br>
 
             <!-- HTML Form for Filters -->
-            <form method="GET" action="">
+            <form method="GET" action="" class="search-form">
                 <input type="text" name="name" placeholder="Search by name"
                     value="<?php echo htmlspecialchars($filterName); ?>" />
-
-                <select name="completion">
-                    <option value="">All Statuses</option>
-                    <option value="1" <?php echo $filterCompletion == '1' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="2" <?php echo $filterCompletion == '2' ? 'selected' : ''; ?>>Declined</option>
-                    <option value="3" <?php echo $filterCompletion == '3' ? 'selected' : ''; ?>>Approved</option>
-                    <option value="4" <?php echo $filterCompletion == '4' ? 'selected' : ''; ?>>Finished</option>
-                </select>
-
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
-
                 <button class="material-symbols-outlined" type="submit">search</button>
             </form>
 
@@ -198,9 +177,9 @@ if (isset($_POST['update'])) {
                         <th>Modified Date</th>
                         <th>Modified Time</th>
                         <th>Type of Service</th>
-                        <th>Recommendation</th>
                         <th>Price</th>
                         <th>Completion Status</th>
+                        <th>Note</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -213,22 +192,29 @@ if (isset($_POST['update'])) {
                             $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                             $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
-                            $recommendation = !empty($row['recommendation']) ? $row['recommendation'] : 'N/A';
+                            $note = !empty($row['note']) ? $row['note'] : 'N/A';
                             $price = isset($row['price']) ? number_format($row['price'], 2) : 'N/A';
-                            $completion_status = !empty($row['completion']) ? ucfirst($row['completion']) : 'N/A';
+
+                            // Check completion status and replace 2 with 'Completed'
+                            $completion_status = ($row['completion'] == 2) ? 'Completed' : (!empty($row['completion']) ? ucfirst($row['completion']) : 'N/A');
 
                             echo "<tr>
-                            <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                            <td>{$row['contact']}</td>
-                            <td>{$dateToDisplay}</td>
-                            <td>{$timeToDisplay}</td>
-                            <td>{$modified_date}</td>
-                            <td>{$modified_time}</td>
-                            <td>{$row['service_name']}</td>
-                            <td>{$recommendation}</td>
-                            <td>₱{$price}</td>
-                            <td>{$completion_status}</td>
-                        </tr>";
+                <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                <td>{$row['contact']}</td>
+                <td>{$dateToDisplay}</td>
+                <td>{$timeToDisplay}</td>
+                <td>{$modified_date}</td>
+                <td>{$modified_time}</td>
+                <td>{$row['service_name']}</td>
+                <td>₱{$price}</td>
+                <td>{$completion_status}</td>
+                <td>
+                        <button type='button' onclick='openModal(\"{$row['note']}\")'
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            View
+                        </button>
+                    </td>
+            </tr>";
                         }
                     } else {
                         echo "<tr><td colspan='11'>No records found</td></tr>";
@@ -236,6 +222,43 @@ if (isset($_POST['update'])) {
                     ?>
                 </tbody>
             </table>
+
+            <!-- Modal Structure -->
+            <div id="myModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2 style="color: #0a0a0a;">NOTES:</h2>
+                    <br>
+                    <div class="body">
+                        <p id="modalText">note text</p>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // Get modal elements
+                const modal = document.getElementById("myModal");
+                const closeModalSpan = document.querySelector(".close");
+                const modalText = document.getElementById("modalText");
+
+                // Open modal function
+                function openModal(note) {
+                    modalText.textContent = note;
+                    modal.style.display = "block";
+                }
+
+                // Close modal on 'X' click
+                closeModalSpan.addEventListener("click", () => {
+                    modal.style.display = "none";
+                });
+
+                // Close modal if clicked outside content
+                window.addEventListener("click", (event) => {
+                    if (event.target === modal) {
+                        modal.style.display = "none";
+                    }
+                });
+            </script>
         </div>
     </div>
 </body>

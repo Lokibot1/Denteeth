@@ -56,40 +56,39 @@ if (isset($_POST['update'])) {
   $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
   $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
   $contact = mysqli_real_escape_string($con, $_POST['contact']);
-  $date = date('Y-m-d'); // Set date to today's date
+  $date = mysqli_real_escape_string($con, $_POST['date']); // Use the selected date from the form
   $time = mysqli_real_escape_string($con, $_POST['time']);
   $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
   // Convert the selected time to 24-hour format
   $time_24hr = DateTime::createFromFormat('h:i A', $time)->format('H:i:s');
 
-  // Check for exact time conflicts only for today's date
+  // Check for exact time conflicts in both `date` and `modified_date`
   $check_time_query = "
-        SELECT id, time 
-        FROM tbl_appointments 
-        WHERE date = '$date' 
-        AND TIME(time) = TIME('$time_24hr')
-    ";
+      SELECT id 
+      FROM tbl_appointments 
+      WHERE 
+          (date = '$date' AND TIME(time) = TIME('$time_24hr')) OR 
+          (modified_date = '$date' AND TIME(modified_time) = TIME('$time_24hr'))
+  ";
 
   $time_result = mysqli_query($con, $check_time_query);
   $time_row = mysqli_fetch_assoc($time_result);
 
   if ($time_row) {
     // Conflict found
-    echo "<script>alert('The selected time conflicts with another appointment for today. Please choose a different time.');</script>";
+    echo "<script>alert('The selected time conflicts with another appointment on the same date($date) or modified date($modified_date). Please choose a different time.');</script>";
   } else {
     // No conflict - proceed with inserting appointment
-    $insert_patient_query = "
-            INSERT INTO tbl_patient (first_name, last_name, middle_name) 
-            VALUES ('$first_name', '$last_name', '$middle_name')
-        ";
+    $insert_patient_query = "INSERT INTO tbl_patient (first_name, last_name, middle_name) 
+          VALUES ('$first_name', '$last_name', '$middle_name')
+      ";
 
     if (mysqli_query($con, $insert_patient_query)) {
       $patient_id = mysqli_insert_id($con);
-      $insert_appointment_query = "
-                INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) 
-                VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time_24hr', '$service_type')
-            ";
+      $insert_appointment_query = "INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) 
+              VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time_24hr', '$service_type')
+          ";
 
       if (mysqli_query($con, $insert_appointment_query)) {
         header("Location: Home_page.php");
