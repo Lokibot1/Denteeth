@@ -77,7 +77,7 @@ if (isset($_POST['update'])) {
 
   if ($time_row) {
     // Conflict found
-    echo "<script>alert('The selected time conflicts with another appointment on the same date($date) or modified date($modified_date). Please choose a different time.');</script>";
+    echo "<script>alert('The selected time conflicts with another appointment on the same date($date). Please choose a different time.');</script>";
   } else {
     // No conflict - proceed with inserting appointment
     $insert_patient_query = "INSERT INTO tbl_patient (first_name, last_name, middle_name) 
