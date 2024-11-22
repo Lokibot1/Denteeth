@@ -42,22 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     mysqli_stmt_close($stmt);
 
-    if ($service_type == 9) { // Correct comparison operator
-        // Define financial variables
-        $bill = 50000.00;
-        $paid = 15000.00;
-        $outstanding_balance = 35000.00;
-
+    if ($service_type == '9') { // Correct comparison operator
         // Insert record into tbl_transaction_history
-        $insertQuery = "INSERT INTO tbl_transaction_history (id, name, contact, date, service_type, bill, paid, outstanding_balance) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $insertQuery = "INSERT INTO tbl_transaction_history (id, name, contact, date, time, service_type) 
+                        VALUES (?, ?, ?, ?, ?, ?)";
         $insertStmt = mysqli_prepare($con, $insertQuery);
 
         if (!$insertStmt) {
             die("SQL Error (Prepare Failed for Insert): " . mysqli_error($con));
         }
 
-        mysqli_stmt_bind_param($insertStmt, 'isssdddd', $id, $name, $contact, $date, $service_type, $bill, $paid, $outstanding_balance);
+        mysqli_stmt_bind_param($insertStmt, 'isssss', $id, $name, $contact, $date, $time, $service_type);
         if (!mysqli_stmt_execute($insertStmt)) {
             die("SQL Error (Execute Failed for Insert): " . mysqli_error($con));
         }
@@ -251,8 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     echo "<span style='color: red;'>No data available</span>";
                 }
                 ?>
-            </div>
-            <div class="round-box">
+            </div><div class="round-box">
                 <p>APPOINTMENT FOR NEXT WEEK:</p>
                 <?php
                 // Get the start and end date of the current week
@@ -443,11 +437,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <!-- Modal Structure -->
             <div id="myModal" class="modal">
                 <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2 style="color: #0a0a0a;">NOTES:</h2>
+                <span class="close">&times;</span>
+                    <h2 style="color: #0a0a0a;">NOTES FROM THE DOCTOR:</h2>
                     <br>
                     <div class="body">
-                        <p id="modalText">note text</p>
+                    <p id="modalText">note text</p>
                     </div>
                 </div>
             </div>

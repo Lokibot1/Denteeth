@@ -113,7 +113,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 <hr>
                 <br>
                 <li><a href="appointments_archives.php">Archives</a></a></li>
-                <li><a href="transaction.php">Transactions</a></a></li>
+                <li><a href="transaction.php">Packages Transaction History</a></a></li>
                 <li><a href="bin.php">Appointments Bin</a></li>
             </ul>
         </aside>
