@@ -12,164 +12,89 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
 // Database connection
 include("../dbcon.php");
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $id = $_POST['id']; // Assuming 'id' is passed in the form data
 
+    // Initialize variables
+    $service_type = '';
+    $name = '';
+    $contact = '';
+    $date = '';
+    $time = '';
 
-$editMode = false; // Flag to determine if we're editing
-$idToEdit = null; // Variable to hold the ID of the record to edit
+    // Fetch the service details from tbl_archives
+    $query = "SELECT name, contact, date, time, service_type FROM tbl_archives WHERE id = ?";
+    $stmt = mysqli_prepare($con, $query);
 
-
-
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Check if it's an update or insert based on whether an ID is present in POST data
-    if (isset($_POST['id'])) {
-        // Update existing transaction
-        $idToEdit = (int) $_POST['id'];
-        $stmt = $con->prepare("UPDATE tbl_archives SET name = ?, contact = ?, service_type = ?, date = ?, time = ?, bill = ?, change_amount = ?, outstanding_balance = ? WHERE id = ?");
-        $stmt->bind_param("issssdddi", $patient_name, $contact, $service_type, $date, $time, $bill, $change_amount, $outstanding_balance, $idToEdit);
-
-        // Set the flag to true
-        $editMode = true;
-    } else {
-        // Insert new transaction
-        $stmt = $con->prepare("INSERT INTO tbl_archives (name, contact, service_type, date, time, bill, change_amount, outstanding_balance) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("issssddd", $patient_name, $contact, $service_type, $date, $time, $bill, $change_amount, $outstanding_balance);
+    if (!$stmt) {
+        die("SQL Error (Prepare Failed): " . mysqli_error($con));
     }
 
-    // Get and sanitize values from POST
-    $patient_name = mysqli_real_escape_string($con, $_POST['dropdown']); // Set name to the selected ID
-    $contact = mysqli_real_escape_string($con, trim($_POST['contact']));
-    $service_type = mysqli_real_escape_string($con, trim($_POST['service_type']));
-    $date = mysqli_real_escape_string($con, trim($_POST['date']));
-    $time = mysqli_real_escape_string($con, trim($_POST['time']));
-    $bill = (float) $_POST['bill'];
-    $change_amount = (float) $_POST['change_amount'];
-    $outstanding_balance = (float) $_POST['outstanding_balance'];
-
-    // Execute the query
-    if ($stmt->execute()) {
-        // Clear form submitted flag after successful operation
-        unset($_SESSION['form_submitted']);
-        header("Location: " . $_SERVER['REQUEST_URI']); // Redirect to avoid form resubmission
-        exit();
-    } else {
-        echo "<p>Error: " . $stmt->error . "</p>";
+    mysqli_stmt_bind_param($stmt, 'i', $id);
+    if (!mysqli_stmt_execute($stmt)) {
+        die("SQL Error (Execute Failed): " . mysqli_error($con));
     }
 
-    // Close connections
-    $stmt->close();
-}
-
-// Clear the form submitted flag after page reload
-if (isset($_SESSION['form_submitted'])) {
-    unset($_SESSION['form_submitted']);
-}
-
-$sql = "SELECT id, last_name, first_name, middle_name FROM tbl_patient"; // Update with your actual table and field names
-$result_dropdown = $con->query($sql);
-
-// Prepare an array for dropdown options
-$dropdown_options = [];
-if ($result_dropdown && $result_dropdown->num_rows > 0) {
-    while ($row = $result_dropdown->fetch_assoc()) {
-        $full_name = htmlspecialchars($row['last_name'] . ', ' . $row['first_name'] . ' ' . $row['middle_name']);
-        $dropdown_options[$row['id']] = $full_name; // Using patient ID as the key
-    }
-} else {
-    echo "<p>No patients found for the dropdown.</p>";
-}
-
-$result = mysqli_query($con, "SELECT * FROM tbl_archives");
-
-// Update functionality
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update'])) {
-    // Retrieve updated values from the form
-    $id = mysqli_real_escape_string($conn, $_POST['id']);
-    $contact = mysqli_real_escape_string($conn, $_POST['contact']);
-    $service_type = mysqli_real_escape_string($conn, $_POST['service_type']);
-    $date = mysqli_real_escape_string($conn, $_POST['date']);
-    $time = mysqli_real_escape_string($conn, $_POST['time']);
-    $bill = mysqli_real_escape_string($conn, $_POST['bill']);
-    $change_amount = mysqli_real_escape_string($conn, $_POST['change_amount']);
-    $outstanding_balance = mysqli_real_escape_string($conn, $_POST['outstanding_balance']);
-    $
-
-        // Update query
-        $updateQuery = "UPDATE transactions SET 
-            contact = '$contact',
-            service_name = '$service_type',
-            date = '$date',
-            time = '$time',
-            bill = '$bill',
-            change_amount = '$change_amount',
-            outstanding_balance = '$outstanding_balance'
-            WHERE id = '$id'";
-
-    // Execute the query
-    if (mysqli_query($conn, $updateQuery)) {
-        echo "<script>alert('Record updated successfully'); window.location.href='archives.php';</script>";
-    } else {
-        echo "Error updating record: " . mysqli_error($conn);
-    }
-}
-
-// Check if form is submitted
-if (isset($_POST['submit'])) {
-    // Initialize error messages
-    $errors = [];
-    // Get and sanitize the posted data
-    $id = isset($_POST['id']) ? intval($_POST['id']) : 0; // Get the appointment ID, default to 0 if not set
-    $recommendation = isset($_POST['recommendation']) ? mysqli_real_escape_string($con, $_POST['recommendation']) : '';
-    $price = isset($_POST['price']) ? floatval($_POST['price']) : 0.0; // Get the price, default to 0 if not set
-    $service_type_1 = mysqli_real_escape_string($con, $_POST['service_type_1']);
-    $service_type_2 = mysqli_real_escape_string($con, $_POST['service_type_2']);
-    $service_type_3 = mysqli_real_escape_string($con, $_POST['service_type_3']);
-    $service_type_4 = mysqli_real_escape_string($con, $_POST['service_type_4']);
-    $service_type_5 = mysqli_real_escape_string($con, $_POST['service_type_5']);
-
-    // Check if required fields are not empty
-    if (empty($recommendation)) {
-        $errors[] = "Recommendation is required.";
-    }
-    if ($price <= 0) {
-        $errors[] = "Valid price is required.";
-    }
-    if ($id <= 0) {
-        $errors[] = "Valid appointment ID is required.";
+    mysqli_stmt_bind_result($stmt, $name, $contact, $date, $time, $service_type);
+    if (!mysqli_stmt_fetch($stmt)) {
+        die("SQL Error (Fetch Failed or No Record Found): " . mysqli_error($con));
     }
 
-    // If there are any errors, do not process the form
-    if (!empty($errors)) {
-        foreach ($errors as $error) {
-            echo "<p style='color:red;'>$error</p>";
-        }
-        exit(); // Stop the script here if errors exist
-    }
+    mysqli_stmt_close($stmt);
 
-    // Fetch appointment details from the database
-    $fetch_query = "SELECT * FROM tbl_appointments WHERE id = $id";
-    $result = mysqli_query($con, $fetch_query);
+    if ($service_type == '9') { // Correct comparison operator
+        // Insert record into tbl_transaction_history
+        $insertQuery = "INSERT INTO tbl_transaction_history (id, name, contact, date, time, service_type) 
+                        VALUES (?, ?, ?, ?, ?, ?)";
+        $insertStmt = mysqli_prepare($con, $insertQuery);
 
-    if ($result && mysqli_num_rows($result) > 0) {
-        $appointment = mysqli_fetch_assoc($result);
-
-        // Update the appointment data in the tbl_appointments table
-        $update_query = "UPDATE tbl_appointments SET recommendation = '{$recommendation}', price = '{$price}', 
-                         service_type_1 = '{$service_type_1}', service_type_2 = '{$service_type_2}', 
-                         service_type_3 = '{$service_type_3}', service_type_4 = '{$service_type_4}', 
-                         service_type_5 = '{$service_type_5}' WHERE id = $id";
-
-        if (!mysqli_query($con, $update_query)) {
-            die("Error updating appointment: " . mysqli_error($con));
+        if (!$insertStmt) {
+            die("SQL Error (Prepare Failed for Insert): " . mysqli_error($con));
         }
 
-        // Redirect back to appointments page
-        header("Location: appointments.php");
-        exit();
+        mysqli_stmt_bind_param($insertStmt, 'isssss', $id, $name, $contact, $date, $time, $service_type);
+        if (!mysqli_stmt_execute($insertStmt)) {
+            die("SQL Error (Execute Failed for Insert): " . mysqli_error($con));
+        }
+
+        mysqli_stmt_close($insertStmt);
+
+        // Delete record from tbl_archives
+        $deleteQuery = "DELETE FROM tbl_archives WHERE id = ?";
+        $deleteStmt = mysqli_prepare($con, $deleteQuery);
+
+        if (!$deleteStmt) {
+            die("SQL Error (Prepare Failed for Delete): " . mysqli_error($con));
+        }
+
+        mysqli_stmt_bind_param($deleteStmt, 'i', $id);
+        if (!mysqli_stmt_execute($deleteStmt)) {
+            die("SQL Error (Execute Failed for Delete): " . mysqli_error($con));
+        }
+
+        mysqli_stmt_close($deleteStmt);
+
+        echo "Record successfully transferred to transaction history and deleted from archives.";
     } else {
-        die("Appointment not found.");
+        // Update completion to 2 in tbl_archives if not service_type = '9'
+        $updateQuery = "UPDATE tbl_archives SET completion = 2 WHERE id = ?";
+        $updateStmt = mysqli_prepare($con, $updateQuery);
+
+        if (!$updateStmt) {
+            die("SQL Error (Prepare Failed for Update): " . mysqli_error($con));
+        }
+
+        mysqli_stmt_bind_param($updateStmt, 'i', $id);
+        if (!mysqli_stmt_execute($updateStmt)) {
+            die("SQL Error (Execute Failed for Update): " . mysqli_error($con));
+        }
+
+        mysqli_stmt_close($updateStmt);
+
+        echo "Completion status updated to 2 in archives.";
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -341,7 +266,7 @@ if (isset($_POST['submit'])) {
                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
                     )
                     AND status = '3'";
-                    
+
                 $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
@@ -384,7 +309,7 @@ if (isset($_POST['submit'])) {
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 6;
+            $resultsPerPage = 7;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -434,11 +359,12 @@ if (isset($_POST['submit'])) {
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Modified_Date</th>
-                        <th>Modified_Time</th>
-                        <th>Type Of Service</th>
+                        <th>Modified Date</th>
+                        <th>Modified Time</th>
+                        <th>Type of Service</th>
                         <th>Status</th>
                         <th>Price</th>
+                        <th>Note</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -446,24 +372,25 @@ if (isset($_POST['submit'])) {
                     <?php
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
-                            // Check if modified_date and modified_time are valid
+                            // Validate modified_date and modified_time
                             $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
                             $modified_time = (!empty($row['modified_time']) && $row['modified_time'] !== '00:00:00') ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
-                            // Check if date and time are valid
+                            // Validate date and time
                             $dateToDisplay = (!empty($row['date']) && $row['date'] !== '0000-00-00') ? $row['date'] : 'N/A';
                             $timeToDisplay = (!empty($row['time']) && $row['time'] !== '00:00:00') ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                             $priceToDisplay = isset($row['price']) ? number_format($row['price']) : 'N/A';
+
                             // Translate ENUM values for completion
-                            $completionStatus = 'Unknown'; // Default value
+                            $completionStatus = 'Unknown';
                             if (isset($row['completion'])) {
                                 switch ($row['completion']) {
                                     case '1':
                                         $completionStatus = 'Pending';
                                         break;
                                     case '2':
-                                        $completionStatus = 'One time Payment';
+                                        $completionStatus = 'One-time Payment';
                                         break;
                                     case '3':
                                         $completionStatus = 'Package Payment';
@@ -472,270 +399,77 @@ if (isset($_POST['submit'])) {
                             }
 
                             echo "<tr>
-            <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-            <td>{$row['contact']}</td>
-            <td>{$dateToDisplay}</td>
-            <td>{$timeToDisplay}</td>
-            <td>{$modified_date}</td>
-            <td>{$modified_time}</td>
-            <td>{$row['service_name']}</td> 
-            <td>{$completionStatus}</td>
-            <td>{$priceToDisplay}</td>
-            <td>    
-        <button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                        style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td>{$row['contact']}</td>
+                    <td>{$dateToDisplay}</td>
+                    <td>{$timeToDisplay}</td>
+                    <td>{$modified_date}</td>
+                    <td>{$modified_time}</td>
+                    <td>{$row['service_name']}</td>
+                    <td>{$completionStatus}</td>
+                    <td>{$priceToDisplay}</td>
+                    <td>
+                        <button type='button' onclick='openModal(\"{$row['recommendation']}\")'
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            View
+                        </button>
+                    </td>
+                    <td>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                         </form>";
-                            if ($row['status'] != 'Approve') {
+
+                            if ($completionStatus != 'Approve') {
                                 echo "<form method='POST' action='' style='display:inline;'>
-                                <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='approve' value='Approve' 
-                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                            </form>";
+                        <input type='hidden' name='id' value='{$row['id']}'>
+                        <input type='submit' name='approve' value='Approve'
+                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                    </form>";
                             }
 
                             echo "</td></tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='8'>No records found</td></tr>";
+                        echo "<tr><td colspan='11'>No records found</td></tr>";
                     }
                     ?>
                 </tbody>
             </table>
-            <br><br>
-            <!-- Modal Structure for Finish -->
-            <div id="finishModal" class="modal" style="display: none;">
+
+            <!-- Modal Structure -->
+            <div id="myModal" class="modal">
                 <div class="modal-content">
-                    <span id="closeFinishModal" class="close" style="float: right; cursor: pointer; display: block;"
-                        onclick="closeFinishModal()">&times;</span>
-                    <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
-                    <br>
-                    <hr>
-                    <div id="modalDetails">
-                        <p><strong>Name:</strong> <span id="modalName"></span></p>
-                        <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
-                        <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
-                        <p><strong>Current Service:</strong> <span id="modalService"></span></p>
-                    </div>
-                    <hr><br>
-
-                    <form id="newServiceForm" method="POST" action="">
-                        <input type="hidden" name="id" value="">
-
-                        <!-- Additional Service Dropdowns - Initially hidden -->
-                        <div id="additional_service_type_1" class="additional-service">
-                            <label for="service_type_1">Additional Service 1:</label>
-                            <select name="service_type_1" id="modal-service_type_1" required
-                                onchange="updateTotalPrice()">
-                                <option value="">--Select Service Type--</option>
-                                <option value="1">All Porcelain Veneers & Zirconia</option>
-                                <option value="2">Crown & Bridge</option>
-                                <option value="3">Dental Cleaning</option>
-                                <option value="4">Dental Implants</option>
-                                <option value="5">Dental Whitening</option>
-                                <option value="6">Dentures</option>
-                                <option value="7">Extraction</option>
-                                <option value="8">Full Exam & X-Ray</option>
-                                <option value="9">Orthodontic Braces</option>
-                                <option value="10">Restoration</option>
-                                <option value="11">Root Canal Treatment</option>
-                            </select>
-                        </div>
-                        <div id="additional_service_type_2" class="additional-service">
-                            <label for="service_type_2">Additional Service 2:</label>
-                            <select name="service_type_2" id="modal-service_type_2" required
-                                onchange="updateTotalPrice()">
-                                <option value="">--Select Service Type--</option>
-                                <option value="1">All Porcelain Veneers & Zirconia</option>
-                                <option value="2">Crown & Bridge</option>
-                                <option value="3">Dental Cleaning</option>
-                                <option value="4">Dental Implants</option>
-                                <option value="5">Dental Whitening</option>
-                                <option value="6">Dentures</option>
-                                <option value="7">Extraction</option>
-                                <option value="8">Full Exam & X-Ray</option>
-                                <option value="9">Orthodontic Braces</option>
-                                <option value="10">Restoration</option>
-                                <option value="11">Root Canal Treatment</option>
-                            </select>
-                        </div>
-                        <div id="additional_service_type_3" class="additional-service">
-                            <label for="service_type_3">Additional Service 3:</label>
-                            <select name="service_type_3" id="modal-service_type_3" required
-                                onchange="updateTotalPrice()">
-                                <option value="">--Select Service Type--</option>
-                                <option value="1">All Porcelain Veneers & Zirconia</option>
-                                <option value="2">Crown & Bridge</option>
-                                <option value="3">Dental Cleaning</option>
-                                <option value="4">Dental Implants</option>
-                                <option value="5">Dental Whitening</option>
-                                <option value="6">Dentures</option>
-                                <option value="7">Extraction</option>
-                                <option value="8">Full Exam & X-Ray</option>
-                                <option value="9">Orthodontic Braces</option>
-                                <option value="10">Restoration</option>
-                                <option value="11">Root Canal Treatment</option>
-                            </select>
-                        </div>
-                        <div id="additional_service_type_4" class="additional-service">
-                            <label for="service_type_4">Additional Service 4:</label>
-                            <select name="service_type_4" id="modal-service_type_4" required
-                                onchange="updateTotalPrice()">
-                                <option value="">--Select Service Type--</option>
-                                <option value="1">All Porcelain Veneers & Zirconia</option>
-                                <option value="2">Crown & Bridge</option>
-                                <option value="3">Dental Cleaning</option>
-                                <option value="4">Dental Implants</option>
-                                <option value="5">Dental Whitening</option>
-                                <option value="6">Dentures</option>
-                                <option value="7">Extraction</option>
-                                <option value="8">Full Exam & X-Ray</option>
-                                <option value="9">Orthodontic Braces</option>
-                                <option value="10">Restoration</option>
-                                <option value="11">Root Canal Treatment</option>
-                            </select>
-                        </div>
-                        <div id="additional_service_type_5" class="additional-service">
-                            <label for="service_type_5">Additional Service 5:</label>
-                            <select name="service_type_5" id="modal-service_type_5" required
-                                onchange="updateTotalPrice()">
-                                <option value="">--Select Service Type--</option>
-                                <option value="1">All Porcelain Veneers & Zirconia</option>
-                                <option value="2">Crown & Bridge</option>
-                                <option value="3">Dental Cleaning</option>
-                                <option value="4">Dental Implants</option>
-                                <option value="5">Dental Whitening</option>
-                                <option value="6">Dentures</option>
-                                <option value="7">Extraction</option>
-                                <option value="8">Full Exam & X-Ray</option>
-                                <option value="9">Orthodontic Braces</option>
-                                <option value="10">Restoration</option>
-                                <option value="11">Root Canal Treatment</option>
-                            </select>
-                        </div>
-
-                        <label for="recommendation">Recommendation:</label>
-                        <textarea id="recommendation" name="recommendation"
-                            placeholder="Enter your recommendation here..."></textarea>
-
-                        <div id="totalPriceContainer">
-                            <p><strong>Total Price: ₱</strong><span style="font-weight: bold; font-size: 25px;"
-                                    id="totalPrice">0</span></p><br>
-                        </div>
-                        <input type="number" id="price" name="price" style="display: none;" readonly>
-                        <button type="submit" name="submit">SUBMIT</button>
-                    </form>
+                    <span class="close">&times;</span>
+                    <p id="modalText">Recommendation text</p>
                 </div>
             </div>
 
             <script>
-                // Prices for each service
-                const servicePrices = {
-                    "All Porcelain Veneers & Zirconia": 5000,
-                    "Crown & Bridge": 7000,
-                    "Dental Cleaning": 1500,
-                    "Dental Implants": 10000,
-                    "Dental Whitening": 3000,
-                    "Dentures": 2500,
-                    "Extraction": 1000,
-                    "Full Exam & X-Ray": 2000,
-                    "Orthodontic Braces": 8000,
-                    "Restoration": 4000,
-                    "Root Canal Treatment": 6000
-                };
+                // Get modal elements
+                const modal = document.getElementById("myModal");
+                const closeModalSpan = document.querySelector(".close");
+                const modalText = document.getElementById("modalText");
 
-                let basePrice = 0;  // Holds the initial price of the selected service
-                let totalPrice = 0; // Holds the total price, including additional services
-                let dropdownCount = 1; // Counter to track which dropdown to show
-
-                // Function to open the modal and populate it with data
-                function openFinishModal(id, firstName, middleName, lastName, contact, dateTime, time, serviceName, recommendation, price) {
-                    document.getElementById("finishModal").style.display = "block";
-
-                    document.getElementById("modalName").textContent = firstName + " " + middleName + " " + lastName;
-                    document.getElementById("modalContact").textContent = contact;
-                    document.getElementById("modalDateTime").textContent = dateTime + " " + time;
-                    document.getElementById("modalService").textContent = serviceName;
-                    document.getElementById('modal-id').value = id;
-                    document.getElementById('recommendation').value = recommendation;
-                    document.getElementById('price').value = price;
-
-                    // Set service values
-                    document.getElementById('modal-service_type_1').value = service_name_1;
-                    document.getElementById('modal-service_type_2').value = service_name_2;
-                    document.getElementById('modal-service_type_3').value = service_name_3;
-                    document.getElementById('modal-service_type_4').value = service_name_4;
-                    document.getElementById('modal-service_type_5').value = service_name_5;
-
-                    // Set base price based on the current service name
-                    basePrice = servicePrices[serviceName] || 0;
-
-                    // Calculate the total price and update the modal
-                    totalPrice = basePrice;
-                    document.getElementById("totalPrice").textContent = totalPrice.toFixed(2);
-                    document.getElementById("price").value = totalPrice.toFixed(2);
+                // Open modal function
+                function openModal(recommendation) {
+                    modalText.textContent = recommendation;
+                    modal.style.display = "block";
                 }
 
-                function closeFinishModal() {
-                    document.getElementById("finishModal").style.display = "none";
-                }
+                // Close modal on 'X' click
+                closeModalSpan.addEventListener("click", () => {
+                    modal.style.display = "none";
+                });
 
-                // Function to show/hide additional service dropdowns
-                function toggleAdditionalServices() {
-                    if (dropdownCount <= 5) {
-                        document.getElementById(`additional_service_type_${dropdownCount}`).style.display = "block";
-                        dropdownCount++;
-                    } else {
-                        alert("You can only add up to 5 additional services.");
+                // Close modal if clicked outside content
+                window.addEventListener("click", (event) => {
+                    if (event.target === modal) {
+                        modal.style.display = "none";
                     }
-                }
-
-                // Function to update total price when services are selected
-                function updateTotalPrice() {
-                    let newTotalPrice = basePrice;
-                    let additionalServices = [];
-
-                    for (let i = 1; i <= 5; i++) {
-                        const serviceSelect = document.querySelector(`[name="service_type_${i}"]`);
-                        if (serviceSelect && serviceSelect.value) {
-                            const serviceName = serviceSelect.options[serviceSelect.selectedIndex].text;
-                            const servicePrice = servicePrices[serviceName];
-                            if (servicePrice) {
-                                newTotalPrice += servicePrice;
-                                additionalServices.push(serviceSelect.value);
-                            }
-                        }
-                    }
-
-                    totalPrice = newTotalPrice;
-                    document.getElementById("totalPrice").textContent = totalPrice.toFixed(2);
-                    document.getElementById("price").value = totalPrice.toFixed(2);
-
-                    // Attach additional services to form before submitting
-                    document.getElementById('newServiceForm').additional_services = additionalServices;
-                }
-
-                // Handle form submission via AJAX (if needed)
-                document.getElementById("newServiceForm").addEventListener("submit", function (event) {
-                    event.preventDefault();
-
-                    const formData = new FormData(event.target);
-                    fetch("doctor_dashboard.php", {
-                        method: "POST",
-                        body: formData
-                    })
-                        .then(response => response.text())
-                        .then(result => {
-                            alert("Form submitted successfully!");
-                            closeFinishModal();  // Close the modal after submission
-                        })
-                        .catch(error => {
-                            console.error("Error submitting form:", error);
-                        });
                 });
             </script>
         </div>
+    </div>
 </body>
 
 </html>

@@ -48,83 +48,57 @@ if (isset($_POST['update'])) {
 
 if (isset($_POST['submit'])) {
     // Get and sanitize the posted data
-    $id = intval($_POST['id']); // Get the appointment ID
-    $recommendation = mysqli_real_escape_string($con, $_POST['recommendation']);
-    $price = floatval($_POST['price']); // Get the price
+    $id = intval($_POST['id']); // Appointment ID
+    $note = mysqli_real_escape_string($con, $_POST['note']);
+    $price = floatval($_POST['price']); // Price
 
-    // Fetch appointment details from the database
-    $fetch_query = "SELECT * FROM tbl_appointments WHERE id = $id";
-    $result = mysqli_query($con, $fetch_query);
+    // Fetch appointment details
+    $stmt = $con->prepare("SELECT * FROM tbl_appointments WHERE id = ?");
+    $stmt->bind_param("i", $id);
 
-    if ($result && mysqli_num_rows($result) > 0) {
-        $appointment = mysqli_fetch_assoc($result);
-
-        // Insert the appointment data into the tbl_archives table
-        $archive_query = "INSERT INTO tbl_archives (name, contact, date, time, modified_date, modified_time, service_type, recommendation, price, completion)
-                          VALUES ('{$appointment['name']}', '{$appointment['contact']}', '{$appointment['date']}', '{$appointment['time']}', '{$appointment['modified_date']}', '{$appointment['modified_time']}', '{$appointment['service_type']}', '{$recommendation}', '{$price}', '1')";
-
-        if (!mysqli_query($con, $archive_query)) {
-            die("Error inserting into tbl_archives: " . mysqli_error($con));
-        }
-
-        // Update the appointment status to 'finished' in tbl_appointments
-        $update_status_query = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
-        if (!mysqli_query($con, $update_status_query)) {
-            die("Error updating appointment status: " . mysqli_error($con));
-        }
-
-        // Handle additional services using the new connection
-        if (isset($_POST['additional_services'])) {
-            $additional_services_ids = array_map('intval', $_POST['additional_services']); // Sanitize input
-            $values = [];
-
-            // Prepare the values for the insert query
-            foreach ($additional_services_ids as $service_id) {
-                $values[] = "($service_id)"; // Prepare each value for insertion
-            }
-
-            // Create the insert query for additional services
-            if (!empty($values)) {
-                $insert_additional_service_query = "INSERT INTO tbl_additional_service_types (additional_service_type_1) VALUES " . implode(',', $values);
-
-                if (!mysqli_query($additional_services_con, $insert_additional_service_query)) {
-                    die("Error inserting additional services: " . mysqli_error($additional_services_con));
-                }
-            }
-        }
-
-        // Redirect back to appointments page
-        header("Location: appointments.php");
-        exit();
-    } else {
-        die("Appointment not found.");
-    }
-}
-
-if (isset($_POST['finish'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    // Get the appointment ID from the form
-    $id = $_POST['id'];
-
-    // Prepare the query to update the status to 'finished' using a prepared statement
-    $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
-    $status = 4; // Assuming '4' represents finished
-    $stmt->bind_param("ii", $status, $id);
-
-    // Execute the query
     if ($stmt->execute()) {
-        // Redirect back to the dashboard
-        header("Location: doctor_dashboard.php");
-        exit();
-    } else {
-        echo "Error updating status: " . $stmt->error;
-    }
+        $result = $stmt->get_result();
+        if ($result && $result->num_rows > 0) {
+            $appointment = $result->fetch_assoc();
 
-    $stmt->close();
+            // Archive appointment data
+            $archive_stmt = $con->prepare("INSERT INTO tbl_archives 
+                (name, contact, date, time, modified_date, modified_time, service_type, note, price, completion) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '1')");
+            $archive_stmt->bind_param(
+                "ssssssssd",
+                $appointment['name'],
+                $appointment['contact'],
+                $appointment['date'],
+                $appointment['time'],
+                $appointment['modified_date'],
+                $appointment['modified_time'],
+                $appointment['service_type'],
+                $note,
+                $price
+            );
+
+            if (!$archive_stmt->execute()) {
+                die("Error inserting into tbl_archives: " . $archive_stmt->error);
+            }
+
+            // Remove the appointment from tbl_appointments
+            $delete_stmt = $con->prepare("DELETE FROM tbl_appointments WHERE id = ?");
+            $delete_stmt->bind_param("i", $id);
+
+            if (!$delete_stmt->execute()) {
+                die("Error deleting appointment: " . $delete_stmt->error);
+            }
+
+            // Redirect to appointments page
+            header("Location: appointments.php");
+            exit();
+        } else {
+            die("Error: Appointment not found.");
+        }
+    } else {
+        die("Error executing fetch query: " . $stmt->error);
+    }
 }
 
 if (isset($_POST['decline'])) {
@@ -283,21 +257,35 @@ $result = mysqli_query($con, $query);
                 ?>
             </div>
             <div class="round-box">
-                <p>FINISHED APPOINTMENTS:</p>
+                <p>APPOINTMENT FOR NEXT WEEK:</p>
                 <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '4'";
-                $result_finished = mysqli_query($con, $sql_finished);
+                // Get the start and end date of the current week
+                $start_of_week = date('Y-m-d', strtotime('monday this week'));
+                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
+
+                // Query to count appointments for the current week
+                $sql_week = "SELECT COUNT(*) as total_appointments_week 
+                 FROM tbl_appointments 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
+                    )
+                    AND status = '3'";
+
+                $result_week = mysqli_query($con, $sql_week);
 
                 // Check for SQL errors
-                if (!$result_finished) {
+                if (!$result_week) {
                     die("Query failed: " . mysqli_error($con));
                 }
 
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
+                $row_week = mysqli_fetch_assoc($result_week);
+                $appointments_for_week = $row_week['total_appointments_week'];
 
-                if ($finished_appointments) {
+                if ($appointments_for_week) {
                     echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
                 } else {
                     echo "<span style='color: red;'>No data available</span>";
@@ -307,7 +295,7 @@ $result = mysqli_query($con, $query);
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 7;
+            $resultsPerPage = 9;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -337,7 +325,7 @@ $result = mysqli_query($con, $query);
             CASE 
             WHEN a.modified_time IS NOT NULL THEN a.modified_time
             ELSE a.time
-            END DESC
+            END ASC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
@@ -412,14 +400,11 @@ $result = mysqli_query($con, $query);
         </table>
         <br><br>
 
-        <!-- Modal Structure -->
         <div id="finishModal" class="modal" style="display: none;">
             <div class="modal-content">
-            <button class="close">&times;</button>
+                <button class="close">&times;</button>
                 <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
-                <br>
-                <hr>
-                <!-- Display Selected Information -->
+                <hr>not
                 <div id="modalDetails">
                     <p><strong>Name:</strong> <span id="modalName"></span></p>
                     <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
@@ -427,18 +412,14 @@ $result = mysqli_query($con, $query);
                     <p><strong>Current Service:</strong> <span id="modalService"></span></p>
                 </div>
                 <hr>
-                <br>
-                <button id="addServiceButton" onclick="addServiceDropdown()">Add More Services</button>
-                <div id="servicesContainer"></div>
                 <form id="newServiceForm" method="POST" action="">
                     <input type="hidden" name="id" value="">
-                    <label for="recommendation">Recommendation:</label>
-                    <textarea id="recommendation" name="recommendation"
-                        placeholder="Enter your recommendation here..."></textarea>
+                    <label for="note">Note:</label>
+                    <textarea id="note" name="note"
+                        placeholder="Enter your note here..."></textarea>
                     <div id="totalPriceContainer">
-                        <p><strong>Total Price: ₱</strong><span style="font-weight: bold; font-size: 25px;"
-                                id="totalPrice">0</span></p>
-                        <br>
+                        <p><strong>Total Price: ₱</strong><span id="totalPrice"
+                                style="font-weight: bold; font-size: 25px;">0</span></p>
                     </div>
                     <input type="number" id="price" name="price" style="display: none;" readonly>
                     <button type="submit" name="submit">Proceed to Dental Assistant</button>
@@ -446,101 +427,47 @@ $result = mysqli_query($con, $query);
             </div>
         </div>
 
-        <!-- JavaScript for Modal and Dropdown -->
         <script>
-            let totalPrice = 0; // Track the total price of selected services
             const servicePrices = {
                 1: 30000, 2: 30000, 3: 2000, 4: 100000, 5: 20000,
                 6: 30000, 7: 1500, 8: 2000, 9: 280000, 10: 40000, 11: 40000
             };
 
             function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
-                // Populate modal details
                 document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
                 document.getElementById('modalContact').innerText = contact;
                 document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
                 document.getElementById('modalService').innerText = service;
 
-                const serviceId = getServiceIdFromName(service);
-                const servicePrice = servicePrices[serviceId] || 0;
+                const servicePrice = servicePrices[getServiceIdFromName(service)] || 0;
                 document.getElementById('price').value = servicePrice;
-                totalPrice += servicePrice;
-                document.getElementById('totalPrice').innerText = totalPrice;
+                document.getElementById('totalPrice').innerText = servicePrice;
 
-                // Set the hidden input value for ID
                 document.querySelector("#newServiceForm input[name='id']").value = id;
-
                 document.getElementById('finishModal').style.display = 'block';
             }
 
             function getServiceIdFromName(serviceName) {
                 const services = {
-                    "All Porcelain Veneers & Zirconia": 1,
-                    "Crown & Bridge": 2,
-                    "Dental Cleaning": 3,
-                    "Dental Implants": 4,
-                    "Dental Whitening": 5,
-                    "Dentures": 6,
-                    "Extraction": 7,
-                    "Full Exam & X-Ray": 8,
-                    "Orthodontic Braces": 9,
-                    "Restoration": 10,
-                    "Root Canal Treatment": 11
+                    "All Porcelain Veneers & Zirconia": 1, "Crown & Bridge": 2, "Dental Cleaning": 3,
+                    "Dental Implants": 4, "Dental Whitening": 5, "Dentures": 6,
+                    "Extraction": 7, "Full Exam & X-Ray": 8, "Orthodontic Braces": 9,
+                    "Restoration": 10, "Root Canal Treatment": 11
                 };
                 return services[serviceName] || null;
             }
 
-            function addServiceDropdown() {
-                const servicesContainer = document.getElementById('servicesContainer');
-                const newServiceDiv = document.createElement('div');
-                const serviceSelect = document.createElement('select');
-                const services = [
-                    { value: 1, label: "All Porcelain Veneers & Zirconia" },
-                    { value: 2, label: "Crown & Bridge" },
-                    { value: 3, label: "Dental Cleaning" },
-                    { value: 4, label: "Dental Implants" },
-                    { value: 5, label: "Dental Whitening" },
-                    { value: 6, label: "Dentures" },
-                    { value: 7, label: "Extraction" },
-                    { value: 8, label: "Full Exam & X-Ray" },
-                    { value: 9, label: "Orthodontic Braces" },
-                    { value: 10, label: "Restoration" },
-                    { value: 11, label: "Root Canal Treatment" }
-                ];
+            document.querySelector('.close').addEventListener('click', () => {
+                document.getElementById('finishModal').style.display = 'none';
+            });
 
-                services.forEach(service => {
-                    const option = document.createElement('option');
-                    option.value = service.value;
-                    option.innerText = service.label;
-                    serviceSelect.appendChild(option);
-                });
-
-                serviceSelect.addEventListener('change', function () {
-                    const serviceId = parseInt(this.value);
-                    const servicePrice = servicePrices[serviceId];
-                    totalPrice += servicePrice;
-                    document.getElementById('totalPrice').innerText = totalPrice;
-                });
-
-                newServiceDiv.appendChild(serviceSelect);
-                servicesContainer.appendChild(newServiceDiv);
-                
-                const modal = document.getElementById('finishModal');
-                const closeButton = document.querySelector('.close');
-
-                function closeModal() {
-                    modal.style.display = 'none';
-                    }
+            window.addEventListener('click', (event) => {
+                if (event.target == document.getElementById('finishModal')) {
+                    document.getElementById('finishModal').style.display = 'none';
                 }
-
-                closeButton.addEventListener('click', closeModal);
-
-                window.addEventListener('click', function(event) {
-                    if (event.target == modal) {
-                        closeModal();
-                    }
-                });
+            });
         </script>
+
         <!-- Edit Modal -->
         <div id="editModal" class="modal">
             <div class="modal-content">
@@ -568,11 +495,11 @@ $result = mysqli_query($con, $query);
                     <select name="modified_time" id="modal-modified_time" required>
                         <option value="09:00 AM">09:00 AM</option>
                         <option value="10:30 AM">10:30 AM</option>
-                        <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
-                        <option value="12:00 PM">12:00 PM</option>
-                        <option value="01:30 PM">01:30 PM</option>
-                        <option value="03:00 PM">03:00 PM</option>
-                        <option value="04:30 PM">04:30 PM</option>
+                        <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
+                        <option value="12:30 PM">12:30 PM</option>
+                        <option value="13:30 PM">01:30 PM</option>
+                        <option value="15:00 PM">03:00 PM</option>
+                        <option value="16:30 PM">04:30 PM</option>
                     </select>
                     <label for="service_type">Type Of Service:</label>
                     <select name="service_type" id="modal-service_type" required>

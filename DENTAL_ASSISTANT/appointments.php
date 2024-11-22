@@ -165,7 +165,7 @@ $result = mysqli_query($con, $query);
 
                 // Get current date
                 $today = date('Y-m-d');
-                
+
                 // Query to count appointments for today
                 $sql_today = "SELECT COUNT(*) as total_appointments_today 
                               FROM tbl_appointments 
@@ -349,7 +349,15 @@ $result = mysqli_query($con, $query);
                     DATE(a.date) = CURDATE())
             )
             AND a.status = '3'
-            ORDER BY  a.time DESC, a.modified_time DESC
+            ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
             LIMIT $resultsPerPage OFFSET $startRow";
 
             // SQL query for Week with JOIN to fetch the limited number of records with OFFSET
@@ -367,7 +375,15 @@ $result = mysqli_query($con, $query);
                      WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) AND DATE(a.date) > CURDATE())
               )
               AND a.status = '3'
-              ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+              ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
               LIMIT $resultsPerPage OFFSET $startRow";
 
             $queryNextWeek = "SELECT a.*, 
@@ -384,7 +400,15 @@ $result = mysqli_query($con, $query);
                 WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(a.date) > CURDATE())
                 )
               AND a.status = '3'
-              ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+              ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
               LIMIT $resultsPerPage OFFSET $startRow";
 
 
@@ -607,9 +631,9 @@ $result = mysqli_query($con, $query);
                             <option value="10:30 AM">10:30 AM</option>
                             <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
                             <option value="12:00 PM">12:00 PM</option>
-                            <option value="01:30 PM">01:30 PM</option>
-                            <option value="03:00 PM">03:00 PM</option>
-                            <option value="04:30 PM">04:30 PM</option>
+                            <option value="13:30 PM">01:30 PM</option>
+                            <option value="15:00 PM">03:00 PM</option>
+                            <option value="16:30 PM">04:30 PM</option>
                         </select>
                         <label for="service_type">Type Of Service:</label>
                         <select name="service_type" id="modal-service_type" required>
@@ -654,38 +678,38 @@ $result = mysqli_query($con, $query);
                 // Switch between tabs
                 function openTab(evt, tabName) {
                     var i, tabcontent, tablinks;
-    
-                // Hide all tab content
-                tabcontent = document.getElementsByClassName("tabcontent");
+
+                    // Hide all tab content
+                    tabcontent = document.getElementsByClassName("tabcontent");
                     for (i = 0; i < tabcontent.length; i++) {
-                    tabcontent[i].style.display = "none";
+                        tabcontent[i].style.display = "none";
                     }
 
-                // Remove 'active' class from all tab links
-                tablinks = document.getElementsByClassName("tablinks");
+                    // Remove 'active' class from all tab links
+                    tablinks = document.getElementsByClassName("tablinks");
                     for (i = 0; i < tablinks.length; i++) {
-                    tablinks[i].classList.remove("active");
+                        tablinks[i].classList.remove("active");
                     }
 
-                // Display the clicked tab's content and add 'active' class to the clicked tab
-                document.getElementById(tabName).style.display = "block";
-                evt.currentTarget.classList.add("active");
+                    // Display the clicked tab's content and add 'active' class to the clicked tab
+                    document.getElementById(tabName).style.display = "block";
+                    evt.currentTarget.classList.add("active");
                 }
 
                 function switchTab(tabName) {
-                // Update the URL to reflect the selected tab without reloading
-                const url = new URL(window.location.href);
-                url.searchParams.set('tab', tabName); 
-                window.history.pushState({}, '', url); 
-                // Call openTab to display the selected tab content
-                openTab(event, tabName); 
+                    // Update the URL to reflect the selected tab without reloading
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', tabName);
+                    window.history.pushState({}, '', url);
+                    // Call openTab to display the selected tab content
+                    openTab(event, tabName);
                 }
 
                 // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
-                window.onload = function() {
+                window.onload = function () {
                     const params = new URLSearchParams(window.location.search);
-                    const activeTab = params.get('tab') || 'Day'; 
-                        openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+                    const activeTab = params.get('tab') || 'Day';
+                    openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
                 };
             </script>
 

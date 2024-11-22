@@ -360,7 +360,15 @@ $result = mysqli_query($con, $query);
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
           WHERE a.status = '2'
-          ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+          ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
@@ -473,9 +481,9 @@ $result = mysqli_query($con, $query);
                         <option value="10:30 AM">10:30 AM</option>
                         <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
                         <option value="12:00 PM">12:00 PM</option>
-                        <option value="01:30 PM">01:30 PM</option>
-                        <option value="03:00 PM">03:00 PM</option>
-                        <option value="04:30 PM">04:30 PM</option>
+                        <option value="13:30 PM">01:30 PM</option>
+                        <option value="15:00 PM">03:00 PM</option>
+                        <option value="16:30 PM">04:30 PM</option>
                     </select>
                     <label for="service_type">Type Of Service:</label>
                     <select name="service_type" id="modal-service_type" required>

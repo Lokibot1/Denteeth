@@ -25,11 +25,10 @@ if (isset($_POST['update'])) {
     $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
-    $additional_service = mysqli_real_escape_string($con, $_POST['additional_service']);
     $recommendation = mysqli_real_escape_string($con, $_POST['recommendation']);
     $price = mysqli_real_escape_string($con, $_POST['price']);
 
-    
+
 }
 
 
@@ -87,7 +86,7 @@ if (isset($_POST['update'])) {
         <div class="content-box">
             <?php
             // Set the number of results per page
-            $resultsPerPage = 10;
+            $resultsPerPage = 20;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -97,24 +96,25 @@ if (isset($_POST['update'])) {
 
             // Capture filter values from GET parameters
             $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterStatus = isset($_GET['status']) ? $_GET['status'] : '';
+            $filterCompletion = isset($_GET['completion']) ? $_GET['completion'] : '';
             $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
 
             // SQL query to count total records with filtering
-            $countQuery = "SELECT COUNT(*) as total FROM tbl_archives a
-               JOIN tbl_service_type s ON a.service_type = s.id
-               JOIN tbl_patient p ON a.id = p.id
-               JOIN tbl_status t ON a.status = t.id
-               WHERE a.status IN ('1', '2', '3', '4')";
+            $countQuery = "SELECT COUNT(*) as total 
+            FROM tbl_archives a
+            JOIN tbl_service_type s ON a.service_type = s.id
+            JOIN tbl_patient p ON a.name = p.id
+            WHERE a.completion = '2'
+        ";
 
             // Add name filter if specified
             if ($filterName) {
                 $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
             }
 
-            // Add status filter if specified
-            if ($filterStatus) {
-                $countQuery .= " AND a.status = '$filterStatus'";
+            // Add completion filter if specified
+            if ($filterCompletion) {
+                $countQuery .= " AND a.completion = '$filterCompletion'";
             }
 
             // Add date filter if specified
@@ -128,23 +128,22 @@ if (isset($_POST['update'])) {
             
             // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
-            s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name, 
-            t.status     
-          FROM tbl_archives a
-          JOIN tbl_service_type s ON a.service_type = s.id
-          JOIN tbl_patient p ON a.id = p.id
-          JOIN tbl_status t ON a.status = t.id
-          WHERE a.status IN ('1', '2', '3', '4')";
+                   s.service_type AS service_name, 
+                   p.first_name, p.middle_name, p.last_name
+            FROM tbl_archives a
+            JOIN tbl_service_type s ON a.service_type = s.id
+            JOIN tbl_patient p ON a.name = p.id
+            WHERE a.completion = '2'
+        ";
 
             // Add name filter if specified
             if ($filterName) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
             }
 
-            // Add status filter if specified
-            if ($filterStatus) {
-                $query .= " AND a.status = '$filterStatus'";
+            // Add completion filter if specified
+            if ($filterCompletion) {
+                $query .= " AND a.completion = '$filterCompletion'";
             }
 
             // Add date filter if specified
@@ -152,8 +151,8 @@ if (isset($_POST['update'])) {
                 $query .= " AND a.date = '$filterDate'";
             }
 
-            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
-            
+            $query .= " LIMIT $resultsPerPage OFFSET $startRow";
+
             $result = mysqli_query($con, $query);
             ?><br><br><br><br>
 
@@ -162,90 +161,81 @@ if (isset($_POST['update'])) {
                 <input type="text" name="name" placeholder="Search by name"
                     value="<?php echo htmlspecialchars($filterName); ?>" />
 
-                <select name="status">
+                <select name="completion">
                     <option value="">All Statuses</option>
-                    <option value="1" <?php echo $filterStatus == '1' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="2" <?php echo $filterStatus == '2' ? 'selected' : ''; ?>>Declined</option>
-                    <option value="3" <?php echo $filterStatus == '3' ? 'selected' : ''; ?>>Approved</option>
-                    <option value="4" <?php echo $filterStatus == '4' ? 'selected' : ''; ?>>Finished</option>
+                    <option value="1" <?php echo $filterCompletion == '1' ? 'selected' : ''; ?>>Pending</option>
+                    <option value="2" <?php echo $filterCompletion == '2' ? 'selected' : ''; ?>>Declined</option>
+                    <option value="3" <?php echo $filterCompletion == '3' ? 'selected' : ''; ?>>Approved</option>
+                    <option value="4" <?php echo $filterCompletion == '4' ? 'selected' : ''; ?>>Finished</option>
                 </select>
 
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
 
                 <button class="material-symbols-outlined" type="submit">search</button>
             </form>
+
             <!-- Pagination -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
-                        class="pagination-btn">
-                        < </a>
-                        <?php endif; ?>
+                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&completion=<?php echo htmlspecialchars($filterCompletion); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
+                        class="pagination-btn">&lt;</a>
+                <?php endif; ?>
 
-                        <?php if ($currentPage < $totalPages): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
-                                class="pagination-btn"> > </a>
-                        <?php endif; ?>
+                <?php if ($currentPage < $totalPages): ?>
+                    <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&completion=<?php echo htmlspecialchars($filterCompletion); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
+                        class="pagination-btn">&gt;</a>
+                <?php endif; ?>
             </div>
+
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Modified Date</th>
+                        <th>Modified Time</th>
+                        <th>Type of Service</th>
+                        <th>Recommendation</th>
+                        <th>Price</th>
+                        <th>Completion Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                            $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+
+                            $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
+                            $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
+
+                            $recommendation = !empty($row['recommendation']) ? $row['recommendation'] : 'N/A';
+                            $price = isset($row['price']) ? number_format($row['price'], 2) : 'N/A';
+                            $completion_status = !empty($row['completion']) ? ucfirst($row['completion']) : 'N/A';
+
+                            echo "<tr>
+                            <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                            <td>{$row['contact']}</td>
+                            <td>{$dateToDisplay}</td>
+                            <td>{$timeToDisplay}</td>
+                            <td>{$modified_date}</td>
+                            <td>{$modified_time}</td>
+                            <td>{$row['service_name']}</td>
+                            <td>{$recommendation}</td>
+                            <td>₱{$price}</td>
+                            <td>{$completion_status}</td>
+                        </tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='11'>No records found</td></tr>";
+                    }
+                    ?>
+                </tbody>
+            </table>
         </div>
-       <table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Contact</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Modified Date</th>
-            <th>Modified Time</th>
-            <th>Type of Service</th>
-            <th>Additional Service</th>
-            <th>Recommendation</th>
-            <th>Price</th>
-            <th>Completion Status</th>
-         
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                // Check if modified_date and modified_time are empty
-                $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
-                $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
-
-                $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
-                $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
-
-                // Display additional fields
-                $additional_service = !empty($row['additional_service_type']) ? $row['additional_service_type'] : 'N/A';
-                $recommendation = !empty($row['recommendation']) ? $row['recommendation'] : 'N/A';
-                $price = isset($row['price']) ? number_format($row['price'], 2) : 'N/A';
-                $completion_status = !empty($row['completion']) ? ucfirst($row['completion']) : 'N/A';
-
-                echo "<tr>
-                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                    <td>{$row['contact']}</td>
-                    <td>{$dateToDisplay}</td>
-                    <td>{$timeToDisplay}</td>
-                    <td>{$modified_date}</td>
-                    <td>{$modified_time}</td>
-                    <td>{$row['service_name']}</td>
-                    <td>{$additional_service}</td>
-                    <td>{$recommendation}</td>
-                    <td>₱{$price}</td>
-                    <td>{$row['status']}</td>
-                   </tr>";
-            }
-        } else {
-            echo "<tr><td colspan='8'>No records found</td></tr>";
-        }
-        ?>
-    </tbody>
-</table>
-
-
-
-    </div>
     </div>
 </body>
 

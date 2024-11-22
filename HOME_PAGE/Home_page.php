@@ -50,61 +50,59 @@ $bracesData = fetchService($con, 'Orthodontic Braces');
 $restorationData = fetchService($con, 'Restoration');
 $rootData = fetchService($con, 'Root Canal Treatment');
 
-// Handle insert request
 if (isset($_POST['update'])) {
-  $id = isset($_POST['id']) ? $_POST['id'] : '';
-  $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
-  $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
-  $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
-  $contact = mysqli_real_escape_string($con, $_POST['contact']);
-  $date = mysqli_real_escape_string($con, $_POST['date']);
-  $time = mysqli_real_escape_string($con, $_POST['time']);
-  $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
+    $id = isset($_POST['id']) ? $_POST['id'] : '';
+    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
+    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
+    $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
+    $contact = mysqli_real_escape_string($con, $_POST['contact']);
+    $date = date('Y-m-d'); // Set date to today's date
+    $time = mysqli_real_escape_string($con, $_POST['time']);
+    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-  // Check if the selected date already has 7 appointments
-  $check_appointments_query = "SELECT COUNT(*) as appointment_count FROM tbl_appointments WHERE date = '$date'";
-  $result = mysqli_query($con, $check_appointments_query);
-  $row = mysqli_fetch_assoc($result);
+    // Convert the selected time to 24-hour format
+    $time_24hr = DateTime::createFromFormat('h:i A', $time)->format('H:i:s');
 
-  if ($row['appointment_count'] >= 7) {
-    echo "<script>alert('The selected date is fully booked. Please choose another date.');</script>";
-  } else {
-    // Calculate time range for validation
-    $time_start = date("H:i:s", strtotime($time) - 90 * 60); // 90 minutes before
-    $time_end = date("H:i:s", strtotime($time) + 90 * 60); // 90 minutes after
+    // Check for exact time conflicts only for today's date
+    $check_time_query = "
+        SELECT id, time 
+        FROM tbl_appointments 
+        WHERE date = '$date' 
+        AND TIME(time) = TIME('$time_24hr')
+    ";
 
-    // Check for time conflicts within the 90-minute range
-    $check_time_query = "SELECT COUNT(*) as conflict_count 
-                            FROM tbl_appointments 
-                            WHERE date = '$date' 
-                            AND time BETWEEN '$time_start' AND '$time_end'";
     $time_result = mysqli_query($con, $check_time_query);
     $time_row = mysqli_fetch_assoc($time_result);
 
-    if ($time_row['conflict_count'] > 0) {
-      echo "<script>alert('The selected time conflicts with another appointment. Please choose a different time.');</script>";
+    if ($time_row) {
+        // Conflict found
+        echo "<script>alert('The selected time conflicts with another appointment for today. Please choose a different time.');</script>";
     } else {
-      // Insert patient information
-      $insert_patient_query = "INSERT INTO tbl_patient (first_name, last_name, middle_name) 
-                                    VALUES ('$first_name', '$last_name', '$middle_name')";
+        // No conflict - proceed with inserting appointment
+        $insert_patient_query = "
+            INSERT INTO tbl_patient (first_name, last_name, middle_name) 
+            VALUES ('$first_name', '$last_name', '$middle_name')
+        ";
 
-      if (mysqli_query($con, $insert_patient_query)) {
-        $patient_id = mysqli_insert_id($con);
-        $insert_appointment_query = "INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) 
-                                           VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time', '$service_type')";
+        if (mysqli_query($con, $insert_patient_query)) {
+            $patient_id = mysqli_insert_id($con);
+            $insert_appointment_query = "
+                INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) 
+                VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time_24hr', '$service_type')
+            ";
 
-        if (mysqli_query($con, $insert_appointment_query)) {
-          header("Location: Home_page.php");
-          exit();
+            if (mysqli_query($con, $insert_appointment_query)) {
+                header("Location: Home_page.php");
+                exit();
+            } else {
+                echo "Error updating appointment record: " . mysqli_error($con);
+            }
         } else {
-          echo "Error updating appointment record: " . mysqli_error($con);
+            echo "Error updating patient record: " . mysqli_error($con);
         }
-      } else {
-        echo "Error updating patient record: " . mysqli_error($con);
-      }
     }
-  }
 }
+
 ?>
 
 
@@ -212,10 +210,10 @@ if (isset($_POST['update'])) {
       <div class="abtr-txt">
         <span>Your Trusted Partner in Dental Care Since 2011</span>
         <p>
-        Established on January 18, 2011, EHM Dental Clinic in Apolonio Samson,
-         Quezon City, is dedicated to providing exceptional dental care. With skilled 
-         professionals and modern techniques, the clinic ensures a friendly and comfortable 
-         environment for all patients.
+          Established on January 18, 2011, EHM Dental Clinic in Apolonio Samson,
+          Quezon City, is dedicated to providing exceptional dental care. With skilled
+          professionals and modern techniques, the clinic ensures a friendly and comfortable
+          environment for all patients.
         </p>
       </div>
     </div>
@@ -225,31 +223,31 @@ if (isset($_POST['update'])) {
         <i class="fa-regular fa-file my-icon"></i>
         <br>
         <p>
-        Our clinic is staffed with highly trained and experienced dental professionals 
-        committed to providing exceptional care. We adhere to industry standards and operate 
-        with complete legal documentation to ensure the highest level of trust and quality 
-        for our patients.
+          Our clinic is staffed with highly trained and experienced dental professionals
+          committed to providing exceptional care. We adhere to industry standards and operate
+          with complete legal documentation to ensure the highest level of trust and quality
+          for our patients.
         </p>
       </div>
       <div>
         <i class="fa-solid fa-tooth my-icon"></i>
         <br>
         <p>
-        <b>Expert Care:</b> Our experienced professionals are committed to providing the 
-        highest quality dental services tailored to your unique needs. <br>
-        <b>Easy to Understand: </b>We're here to answer your questions, explain your 
-        treatment options, and ensure you have a clear understanding of your dental care.
+          <b>Expert Care:</b> Our experienced professionals are committed to providing the
+          highest quality dental services tailored to your unique needs. <br>
+          <b>Easy to Understand: </b>We're here to answer your questions, explain your
+          treatment options, and ensure you have a clear understanding of your dental care.
         </p>
       </div>
       <div>
         <i class="fa-solid fa-check my-icon"></i>
         <br>
         <p>
-         <b>Friendly, Caring Team:</b> Our warm and welcoming staff is here to greet you
+          <b>Friendly, Caring Team:</b> Our warm and welcoming staff is here to greet you
           with a smile and ensure you feel right at home from the moment you step through
-           our doors. <br>
-         <b>Calm and Relaxed Atmosphere:</b> We've created a soothing environment, so 
-         you can put your nerves at ease. Your dental health should be a stress-free experience. 
+          our doors. <br>
+          <b>Calm and Relaxed Atmosphere:</b> We've created a soothing environment, so
+          you can put your nerves at ease. Your dental health should be a stress-free experience.
         </p>
       </div>
     </div>
@@ -648,23 +646,23 @@ if (isset($_POST['update'])) {
                   .catch(error => console.error("Error:", error));
               });
 
-                // Check for conflicts between selected date and time
-                document.getElementById('modal-time').addEventListener('change', function () {
-                  const date = document.getElementById('modal-date').value;
-                  const time = this.value;
+              // Check for conflicts between selected date and time
+              document.getElementById('modal-time').addEventListener('change', function () {
+                const date = document.getElementById('modal-date').value;
+                const time = this.value;
 
-                  if (date && time) {
-                    fetch(`check_appointments.php?date=${date}&time=${time}`)
-                      .then(response => response.json())
-                      .then(data => {
-                        if (data.conflict) {
-                          alert("The selected time conflicts with another appointment. Please choose a different time.");
-                          this.value = ""; // Clear the time input
-                        }
-                      })
-                      .catch(error => console.error("Error:", error));
-                  }
-                });
+                if (date && time) {
+                  fetch(`check_appointments.php?date=${date}&time=${time}`)
+                    .then(response => response.json())
+                    .then(data => {
+                      if (data.conflict) {
+                        alert("The selected time conflicts with another appointment. Please choose a different time.");
+                        this.value = ""; // Clear the time input
+                      }
+                    })
+                    .catch(error => console.error("Error:", error));
+                }
+              });
 
               document.getElementById('modal-date').setAttribute('min', formatDate(firstDay));
               document.getElementById('modal-date').setAttribute('max', formatDate(lastDay));
