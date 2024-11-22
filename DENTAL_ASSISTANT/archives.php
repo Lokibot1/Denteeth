@@ -78,24 +78,18 @@ if (!$con) {
 
             // Capture filter values from GET parameters
             $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterStatus = isset($_GET['status']) ? $_GET['status'] : '';
             $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
 
             // SQL query to count total records with filtering
             $countQuery = "SELECT COUNT(*) as total FROM tbl_archives a
-    JOIN tbl_service_type s ON a.service_type = s.id
-    JOIN tbl_patient p ON a.id = p.id
-    JOIN tbl_status t ON a.completion = t.id
-    WHERE a.completion IN ('1', '2', '3')";
+                JOIN tbl_service_type s ON a.service_type = s.id
+                JOIN tbl_patient p ON a.name = p.id
+                JOIN tbl_status t ON a.completion = t.id
+                WHERE a.completion IN ('1', '2', '3')";
 
             // Add name filter if specified
             if ($filterName) {
                 $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add status filter if specified
-            if ($filterStatus) {
-                $countQuery .= " AND a.completion = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -109,23 +103,18 @@ if (!$con) {
             
             // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
-    s.service_type AS service_name, 
-    p.first_name, p.middle_name, p.last_name, 
-    t.status     
-    FROM tbl_archives a
-    JOIN tbl_service_type s ON a.service_type = s.id
-    JOIN tbl_patient p ON a.id = p.id
-    JOIN tbl_status t ON a.completion = t.id
-    WHERE a.completion IN ('1', '2', '3')";
+                s.service_type AS service_name, 
+                p.first_name, p.middle_name, p.last_name, 
+                t.status     
+                FROM tbl_archives a
+                JOIN tbl_service_type s ON a.service_type = s.id
+                JOIN tbl_patient p ON a.name = p.id
+                JOIN tbl_status t ON a.completion = t.id
+                WHERE a.completion IN ('1', '2', '3')";
 
             // Add name filter if specified
             if ($filterName) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add status filter if specified
-            if ($filterStatus) {
-                $query .= " AND a.completion = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -136,26 +125,16 @@ if (!$con) {
             $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to results per page
             
             $result = mysqli_query($con, $query);
-            ?>
-            <br><br><br><br>
+            ?><br><br><br>
 
             <!-- HTML Form for Filters -->
             <form method="GET" action="" class="search-form">
                 <input type="text" name="name" placeholder="Search by name"
                     value="<?php echo htmlspecialchars($filterName); ?>" />
-
-                <select name="status">
-                    <option value="">All Statuses</option>
-                    <option value="1" <?php echo $filterStatus == '1' ? 'selected' : ''; ?>>Pending</option>
-                    <option value="2" <?php echo $filterStatus == '2' ? 'selected' : ''; ?>>Declined</option>
-                    <option value="3" <?php echo $filterStatus == '3' ? 'selected' : ''; ?>>Approved</option>
-                    <option value="4" <?php echo $filterStatus == '4' ? 'selected' : ''; ?>>Finished</option>
-                </select>
-
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
-
                 <button class="material-symbols-outlined" type="submit">search</button>
             </form>
+
             <!-- Pagination -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
@@ -169,7 +148,6 @@ if (!$con) {
                                 class="pagination-btn"> > </a>
                         <?php endif; ?>
             </div>
-            <br><br><br>
 
             <!-- Table -->
             <table class="table table-bordered">

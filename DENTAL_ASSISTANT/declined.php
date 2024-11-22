@@ -26,23 +26,41 @@ if (isset($_POST['update'])) {
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Update query for tbl_patient
-    $update_patient_query = "UPDATE tbl_patient 
-                             SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
-                             WHERE id=$id";
+    // Check for conflicts in both original date/time and modified date/time
+    $conflict_query = "
+        SELECT id 
+        FROM tbl_appointments 
+        WHERE 
+            (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
+            (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
+        AND id != $id"; // Exclude the current appointment being updated
 
-    // Update query for tbl_appointments
-    $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
-                                 WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
+    $conflict_result = mysqli_query($con, $conflict_query);
 
-    // Execute both queries
-    if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-        // Redirect to the same page after updating
-        header("Location: declined.php");
-        exit();
+    if (mysqli_num_rows($conflict_result) > 0) {
+        // Conflict found
+        echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
     } else {
-        echo "Error updating record: " . mysqli_error($con);
+        // No conflict - proceed with the update
+
+        // Update query for tbl_patient
+        $update_patient_query = "UPDATE tbl_patient 
+                                 SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
+                                 WHERE id=$id";
+
+        // Update query for tbl_appointments
+        $update_appointment_query = "UPDATE tbl_appointments 
+                                     SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
+                                     WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
+
+        // Execute both queries
+        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+            // Redirect to the same page after updating
+            header("Location: pending.php");
+            exit();
+        } else {
+            echo "Error updating record: " . mysqli_error($con);
+        }
     }
 }
 

@@ -29,11 +29,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Update logic
         $idToEdit = (int) $_POST['id'];
         $stmt = $con->prepare("UPDATE tbl_transaction_history SET name = ?, contact = ?, service_type = ?, date = ?, paid = ?, bill = ?, outstanding_balance = ? WHERE id = ?");
-        $stmt->bind_param("sssddds", $patient_id, $contact, $service_type, $date, $paid, $bill, $outstanding_balance);
+        $stmt->bind_param("ssisdddi", $patient_id, $contact, $service_type, $date, $paid, $bill, $outstanding_balance, $idToEdit);
     } else {
         // Insert logic
         $stmt = $con->prepare("INSERT INTO tbl_transaction_history (name, contact, service_type, date, paid, bill, outstanding_balance) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("sssddds", $patient_id, $contact, $service_type, $date, $paid, $bill, $outstanding_balance);
+        $stmt->bind_param("ssisddd", $patient_id, $contact, $service_type, $date, $paid, $bill, $outstanding_balance);
     }
 
     // Execute the query
@@ -55,7 +55,7 @@ $sql = "SELECT
         CONCAT(p.last_name, ', ', p.first_name, ' ', p.middle_name) AS full_name,
         a.contact 
     FROM tbl_patient p
-    INNER JOIN tbl_appointments a ON p.id = a.name"; // Ensure this is correct
+    INNER JOIN tbl_transaction_history a ON p.id = a.name"; // Ensure this is correct
 $result_dropdown = $con->query($sql);
 
 // Prepare an array for dropdown options
@@ -134,23 +134,17 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
 
             // Capture filter values from GET parameters
             $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterStatus = isset($_GET['status']) ? $_GET['status'] : '';
             $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
 
             // SQL query to count total records with filtering
             $countQuery = "SELECT COUNT(*) as total FROM tbl_transaction_history a
-                    JOIN tbl_service_type s ON a.service_type = s.id
-                    JOIN tbl_patient p ON a.id = p.id
-                    WHERE a.service_type = '9'";
+                       JOIN tbl_service_type s ON a.service_type = s.id
+                       JOIN tbl_patient p ON a.name = p.id
+                       WHERE a.service_type = '9'";
 
             // Add name filter if specified
             if ($filterName) {
                 $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add status filter if specified
-            if ($filterStatus) {
-                $countQuery .= " AND a.service_type = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -164,21 +158,16 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
             
             // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
-                s.service_type AS service_name, 
-                p.first_name, p.middle_name, p.last_name
-                FROM tbl_taransaction_history a
-                JOIN tbl_service_type s ON a.service_type = s.id
-                JOIN tbl_patient p ON a.id = p.id
-                WHERE a.service_type ='9'";
+                         s.service_type AS service_name, 
+                         p.first_name, p.middle_name, p.last_name
+                  FROM tbl_transaction_history a
+                  JOIN tbl_service_type s ON a.service_type = s.id
+                  JOIN tbl_patient p ON a.name = p.id 
+                  WHERE a.service_type ='9'";
 
             // Add name filter if specified
             if ($filterName) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add status filter if specified
-            if ($filterStatus) {
-                $query .= " AND a.service_type = '$filterStatus'";
             }
 
             // Add date filter if specified
@@ -189,227 +178,153 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
             $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to results per page
             
             $result = mysqli_query($con, $query);
-
-            ?>
-            <br><br><br><br>
+            ?><br><br><br>
 
             <!-- HTML Form for Filters -->
             <form method="GET" action="" class="search-form">
                 <input type="text" name="name" placeholder="Search by name"
                     value="<?php echo htmlspecialchars($filterName); ?>" />
-
                 <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
-
                 <button class="material-symbols-outlined" type="submit">search</button>
             </form>
+
             <!-- Pagination -->
             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
+                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
                         class="pagination-btn">
                         < </a>
                         <?php endif; ?>
 
                         <?php if ($currentPage < $totalPages): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&status=<?php echo htmlspecialchars($filterStatus); ?>"
+                            <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
                                 class="pagination-btn"> > </a>
                         <?php endif; ?>
             </div>
 
-
             <h2>Transaction History</h2>
             <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
 
-            <?php
-            // Set the number of results per page
-            $resultsPerPage = 6;
+            <!-- Table -->
+            <table class="table table-bordered centered-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Type Of Service</th>
+                        <th>Date</th>
+                        <th>Bill</th>
+                        <th>Amount Paid</th>
+                        <th>Outstanding Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            // Format prices with commas
+                            $paid = "₱" . number_format($row['paid'], 2);
+                            $bill = "₱" . number_format($row['bill'], 2);
+                            $outstanding_balance = "₱" . number_format($row['outstanding_balance'], 2);
 
-            // Get the current page number from query parameters, default to 1
-            $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-
-            // Calculate the starting row for the SQL query
-            $startRow = ($currentPage - 1) * $resultsPerPage;
-
-            // SQL query to count total records
-            $countQuery = "SELECT COUNT(*) as total FROM tbl_transaction_history";
-            $countResult = mysqli_query($con, $countQuery);
-            $totalCount = mysqli_fetch_assoc($countResult)['total'];
-            $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
-            
-            // SQL query with JOIN to fetch the limited number of records with OFFSET
-            $query = "SELECT a.*, 
-            s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name  
-          FROM tbl_transaction_history a
-          JOIN tbl_service_type s ON a.service_type = s.id
-          JOIN tbl_patient p ON a.name = p.id 
-          LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
-            
-            $result = mysqli_query($con, $query);
-
-
-            $service_type = 9; // Fixed ID for Orthodontic Braces
-            
-
-            ?>
-
-            <!-- HTML Table -->
-
-            <div class="pagination-container">
-                <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
-                        < </a>
-                        <?php endif; ?>
-
-                        <?php if ($currentPage < $totalPages): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn"> > </a>
-                        <?php endif; ?>
-
-                        <?php if ($totalCount > 15): ?>
-                        <?php endif; ?>
-            </div>
-        </div>
-
-
-        <!-- Table -->
-        <table class="table table-bordered centered-table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Contact</th>
-                    <th>Type Of Service</th>
-                    <th>Date</th>
-                    <th>Bill</th>
-                    <th>Amount Paid</th>
-                    <th>Outstanding Balance</th>
-
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        // Check if modified_date and modified_time are empty
-                        $dateToDisplay = !empty($row['date']) ? $row['date'] : $row['date'];
-
-                        // Format prices with commas
-                        $paid = "₱" . number_format($row['paid'], 2);
-                        $bill = "₱" . number_format($row['bill'], 2);
-                        $outstanding_balance = "₱" . number_format($row['outstanding_balance'], 2);
-
-                        echo "<tr>
-                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                    <td>{$row['contact']}</td>
-                    <td>{$row['service_name']}</td>
-                    <td>{$dateToDisplay}</td>
-                    <td>{$bill}</td>
-                    <td>{$paid}</td>
-                    <td>{$outstanding_balance}</td>
-                    
-                </tr>";
+                            echo "<tr>
+                            <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                            <td>{$row['contact']}</td>
+                            <td>{$row['service_name']}</td>
+                            <td>{$row['date']}</td>
+                            <td>{$bill}</td>
+                            <td>{$paid}</td>
+                            <td>{$outstanding_balance}</td>
+                        </tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='7'>No records found</td></tr>";
                     }
-                } else {
-                    echo "<tr><td colspan='8'>No records found</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-        <br><br>
+                    ?>
+                </tbody>
+            </table>
 
-        <!-- Modal for adding new transactions -->
-        <div id="transactionModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <h2><?php echo $editMode ? 'Edit Transaction' : 'Add Transaction'; ?></h2>
-                <form method="POST" action="">
-                    <label for="dropdown">Choose an option:</label>
-                    <select id="dropdown" name="dropdown" onchange="updateContact()">
-                        <option value="">Select a patient</option>
-                        <?php foreach ($dropdown_options as $id => $details): ?>
-                            <option value="<?php echo $id; ?>" data-contact="<?php echo $details['contact']; ?>">
-                                <?php echo $details['name']; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+            <br><br>
 
-                    <br>
-                    <label for="modal-contact">Contact:</label>
-                    <input type="text" id="modal-contact" readonly>
-                    <input type="hidden" name="contact" id="modal-contact-hidden"> <!-- Hidden input for contact -->
-                    <br>
-                    <label for="typeOfService">Type of Service:</label>
-                    <input type="text" id="typeOfService" name="typeOfService" value="Orthodontic Braces" readonly>
+            <!-- Modal for adding new transactions -->
+            <div id="transactionModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <h2>Add Transaction</h2>
+                    <form method="POST" action="">
+                        <label for="dropdown">Choose an option:</label>
+                        <select id="dropdown" name="dropdown" onchange="updateContact()">
+                            <option value="">Select a patient</option>
+                            <?php foreach ($dropdown_options as $id => $details): ?>
+                                <option value="<?php echo $id; ?>" data-contact="<?php echo $details['contact']; ?>">
+                                    <?php echo $details['name']; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
 
-                    <label for="date">Date:</label>
-                    <input type="date" name="date" id="modal-date" required>
+                        <br>
+                        <label for="modal-contact">Contact:</label>
+                        <input type="text" id="modal-contact" readonly>
+                        <input type="hidden" name="contact" id="modal-contact-hidden"> <!-- Hidden input for contact -->
+                        <br>
+                        <label for="typeOfService">Type of Service:</label>
+                        <input type="text" id="typeOfService" name="typeOfService" value="Orthodontic Braces" readonly>
 
-                    <br>
+                        <label for="date">Date:</label>
+                        <input type="date" name="date" id="modal-date" required>
 
-                    <label for="modal-bill">Bill:</label>
-                    <input type="number" step="0.01" name="bill" id="modal-bill" required>
-                    <br>
-                    <br>
+                        <br>
 
-                    <label for="modal-paid">Amount Paid :</label>
-                    <input type="number" step="0.01" name="paid" id="modal-paid" required>
-                    <br>
+                        <label for="modal-bill">Bill:</label>
+                        <input type="number" step="0.01" name="bill" id="modal-bill" required>
+                        <br>
+                        <br>
 
-                    <label for="modal-balance">Outstanding Balance:</label>
-                    <input type="number" step="0.01" name="outstanding_balance" id="modal-balance" required>
-                    <br>
-                    <button type="submit"><?php echo $editMode ? 'Update' : 'Add'; ?></button>
-                </form>
+                        <label for="modal-paid">Amount Paid :</label>
+                        <input type="number" step="0.01" name="paid" id="modal-paid" required>
+                        <br>
+
+                        <label for="modal-balance">Outstanding Balance:</label>
+                        <input type="number" step="0.01" name="outstanding_balance" id="modal-balance" required>
+                        <br>
+                        <button type="submit">Add</button>
+                    </form>
+                </div>
             </div>
-        </div>
 
-        <script>
-            // Modal functions
-            const modal = document.getElementById("transactionModal");
-            const btn = document.getElementById("openModalBtn");
+            <script>
+                // Modal functions
+                const modal = document.getElementById("transactionModal");
+                const btn = document.getElementById("openModalBtn");
 
-            btn.onclick = function () {
-                openModal(); // Call openModal function when the button is clicked
-            }
-
-            function openModal(id, firstName, middleName, lastName, contact, date, serviceType) {
-                document.getElementById('transactionModal').style.display = "block";
-                if (id) {
-                    // Populate the form for editing
-                    document.querySelector('input[name="id"]').value = id;
-                    document.querySelector('input[name="contact"]').value = contact;
-                    document.querySelector('input[name="service_type"]').value = serviceType;
-                    document.querySelector('input[name="date"]').value = date;
-
-                } else {
-                    // Clear the form for adding
-                    document.querySelector('input[name="id"]').value = '';
-                    document.querySelector('input[name="contact"]').value = '';
-                    document.querySelector('input[name="service_type"]').value = '';
-                    document.querySelector('input[name="date"]').value = '';
-
+                btn.onclick = function () {
+                    openModal(); // Call openModal function when the button is clicked
                 }
-            }
 
-            function closeModal() {
-                document.getElementById('transactionModal').style.display = "none";
-            }
+                function openModal() {
+                    document.getElementById('transactionModal').style.display = "block";
+                }
 
-            function updateContact() {
-                const dropdown = document.getElementById('dropdown');
-                const selectedOption = dropdown.options[dropdown.selectedIndex];
-                const contactInput = document.getElementById('modal-contact');
-                const hiddenContactInput = document.getElementById('modal-contact-hidden');
+                function closeModal() {
+                    document.getElementById('transactionModal').style.display = "none";
+                }
 
-                // Get the contact from the selected option's data attribute
-                const contact = selectedOption.getAttribute('data-contact');
+                function updateContact() {
+                    const dropdown = document.getElementById('dropdown');
+                    const selectedOption = dropdown.options[dropdown.selectedIndex];
+                    const contactInput = document.getElementById('modal-contact');
+                    const hiddenContactInput = document.getElementById('modal-contact-hidden');
 
-                // Update the contact input field and the hidden field with the selected contact value
-                contactInput.value = contact ? contact : '';  // If no selection, set contact to empty string
-                hiddenContactInput.value = contact ? contact : '';  // Set the hidden input value
-            }
+                    // Get the contact from the selected option's data attribute
+                    const contact = selectedOption.getAttribute('data-contact');
 
-        </script>
+                    // Update the contact input field and the hidden field with the selected contact value
+                    contactInput.value = contact ? contact : '';  // If no selection, set contact to empty string
+                    hiddenContactInput.value = contact ? contact : '';  // Set the hidden input value
+                }
+            </script>
 
+        </div>
     </div>
 </body>
 
