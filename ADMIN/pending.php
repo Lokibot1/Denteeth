@@ -26,28 +26,46 @@ if (isset($_POST['update'])) {
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Update query for tbl_patient
-    $update_patient_query = "UPDATE tbl_patient 
-                             SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
-                             WHERE id=$id";
+    // Check for conflicts in both original date/time and modified date/time
+    $conflict_query = "
+        SELECT id 
+        FROM tbl_appointments 
+        WHERE 
+            (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
+            (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
+        AND id != $id"; // Exclude the current appointment being updated
 
-    // Update query for tbl_appointments
-    $update_appointment_query = "UPDATE tbl_appointments 
-                                 SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '1', service_type='$service_type' 
-                                 WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
+    $conflict_result = mysqli_query($con, $conflict_query);
 
-    // Execute both queries
-    if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-        // Redirect to the same page after updating
-        header("Location: pending.php");
-        exit();
+    if (mysqli_num_rows($conflict_result) > 0) {
+        // Conflict found
+        echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
     } else {
-        echo "Error updating record: " . mysqli_error($con);
+        // No conflict - proceed with the update
+
+        // Update query for tbl_patient
+        $update_patient_query = "UPDATE tbl_patient 
+                                 SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
+                                 WHERE id=$id";
+
+        // Update query for tbl_appointments
+        $update_appointment_query = "UPDATE tbl_appointments 
+                                     SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '1', service_type='$service_type' 
+                                     WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
+
+        // Execute both queries
+        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+            // Redirect to the same page after updating
+            header("Location: pending.php");
+            exit();
+        } else {
+            echo "Error updating record: " . mysqli_error($con);
+        }
     }
 }
 
 
-if (isset($_POST['accept'])) {
+if (isset($_POST['approve'])) {
     // Check if the connection exists
     if (!$con) {
         die("Connection failed: " . mysqli_connect_error());
@@ -57,8 +75,8 @@ if (isset($_POST['accept'])) {
     $id = $_POST['id'];
 
     // Prepare the query to update the status to 'finished' using a prepared statement
-    $stmt = $con->prepare("UPDATE tbl_appointments SET status = ?, modified_by = '1' WHERE id = ?");
-    $status = 3; // Assuming '3' represents finished
+    $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
+    $status = 3; // Assuming '4' represents finished
     $stmt->bind_param("ii", $status, $id);
 
     // Execute the query
@@ -74,29 +92,12 @@ if (isset($_POST['accept'])) {
 }
 
 if (isset($_POST['decline'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    // Get the appointment ID from the form
     $id = $_POST['id'];
+    $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
+    mysqli_query($con, $deleteQuery);
 
-    // Prepare the query to update the status to 'declined' directly
-    $declineQuery = "UPDATE tbl_appointments SET status = '2', modified_by = '1' WHERE id = ?";
-    $stmt = $con->prepare($declineQuery);
-    $stmt->bind_param("i", $id);
-
-    // Execute the query
-    if ($stmt->execute()) {
-        // Redirect back to the dashboard
-        header("Location: pending.php");
-        exit();
-    } else {
-        echo "Error updating status: " . $stmt->error;
-    }
-
-    $stmt->close();
+    // Redirect to refresh the page and show updated records
+    header("Location: pending.php");
 }
 
 // SQL query to count total records
@@ -333,7 +334,7 @@ $result = mysqli_query($con, $query);
             </div>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 7;
+            $resultsPerPage = 6;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -355,8 +356,17 @@ $result = mysqli_query($con, $query);
           FROM tbl_appointments a
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.id = p.id
-          JOIN tbl_status t ON a.status = t.id
+          JOIN tbl_status t ON a.status = t.id  
           WHERE a.status = '1'
+          ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
@@ -386,8 +396,8 @@ $result = mysqli_query($con, $query);
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Modified_Date</th>
-                    <th>Modified_Time</th>
+                    <th>Reschedule Date</th>
+                    <th>Reschedule Time</th>
                     <th>Type Of Service</th>
                     <th>Actions</th>
                 </tr>
@@ -404,32 +414,33 @@ $result = mysqli_query($con, $query);
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                         echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplay}</td>
-                        <td>{$modified_date}</td>
-                        <td>{$modified_time}</td>
-                        <td>{$row['service_name']}</td>
-                        <td>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>Update</button>
-                            <form method='POST' action='' style='display:inline;'>
-                                <input type='hidden' name='id' value='{$row['id']}'>
-                             </form>";
-                        if ($row['status'] != 'Accept') {
+                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td>{$row['contact']}</td>
+                    <td>{$dateToDisplay}</td>
+                    <td>{$timeToDisplay}</td>
+                    <td>{$modified_date}</td>
+                    <td>{$modified_time}</td>
+                    <td>{$row['service_name']}</td>
+                    <td>
+                        <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                        style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px;margin:7px 0px; cursor:pointer;'>Update</button>
+                        <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                        </form>";
+
+                        if ($row['status'] != 'Approve') {
                             echo "<form method='POST' action='' style='display:inline;'>
-                                <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='accept' value='Accept' 
-                                style='background-color:green; color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>
-                            </form>";
+                        <input type='hidden' name='id' value='{$row['id']}'>
+                        <input type='submit' name='approve' value='Approve' 
+                        style='background-color:green; color:white; border:none; padding:7px 5px; border-radius:10px; margin:7px 0px; cursor:pointer;'>
+                    </form>";
                         }
                         if ($row['status'] != 'Decline') {
                             echo "<form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='decline' value='Decline' 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 5px; border-radius:10px; margin:11px 0px; cursor:pointer;'>
-                        </form>";
+                        <input type='hidden' name='id' value='{$row['id']}'>
+                        <input type='submit' name='decline' value='Decline' 
+                        style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 5px; border-radius:10px; margin:7px 0px; cursor:pointer;'>
+                    </form>";
                         }
 
                         echo "</td></tr>";
@@ -459,8 +470,8 @@ $result = mysqli_query($con, $query);
                     <input type="text" name="middle_name" id="modal-middle-name" required>
                     <br>
                     <label for="contact">Contact:</label>
-                    <input type="text" name="contact" id="modal-contact" required>
-                    <br>
+                    <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
+                        maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
                     <label for="date">Date:</label>
                     <input type="date" name="modified_date" id="modal-modified_date" required>
                     <br>
@@ -468,11 +479,11 @@ $result = mysqli_query($con, $query);
                     <select name="modified_time" id="modal-modified_time" required>
                         <option value="09:00 AM">09:00 AM</option>
                         <option value="10:30 AM">10:30 AM</option>
-                        <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
-                        <option value="12:00 PM">12:00 PM</option>
-                        <option value="01:30 PM">01:30 PM</option>
-                        <option value="03:00 PM">03:00 PM</option>
-                        <option value="04:30 PM">04:30 PM</option>
+                        <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
+                        <option value="12:30 PM">12:30 PM</option>
+                        <option value="13:30 PM">01:30 PM</option>
+                        <option value="15:00 PM">03:00 PM</option>
+                        <option value="16:30 PM">04:30 PM</option>
                     </select>
                     <label for="service_type">Type Of Service:</label>
                     <select name="service_type" id="modal-service_type" required>

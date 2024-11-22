@@ -301,7 +301,7 @@ if (isset($_POST['delete'])) {
             </div>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 6;
+            $resultsPerPage = 4;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;

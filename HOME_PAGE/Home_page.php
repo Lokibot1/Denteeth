@@ -64,8 +64,7 @@ if (isset($_POST['update'])) {
   $time_24hr = DateTime::createFromFormat('h:i A', $time)->format('H:i:s');
 
   // Check for exact time conflicts in both `date` and `modified_date`
-  $check_time_query = "
-      SELECT id 
+  $check_time_query = "SELECT id 
       FROM tbl_appointments 
       WHERE 
           (date = '$date' AND TIME(time) = TIME('$time_24hr')) OR 

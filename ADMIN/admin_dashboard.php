@@ -285,6 +285,7 @@ if (!$con) {
                     <th>Time</th>
                     <th>Modified_Date</th>
                     <th>Modified_Time</th>
+                    <th>Modified_By</th>
                     <th>Type Of Service</th>
                     <th>Status</th>
                 </tr>
@@ -294,22 +295,41 @@ if (!$con) {
                 if (mysqli_num_rows($result) > 0) {
                     while ($row = mysqli_fetch_assoc($result)) {
                         // Check if modified_date and modified_time are empty
-                        $modified_date = !'' && !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
-                        $modified_time = !'' && !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+                        $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
+                        $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
                         $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
+                        // Translate modified_by number to role
+                        $modified_by = 'N/A'; // Default value
+                        if (!empty($row['modified_by'])) {
+                            switch ($row['modified_by']) {
+                                case 1:
+                                    $modified_by = 'Admin';
+                                    break;
+                                case 2:
+                                    $modified_by = 'Doctor';
+                                    break;
+                                case 3:
+                                    $modified_by = 'Dental Assistant';
+                                    break;
+                                default:
+                                    $modified_by = 'N/A';
+                            }
+                        }
+
                         echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplay}</td>
-                        <td>{$modified_date}</td>
-                        <td>{$modified_time}</td>
-                        <td>{$row['service_name']}</td>
-                        <td>{$row['status']}</td>
-                    </tr>";
+                <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                <td>{$row['contact']}</td>
+                <td>{$dateToDisplay}</td>
+                <td>{$timeToDisplay}</td>
+                <td>{$modified_date}</td>
+                <td>{$modified_time}</td>
+                <td>{$modified_by}</td>
+                <td>{$row['service_name']}</td>
+                <td>{$row['status']}</td>
+            </tr>";
                     }
                 } else {
                     echo "<tr><td colspan='8'>No records found</td></tr>";
