@@ -478,8 +478,8 @@ $result = mysqli_query($con, $query);
                     <select name="modified_time" id="modal-modified_time" required>
                         <option value="09:00 AM">09:00 AM</option>
                         <option value="10:30 AM">10:30 AM</option>
-                        <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
-                        <option value="12:00 PM">12:00 PM</option>
+                        <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
+                        <option value="12:30 PM">12:30 PM</option>
                         <option value="13:30 PM">01:30 PM</option>
                         <option value="15:00 PM">03:00 PM</option>
                         <option value="16:30 PM">04:30 PM</option>
