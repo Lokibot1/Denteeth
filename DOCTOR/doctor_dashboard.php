@@ -402,9 +402,9 @@ $result = mysqli_query($con, $query);
 
         <div id="finishModal" class="modal" style="display: none;">
             <div class="modal-content">
-                <button class="close">&times;</button>
+                <button style="background-color: transparent;" class="close">&times;</button>
                 <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
-                <hr>not
+                <hr>
                 <div id="modalDetails">
                     <p><strong>Name:</strong> <span id="modalName"></span></p>
                     <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
