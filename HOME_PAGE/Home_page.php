@@ -51,56 +51,56 @@ $restorationData = fetchService($con, 'Restoration');
 $rootData = fetchService($con, 'Root Canal Treatment');
 
 if (isset($_POST['update'])) {
-    $id = isset($_POST['id']) ? $_POST['id'] : '';
-    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
-    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
-    $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
-    $contact = mysqli_real_escape_string($con, $_POST['contact']);
-    $date = date('Y-m-d'); // Set date to today's date
-    $time = mysqli_real_escape_string($con, $_POST['time']);
-    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
+  $id = isset($_POST['id']) ? $_POST['id'] : '';
+  $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
+  $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
+  $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
+  $contact = mysqli_real_escape_string($con, $_POST['contact']);
+  $date = date('Y-m-d'); // Set date to today's date
+  $time = mysqli_real_escape_string($con, $_POST['time']);
+  $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Convert the selected time to 24-hour format
-    $time_24hr = DateTime::createFromFormat('h:i A', $time)->format('H:i:s');
+  // Convert the selected time to 24-hour format
+  $time_24hr = DateTime::createFromFormat('h:i A', $time)->format('H:i:s');
 
-    // Check for exact time conflicts only for today's date
-    $check_time_query = "
+  // Check for exact time conflicts only for today's date
+  $check_time_query = "
         SELECT id, time 
         FROM tbl_appointments 
         WHERE date = '$date' 
         AND TIME(time) = TIME('$time_24hr')
     ";
 
-    $time_result = mysqli_query($con, $check_time_query);
-    $time_row = mysqli_fetch_assoc($time_result);
+  $time_result = mysqli_query($con, $check_time_query);
+  $time_row = mysqli_fetch_assoc($time_result);
 
-    if ($time_row) {
-        // Conflict found
-        echo "<script>alert('The selected time conflicts with another appointment for today. Please choose a different time.');</script>";
-    } else {
-        // No conflict - proceed with inserting appointment
-        $insert_patient_query = "
+  if ($time_row) {
+    // Conflict found
+    echo "<script>alert('The selected time conflicts with another appointment for today. Please choose a different time.');</script>";
+  } else {
+    // No conflict - proceed with inserting appointment
+    $insert_patient_query = "
             INSERT INTO tbl_patient (first_name, last_name, middle_name) 
             VALUES ('$first_name', '$last_name', '$middle_name')
         ";
 
-        if (mysqli_query($con, $insert_patient_query)) {
-            $patient_id = mysqli_insert_id($con);
-            $insert_appointment_query = "
+    if (mysqli_query($con, $insert_patient_query)) {
+      $patient_id = mysqli_insert_id($con);
+      $insert_appointment_query = "
                 INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) 
                 VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time_24hr', '$service_type')
             ";
 
-            if (mysqli_query($con, $insert_appointment_query)) {
-                header("Location: Home_page.php");
-                exit();
-            } else {
-                echo "Error updating appointment record: " . mysqli_error($con);
-            }
-        } else {
-            echo "Error updating patient record: " . mysqli_error($con);
-        }
+      if (mysqli_query($con, $insert_appointment_query)) {
+        header("Location: Home_page.php");
+        exit();
+      } else {
+        echo "Error updating appointment record: " . mysqli_error($con);
+      }
+    } else {
+      echo "Error updating patient record: " . mysqli_error($con);
     }
+  }
 }
 
 ?>
@@ -447,11 +447,11 @@ if (isset($_POST['update'])) {
                 <select name="time" id="modal-time" required>
                   <option value="09:00 AM">09:00 AM</option>
                   <option value="10:30 AM">10:30 AM</option>
-                  <option value="11:00 AM" disabled>11:30 AM (Lunch Break)</option>
-                  <option value="12:00 PM">12:00 PM</option>
-                  <option value="01:30 PM">01:30 PM</option>
-                  <option value="03:00 PM">03:00 PM</option>
-                  <option value="04:30 PM">04:30 PM</option>
+                  <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
+                  <option value="12:30 PM">12:30 PM</option>
+                  <option value="13:30 PM">01:30 PM</option>
+                  <option value="15:00 PM">03:00 PM</option>
+                  <option value="16:30 PM">04:30 PM</option>
                 </select>
                 <label for="service_type">Type Of Service:</label>
                 <select name="service_type" id="modal-service_type" required>
