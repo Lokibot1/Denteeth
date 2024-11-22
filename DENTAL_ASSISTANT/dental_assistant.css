@@ -283,7 +283,7 @@ textarea {
     border-radius: 5px;
     width: 70%;
     height: 50%;
-    overflow: hidden;
+    overflow: auto;
 }
 .body{
     height: 80%;
