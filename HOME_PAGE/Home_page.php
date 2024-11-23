@@ -433,9 +433,9 @@ if (isset($_POST['update'])) {
               <form method="POST" action="" id="appointmentForm">
                 <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
                 <div class="name-fields">
-                  <input type="text" name="last_name" id="modal-last-name" placeholder="Enter Last Name" required>
-                  <input type="text" name="first_name" id="modal-first-name" placeholder="Enter First Name" required>
-                  <input type="text" name="middle_name" id="modal-middle-name" placeholder="Enter Middle Initial">
+                  <input type="text" name="last_name" id="modal-last-name" maxlength="50" placeholder="Enter Last Name" required>
+                  <input type="text" name="first_name" id="modal-first-name" maxlength="50" placeholder="Enter First Name" required>
+                  <input type="text" name="middle_name" id="modal-middle-name" maxlength="2" placeholder="Enter Middle Initial">
                 </div>
                 <label for="contact">Contact:</label>
                 <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
