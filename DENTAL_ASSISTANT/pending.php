@@ -51,15 +51,15 @@ if (isset($_POST['update'])) {
         // Update query for tbl_appointments
         $update_appointment_query = "UPDATE tbl_appointments 
                                      SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
-                                     WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
+                                     WHERE id=$id";
 
         // Execute both queries
         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-            // Echo success message
-            echo "<script>alert('Record updated successfully!');</script>";
-
-            // Redirect to the same page after updating
-            header("Location: pending.php");
+            // Display success message and redirect using JavaScript
+            echo "<script>
+                alert('Record updated successfully!');
+                window.location.href = 'pending.php';
+            </script>";
             exit();
         } else {
             // Display error if the query fails
@@ -67,7 +67,6 @@ if (isset($_POST['update'])) {
         }
     }
 }
-
 
 if (isset($_POST['approve'])) {
     // Check if the connection exists
