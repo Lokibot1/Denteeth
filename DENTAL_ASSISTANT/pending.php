@@ -84,15 +84,18 @@ if (isset($_POST['approve'])) {
 
     // Execute the query
     if ($stmt->execute()) {
-        // Display success message
-        echo "<script>alert('Appointment successfully approved!');</script>";
-
-        // Redirect back to the dashboard
-        header("Location: pending.php");
-        exit();
+        // Display success message using JavaScript
+        echo "<script>
+            alert('Appointment successfully approved!');
+            window.location.href = 'pending.php'; // Redirect after alert
+        </script>";
+        exit();  // Exit to ensure the script stops here
     } else {
         // Display error message if query fails
-        echo "<script>alert('Error updating status: " . $stmt->error . "');</script>";
+        echo "<script>
+            alert('Error updating status: " . $stmt->error . "');
+            window.location.href = 'pending.php'; // Redirect to same page
+        </script>";
     }
 
     $stmt->close();
@@ -102,19 +105,22 @@ if (isset($_POST['decline'])) {
     // Get the appointment ID from the form
     $id = $_POST['id'];
 
-    // Prepare the query to update the status to 'declined'
+    // Prepare the query to update the status to 'declined' (status = '2')
     $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
 
     if (mysqli_query($con, $deleteQuery)) {
-        // Display success message
-        echo "<script>alert('Appointment successfully declined!');</script>";
-
-        // Redirect to refresh the page and show updated records
-        header("Location: pending.php");
-        exit();
+        // Display success message using JavaScript
+        echo "<script>
+            alert('Appointment successfully declined!');
+            window.location.href = 'pending.php'; // Redirect after alert
+        </script>";
+        exit();  // Ensure no further code runs after the redirect
     } else {
-        // Display error message if query fails
-        echo "<script>alert('Error declining appointment: " . mysqli_error($con) . "');</script>";
+        // Display error message if the query fails
+        echo "<script>
+            alert('Error declining appointment: " . mysqli_error($con) . "');
+            window.location.href = 'pending.php'; // Redirect after error message
+        </script>";
     }
 }
 
