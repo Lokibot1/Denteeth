@@ -55,11 +55,15 @@ if (isset($_POST['update'])) {
 
         // Execute both queries
         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+            // Echo success message
+            echo "<script>alert('Record updated successfully!');</script>";
+
             // Redirect to the same page after updating
             header("Location: pending.php");
             exit();
         } else {
-            echo "Error updating record: " . mysqli_error($con);
+            // Display error if the query fails
+            echo "<script>alert('Error updating record: " . mysqli_error($con) . "');</script>";
         }
     }
 }
@@ -76,28 +80,43 @@ if (isset($_POST['approve'])) {
 
     // Prepare the query to update the status to 'finished' using a prepared statement
     $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
-    $status = 3; // Assuming '4' represents finished
+    $status = 3; // Assuming '3' represents finished
     $stmt->bind_param("ii", $status, $id);
 
     // Execute the query
     if ($stmt->execute()) {
+        // Display success message
+        echo "<script>alert('Appointment successfully approved!');</script>";
+
         // Redirect back to the dashboard
         header("Location: pending.php");
         exit();
     } else {
-        echo "Error updating status: " . $stmt->error;
+        // Display error message if query fails
+        echo "<script>alert('Error updating status: " . $stmt->error . "');</script>";
     }
 
     $stmt->close();
 }
 
 if (isset($_POST['decline'])) {
+    // Get the appointment ID from the form
     $id = $_POST['id'];
-    $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
-    mysqli_query($con, $deleteQuery);
 
-    // Redirect to refresh the page and show updated records
-    header("Location: pending.php");
+    // Prepare the query to update the status to 'declined'
+    $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
+
+    if (mysqli_query($con, $deleteQuery)) {
+        // Display success message
+        echo "<script>alert('Appointment successfully declined!');</script>";
+
+        // Redirect to refresh the page and show updated records
+        header("Location: pending.php");
+        exit();
+    } else {
+        // Display error message if query fails
+        echo "<script>alert('Error declining appointment: " . mysqli_error($con) . "');</script>";
+    }
 }
 
 // SQL query to count total records
