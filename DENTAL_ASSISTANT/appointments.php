@@ -27,7 +27,8 @@ if (isset($_POST['update'])) {
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
     // Check for conflicts in both original date/time and modified date/time
-    $conflict_query = "SELECT id 
+    $conflict_query = "
+        SELECT id 
         FROM tbl_appointments 
         WHERE 
             (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
@@ -50,20 +51,18 @@ if (isset($_POST['update'])) {
         // Update query for tbl_appointments
         $update_appointment_query = "UPDATE tbl_appointments 
                                      SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
-                                     WHERE id=$id"; // Assuming `id` is used as the foreign key
+                                     WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
 
         // Execute both queries
-        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
             // Redirect to the same page after updating
-            header("Location: appointments.php");
+            header("Location: pending.php");
             exit();
         } else {
             echo "Error updating record: " . mysqli_error($con);
         }
     }
 }
-
-
 if (isset($_POST['accept'])) {
     // Check if the connection exists
     if (!$con) {
@@ -81,7 +80,7 @@ if (isset($_POST['accept'])) {
     // Execute the query
     if ($stmt->execute()) {
         // Redirect back to the dashboard
-        header("Location: appointments.php");
+        header("Location: pending.php");
         exit();
     } else {
         echo "Error updating status: " . $stmt->error;
@@ -89,14 +88,14 @@ if (isset($_POST['accept'])) {
 
     $stmt->close();
 }
-
 if (isset($_POST['decline'])) {
     $id = $_POST['id'];
     $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
     mysqli_query($con, $deleteQuery);
 
     // Redirect to refresh the page and show updated records
-    header("Location: appointments.php");
+    header("Location: pending.php");
+    
 }
 
 // SQL query to count total records

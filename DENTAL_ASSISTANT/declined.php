@@ -54,7 +54,7 @@ if (isset($_POST['update'])) {
                                      WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
 
         // Execute both queries
-        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
             // Redirect to the same page after updating
             header("Location: pending.php");
             exit();
