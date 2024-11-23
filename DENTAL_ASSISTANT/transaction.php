@@ -282,6 +282,10 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                             <input type="number" step="0.01" name="outstanding_balance" id="modal-balance" required>
                         </div>
                         <br>
+                        <button type="submit">Add</button>
+                    </form>
+                </div>
+            </div>
                                                                            
             <script>
                 // Modal functions
