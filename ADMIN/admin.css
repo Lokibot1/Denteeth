@@ -148,30 +148,9 @@ a:hover {
 /* Search Bar */
 .search-form {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px; 
-    align-items: center; 
-    justify-content: flex-start; 
-    margin-bottom: 20px;
-}
-.search-button {
-    background: #0A2C16;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
+    gap: 15px;
     align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease;
 }
-
-.search-button:hover {
-    background-color: #094514;
-}
-
 input[type="text"], input[type="date"], select {
     padding: 10px;
     font-size: 16px;
@@ -179,12 +158,11 @@ input[type="text"], input[type="date"], select {
     border-radius: 15px;
     outline: none;
     transition: border-color 0.3s;
-    width: calc(100% / 4 - 10px);
+    width: 50%;
     box-sizing: border-box;
     margin-right: 20px;
     
 }
-
 .material-symbols-outlined {
     all: unset;
     font-family: "Material Symbols Outlined"; /* Ensure the font is properly loaded */
@@ -415,7 +393,7 @@ textarea {
 }
 
 .pagination-container {
-    text-align: left;
+    text-align: left;   
 }
 
 .pagination-btn {
@@ -507,3 +485,25 @@ div h3{
     background-color: #094514;
     margin-top: -1px;
 }
+.labels {
+    display: flex;
+    gap: 300px; 
+    align-items: center;
+}
+.bill-fields {
+    display: flex;
+    gap: 30px; 
+    align-items: center;
+}
+.notification {
+    position: fixed;
+    top: 10px;
+    left: 45%;
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    border-radius: 5px;
+    padding: 10px 20px;
+    z-index: 9999; 
+    opacity: 1;
+  }

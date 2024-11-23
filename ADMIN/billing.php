@@ -149,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </aside>
     </div>
     <!-- Main Content/Crud -->
-    < <div class="top">
+    <div class="top">
         <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>

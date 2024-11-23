@@ -366,6 +366,10 @@ if (isset($_POST['delete'])) {
                     </form>
                 </div>
             </div>
+            <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Added!</p>
+                </div>
+
 
             <!-- Display Table -->
             <table class="table table-bordered">
@@ -430,6 +434,25 @@ if (isset($_POST['delete'])) {
                     if (event.target == modal) {
                         modal.style.display = "none";
                     }
+                }
+                document.getElementById('submitBtn').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
                 }
             </script>
         </div>

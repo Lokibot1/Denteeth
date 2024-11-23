@@ -153,32 +153,12 @@ a:hover {
     transition: color .3s, text-shadow .3s;
 }
 /* Search Bar */
+
 .search-form {
     display: flex;
-    flex-wrap: wrap;
-    gap: 15px; 
-    align-items: center; 
-    justify-content: flex-start; 
-    margin-bottom: 20px;
-}
-.search-button {
-    background: #0A2C16;
-    color: white;
-    border: none;
-    border-radius: 15px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
+    gap: 15px;
     align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease;
 }
-
-.search-button:hover {
-    background-color: #094514;
-}
-
 input[type="text"], input[type="date"], select {
     padding: 10px;
     font-size: 16px;
@@ -186,12 +166,11 @@ input[type="text"], input[type="date"], select {
     border-radius: 15px;
     outline: none;
     transition: border-color 0.3s;
-    width: calc(100% / 4 - 10px);
+    width: 50%;
     box-sizing: border-box;
     margin-right: 20px;
     
 }
-
 .material-symbols-outlined {
     all: unset;
     font-family: "Material Symbols Outlined"; /* Ensure the font is properly loaded */
@@ -282,7 +261,7 @@ textarea {
     padding: 50px 50px;
     border-radius: 5px;
     width: 70%;
-    height: 50%;
+    height: 100%;
     overflow: auto;
 }
 .body{
@@ -297,16 +276,14 @@ textarea {
     font-size: 30px;
     float: right;
 }
-
-.bill-fields {
+.labels {
     display: flex;
-    gap: 305px;
+    gap: 300px; 
     align-items: center;
 }
-
-.bill-inputs {
+.bill-fields {
     display: flex;
-    gap: 30px;
+    gap: 30px; 
     align-items: center;
 }
 
@@ -405,22 +382,23 @@ textarea {
 .managehead {
     display: flex;
     justify-content: space-between;
-    align-items: center; 
+    align-items: center;
     padding: 10px;
+    margin-bottom: 20px;
 }
 
+/* Pagination styling */
 .pagination-container {
-    text-align: left;
+    display: flex;
+    align-items: center;
 }
 
 .pagination-btn {
-    display: inline-block;
     padding: 10px 15px;
-    margin: 10px;
+    margin: 0 5px;
     border: none;
     border-radius: 5px;
     background-color: #0A2C16;
-    /* Bootstrap primary color */
     color: white;
     text-decoration: none;
     transition: background-color 0.3s;
@@ -428,7 +406,6 @@ textarea {
 
 .pagination-btn:hover {
     background-color: #FF9F00;
-    /* Darker shade for hover */
 }
 
 

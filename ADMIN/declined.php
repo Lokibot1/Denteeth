@@ -191,7 +191,7 @@ $result = mysqli_query($con, $query);
         </aside>
     </div>
     <!-- Main Content/Crud -->
-    < <div class="top">
+    <div class="top">
         <div class="content-box">
             <div class="round-box">
                 <p>APPOINTMENT TODAY:</p>
@@ -354,7 +354,7 @@ $result = mysqli_query($con, $query);
                     echo "<span style='color: red;'>No data available</span>";
                 }
                 ?>
-            </div>
+            </div>  
             <?php
             // Set the number of results per page
             $resultsPerPage = 6;

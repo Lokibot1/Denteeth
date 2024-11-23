@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <li><a href="pending.php">Pending Appointments</a></a></li>
             <li><a href="appointments.php">Approved Appointments</a></li>
             <li><a href="declined.php">Declined Appointment</a></li>
-            <li><a href="billing.php">Billing Approval</a></li>
+            <li><a href="billing.php">Billing Approval </a></li>
         </ul>
     </aside>
 

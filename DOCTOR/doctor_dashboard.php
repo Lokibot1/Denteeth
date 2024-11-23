@@ -398,7 +398,7 @@ $result = mysqli_query($con, $query);
                             style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
 
                             <!-- Decline Button -->
-                            <form method='POST' action='' style='display:inline;'>
+                            <form method='POST' id='declined' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                                 <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
                                 style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
@@ -413,7 +413,10 @@ $result = mysqli_query($con, $query);
                 } else {
                     echo "<tr><td colspan='6'>No records found</td></tr>";
                 }
-                ?>
+                ?>        
+                <div id="declined" class="notification" style="display: none;">
+                <p>Successfully Declined!</p>
+            </div>
             </tbody>
         </table>
         <br><br>
@@ -445,11 +448,13 @@ $result = mysqli_query($con, $query);
                     </div>
                     <br>
                     <input type="number" id="price" name="price" style="display: none;" readonly>
-                    <button type="submit" name="submit">Proceed to Dental Assistant</button>
+                    <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
                 </form>
             </div>
         </div>
-
+        <div id="notification" class="notification" style="display: none;">
+            <p>Successfully Submitted!</p>
+        </div>
         <script>
             const servicePrices = {
                 1: 30000, 2: 30000, 3: 2000, 4: 100000, 5: 20000,
@@ -489,6 +494,29 @@ $result = mysqli_query($con, $query);
                     document.getElementById('finishModal').style.display = 'none';
                 }
             });
+
+            document.getElementById('proceed').addEventListener('click', function () {
+              showNotification();
+            });
+            document.getElementById('proceed').addEventListener('click', function () {
+              showNotification();
+            });
+
+            function showNotification() {
+              const notification = document.getElementById('notification, declined');
+              notification.style.display = 'block';
+
+              // Start fading out after 3 seconds
+              setTimeout(() => {
+                  notification.style.opacity = '0';
+              }, 5000);
+
+              // Hide completely after fading
+              setTimeout(() => {
+                  notification.style.display = 'none';
+                  notification.style.opacity = '1'; // Reset for next use
+              }, 3500);
+          }
         </script>
 
         <!-- Edit Modal -->

@@ -1,0 +1,21 @@
+.s-img img {
+    animation: bounceIn 2s ease infinite; 
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-20px); 
+    }
+    50% {
+        transform: translateY(0); 
+    }
+    70% {
+        transform: translateY(-10px); 
+    }
+    100% {
+        transform: translateY(0);
+    }
+}

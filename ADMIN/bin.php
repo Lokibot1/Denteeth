@@ -236,28 +236,28 @@ $result = mysqli_query($con, $query);
             
             $result = mysqli_query($con, $query);
             ?><br><br><br>
+            <div class="managehead">
+                 <!-- Search Form Container -->
+                <div class="f-search">
+                    <form method="GET" action="" class="search-form">
+                        <input type="text" name="name" placeholder="Search by name" value="<?php echo htmlspecialchars($filterName); ?>" />
+                        <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
+                        <button class="material-symbols-outlined" type="submit">search</button>
+                    </form>
+                </div>
 
-            <!-- HTML Form for Filters -->
-            <form method="GET" action="" class="search-form">
-                <input type="text" name="name" placeholder="Search by name"
-                    value="<?php echo htmlspecialchars($filterName); ?>" />
-                <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
-                <span class="material-symbols-outlined" type="submit">search</span>
-            </form>
+                <!-- Pagination Navigation -->
+                <div class="pagination-container">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">&lt;</a>
+                    <?php endif; ?>
 
-            <!-- Pagination -->
-            <div class="pagination-container">
-                <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
-                        class="pagination-btn">&lt;</a>
-                <?php endif; ?>
-
-                <?php if ($currentPage < $totalPages): ?>
-                    <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
-                        class="pagination-btn">&gt;</a>
-                <?php endif; ?>
+                    <?php if ($currentPage < $totalPages): ?>
+                        <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">&gt;</a>
+                    <?php endif; ?>
+                </div>
             </div>
-
+            <br><br>
             <table class="table table-bordered">
                 <thead>
                     <tr>

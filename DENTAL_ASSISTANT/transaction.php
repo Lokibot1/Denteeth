@@ -179,32 +179,31 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
             
             $result = mysqli_query($con, $query);
             ?><br><br><br>
+<div class="managehead">
+                 <!-- Search Form Container -->
+                <div class="f-search">
+                    <form method="GET" action="" class="search-form">
+                        <input type="text" name="name" placeholder="Search by name" value="<?php echo htmlspecialchars($filterName); ?>" />
+                        <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
+                        <button class="material-symbols-outlined" type="submit">search</button>
+                    </form>
+                </div>
 
-            <!-- HTML Form for Filters -->
-            <form method="GET" action="" class="search-form">
-                <input type="text" name="name" placeholder="Search by name"
-                    value="<?php echo htmlspecialchars($filterName); ?>" />
-                <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
-                <button class="material-symbols-outlined" type="submit">search</button>
-            </form>
+                <!-- Pagination Navigation -->
+                <div class="pagination-container">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">&lt;</a>
+                    <?php endif; ?>
 
-            <!-- Pagination -->
-            <div class="pagination-container">
-                <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
-                        class="pagination-btn">
-                        < </a>
-                        <?php endif; ?>
-
-                        <?php if ($currentPage < $totalPages): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo htmlspecialchars($filterName); ?>&date=<?php echo htmlspecialchars($filterDate); ?>"
-                                class="pagination-btn"> > </a>
-                        <?php endif; ?>
+                    <?php if ($currentPage < $totalPages): ?>
+                        <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">&gt;</a>
+                    <?php endif; ?>
+                </div>
             </div>
-
+            <br>
             <h2>Transaction History</h2>
             <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
-
+            <br><br>
             <!-- Table -->
             <table class="table table-bordered centered-table">
                 <thead>
@@ -272,26 +271,18 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
 
                         <label for="date">Date:</label>
                         <input type="date" name="date" id="modal-date" required>
-
+                        <div class="labels">
+                            <label for="modal-bill">Bill:</label>
+                            <label for="modal-paid">Amount Paid:</label>
+                            <label for="modal-balance">Outstanding Balance:</label>
+                        </div>
+                        <div class="bill-fields">
+                            <input type="number" step="0.01" name="bill" id="modal-bill" required>
+                            <input type="number" step="0.01" name="paid" id="modal-paid" required>
+                            <input type="number" step="0.01" name="outstanding_balance" id="modal-balance" required>
+                        </div>
                         <br>
-
-                        <label for="modal-bill">Bill:</label>
-                        <input type="number" step="0.01" name="bill" id="modal-bill" required>
-                        <br>
-                        <br>
-
-                        <label for="modal-paid">Amount Paid :</label>
-                        <input type="number" step="0.01" name="paid" id="modal-paid" required>
-                        <br>
-
-                        <label for="modal-balance">Outstanding Balance:</label>
-                        <input type="number" step="0.01" name="outstanding_balance" id="modal-balance" required>
-                        <br>
-                        <button type="submit">Add</button>
-                    </form>
-                </div>
-            </div>
-
+                                                                           
             <script>
                 // Modal functions
                 const modal = document.getElementById("transactionModal");
@@ -321,6 +312,26 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                     // Update the contact input field and the hidden field with the selected contact value
                     contactInput.value = contact ? contact : '';  // If no selection, set contact to empty string
                     hiddenContactInput.value = contact ? contact : '';  // Set the hidden input value
+                }
+
+                document.getElementById('add').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
                 }
             </script>
 

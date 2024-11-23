@@ -357,10 +357,14 @@ $con->close();
                             <label for="priceBraces">Start at:</label>
                             <input type="number" name="price" id="priceBraces" placeholder="Enter Price" required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit"id="s9">Save Changes</button>
                         </form>
                     </div>
                 </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
+
 
                 <script>
                     // Modal Elements for Orthodontic Braces
@@ -400,6 +404,25 @@ $con->close();
                         const bracesData = <?php echo json_encode($bracesData); ?>;
                         openBracesModal(bracesData);
                     };
+                    document.getElementById('s9').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Dental Cleaning -->
@@ -436,10 +459,14 @@ $con->close();
                             <label for="priceCleaning">Start at:</label>
                             <input type="number" name="price" id="priceCleaning" placeholder="Enter Price" required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" id="s10">Save Changes</button>
                         </form>
                     </div>
                 </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
+
 
                 <script>
                     // Modal Elements for Dental Cleaning
@@ -479,6 +506,25 @@ $con->close();
                         const cleaningData = <?php echo json_encode($cleaningData); ?>;
                         openServiceModalCleaning(cleaningData);
                     };
+                    document.getElementById('s10').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Dental Whitening -->
@@ -515,10 +561,14 @@ $con->close();
                             <label for="priceWhitening">Per Cycle(3):</label>
                             <input type="number" name="price" id="priceWhitening" placeholder="Enter Price"
                                 required><br>
-                            <button type="submit">Save Changes</button>
+                            <button type="submit"id="s11">Save Changes</button>
                         </form>
                     </div>
                 </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
+
 
                 <script>
                     // Modal Elements for Dental Whitening
@@ -557,7 +607,25 @@ $con->close();
                     document.getElementById("openModalBtnWhitening").onclick = () => {
                         const whiteningData = <?php echo json_encode($whiteningData); ?>;
                         openServiceModal(whiteningData);
-                    };
+                    };document.getElementById('s11').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Dental Implants -->
@@ -594,11 +662,13 @@ $con->close();
                             <label for="priceImplants">Start at:</label>
                             <input type="number" name="price" id="priceImplants" placeholder="Enter Price" required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" id="s1">Save Changes</button>
                         </form>
                     </div>
                 </div>
-
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
                 <script>
                     // Modal Elements for Dental Implants
                     const modalImplants = document.getElementById("serviceModalImplants");
@@ -637,6 +707,27 @@ $con->close();
                         const implantsData = <?php echo json_encode($implantsData); ?>;
                         openServiceModalImplants(implantsData);
                     };
+
+                    
+                    document.getElementById('s1').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Restoration -->
@@ -673,10 +764,12 @@ $con->close();
                             <label for="priceRestoration">Start at:</label>
                             <input type="number" name="price" id="priceRestoration" placeholder="Enter Price"
                                 required><br>
-
-                            <button type="submit">Save Changes</button>
+                                <button type="submit" id="s2">Save Changes</button>
                         </form>
                     </div>
+                </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
                 </div>
 
                 <script>
@@ -717,6 +810,26 @@ $con->close();
                         const restorationData = <?php echo json_encode($restorationData); ?>;
                         openServiceModalRestoration(restorationData);
                     };
+
+                    document.getElementById('s2').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Extraction -->
@@ -754,10 +867,14 @@ $con->close();
                             <input type="number" name="price" id="priceExtraction" placeholder="Enter Price"
                                 required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" id="s3">Save Changes</button>
                         </form>
                     </div>
                 </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
+
 
                 <script>
                     // Modal Elements for Extraction
@@ -797,6 +914,25 @@ $con->close();
                         const extractionData = <?php echo json_encode($extractionData); ?>;
                         openServiceModalExtraction(extractionData);
                     };
+                    document.getElementById('s3').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Veneers -->
@@ -832,10 +968,14 @@ $con->close();
                             <label for="priceVeneers">Per Unit:</label>
                             <input type="number" name="price" id="priceVeneers" placeholder="Enter Price" required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" id="s4">Save Changes</button>
                         </form>
                     </div>
                 </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
+
 
                 <script>
                     // Modal Elements for Veneers
@@ -875,6 +1015,25 @@ $con->close();
                         const veneersData = <?php echo json_encode($veneersData); ?>;
                         openServiceModalVeneers(veneersData);
                     };
+                    document.getElementById('s4').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Full Exam & X-Ray -->
@@ -909,10 +1068,14 @@ $con->close();
                             <label for="priceExam">Price:</label>
                             <input type="number" name="price" id="priceExam" placeholder="Enter Price" required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" id="s5">Save Changes</button>
                         </form>
                     </div>
                 </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
+
 
                 <script>
                     // Modal Elements for Full Exam & X-Ray
@@ -952,6 +1115,25 @@ $con->close();
                         const examData = <?php echo json_encode($examData); ?>;
                         openServiceModalExam(examData);
                     };
+                    document.getElementById('s5').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Root Canal Treatment -->
@@ -989,9 +1171,12 @@ $con->close();
                             <input type="number" name="price" id="priceRootCanal" placeholder="Enter Price"
                                 required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" id="s6">Save Changes</button>
                         </form>
                     </div>
+                </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
                 </div>
 
                 <script>
@@ -1032,6 +1217,25 @@ $con->close();
                         const rootData = <?php echo json_encode($rootData); ?>;
                         openServiceModalRootCanal(rootData);
                     };
+                    document.getElementById('s6').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Dentures -->
@@ -1066,10 +1270,14 @@ $con->close();
                             <label for="priceDentures">Start at:</label>
                             <input type="number" name="price" id="priceDentures" placeholder="Enter Price" required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" id="s7">Save Changes</button>
                         </form>
                     </div>
                 </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
+
 
                 <script>
                     // Modal Elements for Dentures
@@ -1108,7 +1316,25 @@ $con->close();
                     document.getElementById("openModalBtnDentures").onclick = () => {
                         const dentureData = <?php echo json_encode($dentureData); ?>;
                         openServiceModalDentures(dentureData);
-                    };
+                    };document.getElementById('s7').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <!-- Img-box and Modal for Crown & Bridge -->
@@ -1145,10 +1371,14 @@ $con->close();
                             <input type="number" name="price" id="priceCrownBridge" placeholder="Enter Price"
                                 required><br>
 
-                            <button type="submit">Save Changes</button>
+                            <button type="submit" id="s8">Save Changes</button>
                         </form>
                     </div>
                 </div>
+                <div id="notification" class="notification" style="display: none;">
+                    <p>Successfully Submitted!</p>
+                </div>
+
 
                 <script>
                     // Modal Elements for Crown & Bridge
@@ -1188,6 +1418,25 @@ $con->close();
                         const crownBridgeData = <?php echo json_encode($crownBridgeData); ?>;
                         openServiceModalCrownBridge(crownBridgeData);
                     };
+                    document.getElementById('s8').addEventListener('click', function () {
+                    showNotification();
+                    });
+
+                    function showNotification() {
+                    const notification = document.getElementById('notification');
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 5000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
                 </script>
 
                 <script>
