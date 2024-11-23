@@ -16,12 +16,8 @@ if (!$con) {
 
 // Handle update request
 if (isset($_POST['update'])) {
-    echo "Update request received.<br>";
-
     // Get form data from modal
     $id = $_POST['id'];
-    echo "ID: $id<br>";
-
     $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
     $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
     $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
@@ -29,8 +25,6 @@ if (isset($_POST['update'])) {
     $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
-
-    echo "Received data - First Name: $first_name, Last Name: $last_name, Middle Name: $middle_name, Contact: $contact, Modified Date: $modified_date, Modified Time: $modified_time, Service Type: $service_type<br>";
 
     // Check for conflicts in both original date/time and modified date/time
     $conflict_query = "
@@ -41,44 +35,37 @@ if (isset($_POST['update'])) {
             (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
         AND id != $id"; // Exclude the current appointment being updated
 
-    echo "Conflict Query: $conflict_query<br>";
     $conflict_result = mysqli_query($con, $conflict_query);
 
     if (mysqli_num_rows($conflict_result) > 0) {
         // Conflict found
-        echo "Conflict detected. Appointment already booked.<br>";
         echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
     } else {
         // No conflict - proceed with the update
-        echo "No conflicts found. Proceeding with update.<br>";
 
         // Update query for tbl_patient
         $update_patient_query = "UPDATE tbl_patient 
                                  SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
                                  WHERE id=$id";
-        echo "Update Patient Query: $update_patient_query<br>";
 
         // Update query for tbl_appointments
         $update_appointment_query = "UPDATE tbl_appointments 
                                      SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
                                      WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
-        echo "Update Appointment Query: $update_appointment_query<br>";
 
         // Execute both queries
         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-            echo "Update successful.<br>";
             // Redirect to the same page after updating
             header("Location: pending.php");
             exit();
         } else {
-            echo "Error updating record: " . mysqli_error($con) . "<br>";
+            echo "Error updating record: " . mysqli_error($con);
         }
     }
 }
 
-if (isset($_POST['approve'])) {
-    echo "Approve request received.<br>";
 
+if (isset($_POST['approve'])) {
     // Check if the connection exists
     if (!$con) {
         die("Connection failed: " . mysqli_connect_error());
@@ -86,35 +73,27 @@ if (isset($_POST['approve'])) {
 
     // Get the appointment ID from the form
     $id = $_POST['id'];
-    echo "ID to approve: $id<br>";
 
-    // Prepare the query to update the status to 'finished'
+    // Prepare the query to update the status to 'finished' using a prepared statement
     $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
-    $status = 3; // Assuming '3' represents finished
+    $status = 3; // Assuming '4' represents finished
     $stmt->bind_param("ii", $status, $id);
 
     // Execute the query
     if ($stmt->execute()) {
-        echo "Approval successful.<br>";
         // Redirect back to the dashboard
         header("Location: pending.php");
         exit();
     } else {
-        echo "Error updating status: " . $stmt->error . "<br>";
+        echo "Error updating status: " . $stmt->error;
     }
 
     $stmt->close();
 }
 
 if (isset($_POST['decline'])) {
-    echo "Decline request received.<br>";
-
     $id = $_POST['id'];
-    echo "ID to decline: $id<br>";
-
     $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
-    echo "Decline Query: $deleteQuery<br>";
-
     mysqli_query($con, $deleteQuery);
 
     // Redirect to refresh the page and show updated records
@@ -123,10 +102,8 @@ if (isset($_POST['decline'])) {
 
 // SQL query to count total records
 $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '3'";
-echo "Count Query: $countQuery<br>";
 $countResult = mysqli_query($con, $countQuery);
 $totalCount = mysqli_fetch_assoc($countResult)['total'];
-echo "Total Finished Appointments: $totalCount<br>";
 
 // SQL query with JOIN to fetch the limited number of records
 $query = "SELECT a.*, 
@@ -137,14 +114,8 @@ $query = "SELECT a.*,
           JOIN tbl_patient p ON a.id = p.id
           WHERE a.status = '3'
           LIMIT 15";  // Limit to 15 rows
-echo "Main Query: $query<br>";
 
 $result = mysqli_query($con, $query);
-if ($result) {
-    echo "Records fetched successfully.<br>";
-} else {
-    echo "Error fetching records: " . mysqli_error($con) . "<br>";
-}
 
 ?>
 
@@ -529,12 +500,12 @@ if ($result) {
                         <option value="11">Root Canal Treatment</option>
                     </select>
                     <br>
-                    <input type="submit" name="update" id="update" value="Save">
+                    <input type="submit" name="update" id="update"value="Save">
                 </form>
             </div>
             <div id="notification" class="notification" style="display: none;">
                 <p>Your appointment has been successfully booked!</p>
-            </div>
+              </div>
 
             <script>
                 // Open the modal and populate it with data
@@ -591,7 +562,7 @@ if ($result) {
                     return `${year}-${month}-${day}`;
                 }
                 document.getElementById('update').addEventListener('click', function () {
-                    showNotification();
+                showNotification();
                 });
                 // Close modal when clicking outside of it
                 window.onclick = function (event) {
