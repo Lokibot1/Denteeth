@@ -210,7 +210,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                     <tr>
                         <th>Name</th>
                         <th>Contact</th>
-                        <th>Type Of Service</th>
+                        <th>Service</th>
                         <th>Date</th>
                         <th>Bill</th>
                         <th>Amount Paid</th>
@@ -227,7 +227,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                             $outstanding_balance = "₱" . number_format($row['outstanding_balance'], 2);
 
                             echo "<tr>
-                            <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                            <td style='width: 230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                             <td>{$row['contact']}</td>
                             <td>{$row['service_name']}</td>
                             <td>{$row['date']}</td>

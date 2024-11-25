@@ -500,7 +500,7 @@ $result = mysqli_query($con, $query);
                             <th>Time</th>
                             <th style="font-size: 15px;">Rescheduled Date</th>
                             <th style="font-size: 15px;">Rescheduled Time</th>
-                            <th>Type Of Service</th>
+                            <th>Service</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -514,16 +514,16 @@ $result = mysqli_query($con, $query);
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplay}</td>
-                        <td>{$modified_date}</td>
-                        <td>{$modified_time}</td>
+                        <td style='width: 110px'>{$dateToDisplay}</td>
+                        <td style='width: 110px'>{$timeToDisplay}</td>
+                        <td style='width: 110px'>{$modified_date}</td>
+                        <td style='width: 110px'>{$modified_time}</td>
                         <td>{$row['service_name']}</td>
-                        <td>
+                        <td style='width: 10px'>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer;'>Update</button>
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
                         </td>
                     </tr>";
                             }
@@ -556,9 +556,9 @@ $result = mysqli_query($con, $query);
                             <th>Contact</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th>Rescheduled Date</th>
-                            <th>Rescheduled Time</th>
-                            <th>Type Of Service</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
+                            <th>Service</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -572,16 +572,16 @@ $result = mysqli_query($con, $query);
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplay}</td>
-                        <td>{$modified_date}</td>
-                        <td>{$modified_time}</td>
+                        <td style='width: 110px'>{$dateToDisplay}</td>
+                        <td style='width: 110px'>{$timeToDisplay}</td>
+                        <td style='width: 110px'>{$modified_date}</td>
+                        <td style='width: 110px'>{$modified_time}</td>
                         <td>{$row['service_name']}</td>
-                        <td>
+                        <td style='width: 10px'>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer;'>Update</button>
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
                         </td>
                     </tr>";
                             }
@@ -618,7 +618,7 @@ $result = mysqli_query($con, $query);
                             <th>Time</th>
                             <th style="font-size: 15px;">Rescheduled Date</th>
                             <th style="font-size: 15px;">Rescheduled Time</th>
-                            <th>Type Of Service</th>
+                            <th>Service</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -632,16 +632,16 @@ $result = mysqli_query($con, $query);
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplay}</td>
-                        <td>{$modified_date}</td>
-                        <td>{$modified_time}</td>
+                        <td style='width: 110px'>{$dateToDisplay}</td>
+                        <td style='width: 110px'>{$timeToDisplay}</td>
+                        <td style='width: 110px'>{$modified_date}</td>
+                        <td style='width: 110px'>{$modified_time}</td>
                         <td>{$row['service_name']}</td>
-                        <td>
+                        <td style='width: 10px'>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px;  cursor:pointer;'>Update</button>
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px;  cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
                         </td>
                     </tr>";
                             }
@@ -660,16 +660,12 @@ $result = mysqli_query($con, $query);
                     <form method="POST" action="">
                         <h1>EDIT DETAILS</h1><br>
                         <input type="hidden" name="id" id="modal-id">
-                        <br>
-                        <label for="modal-first-name">First Name:</label>
-                        <input type="text" name="first_name" id="modal-first-name" required>
-                        <br>
-                        <label for="modal-last-name">Last Name:</label>
-                        <input type="text" name="last_name" id="modal-last-name" required>
-                        <br>
-                        <label for="modal-middle-name">Middle Name:</label>
-                        <input type="text" name="middle_name" id="modal-middle-name" required>
-                        <br>
+                        <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
+                        <div class="name-fields">
+                        <input type="text" name="last_name" id="modal-last-name" maxlength="50" placeholder="Enter Last Name" required>
+                        <input type="text" name="first_name" id="modal-first-name" maxlength="50" placeholder="Enter First Name" required>
+                        <input type="text" name="middle_name" id="modal-middle-name" maxlength="2" placeholder="Enter Middle Initial">
+                        </div>
                         <label for="contact">Contact:</label>
                         <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
                             maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
@@ -686,7 +682,7 @@ $result = mysqli_query($con, $query);
                             <option value="15:00 PM">03:00 PM</option>
                             <option value="16:30 PM">04:30 PM</option>
                         </select>
-                        <label for="service_type">Type Of Service:</label>
+                        <label for="service_type">Type of Services:</label>
                         <select name="service_type" id="modal-service_type" required>
                             <option value="">--Select Service Type--</option>
                             <option value="1">All Porcelain Veneers & Zirconia</option>

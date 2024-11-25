@@ -421,7 +421,7 @@ $result = mysqli_query($con, $query);
                     <th>Time</th>
                     <th style="font-size: 15px;">Rescheduled Date</th>
                     <th style="font-size: 15px;">Rescheduled Time</th>
-                    <th>Type Of Service</th>
+                    <th>Service</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -437,16 +437,16 @@ $result = mysqli_query($con, $query);
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                         echo "<tr>
-                    <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                     <td>{$row['contact']}</td>
                     <td style='width: 110px'>{$dateToDisplay}</td>
-                    <td style='width: 100px'>{$timeToDisplay}</td>
-                    <td style='width: 100px'>{$modified_date}</td>
-                    <td style='width: 100px'>{$modified_time}</td>
-                    <td>{$row['service_name']}</td>
-                    <td style='width: 250px'>
+                    <td style='width: 110px'>{$timeToDisplay}</td>
+                    <td style='width: 110px'>{$modified_date}</td>
+                    <td style='width: 110px'>{$modified_time}</td>
+                    <td style='font-size: 15px'>{$row['service_name']}</td>
+                    <td style='width: 180px'>
                         <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                        style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px; cursor:pointer;'>Update</button>
+                        style='background-color:#083690; color:white; border:none; padding:10px 5px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                         </form>";
@@ -455,14 +455,14 @@ $result = mysqli_query($con, $query);
                             echo "<form method='POST' action='' style='display:inline;'>
                         <input type='hidden' name='id' value='{$row['id']}'>
                         <input type='submit' name='approve' value='Approve' 
-                        style='background-color:green; color:white; border:none; padding:7px 5px; border-radius:10px; cursor:pointer;'>
+                        style='background-color:green; color:white; border:none; padding:10px 5px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>
                     </form>";
                         }
                         if ($row['status'] != 'Decline') {
                             echo "<form method='POST' action='' style='display:inline;'>
                         <input type='hidden' name='id' value='{$row['id']}'>
                         <input type='submit' name='decline' value='Decline' 
-                        style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 5px; border-radius:10px; cursor:pointer;'>
+                        style='background-color: rgb(196, 0, 0); color:white; border:none; padding:10px 5px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>
                     </form>";
                         }
 
@@ -480,18 +480,14 @@ $result = mysqli_query($con, $query);
             <div class="modal-content">
                 <span class="close" onclick="closeModal()">&times;</span>
                 <form method="POST" action="">
-                    <h1>EDIT DELAILS</h1><br>
+                    <h1>EDIT DETAILS</h1><br>
                     <input type="hidden" name="id" id="modal-id">
-                    <br>
-                    <label for="modal-first-name">First Name:</label>
-                    <input type="text" name="first_name" id="modal-first-name" required>
-                    <br>
-                    <label for="modal-last-name">Last Name:</label>
-                    <input type="text" name="last_name" id="modal-last-name" required>
-                    <br>
-                    <label for="modal-middle-name">Middle Name:</label>
-                    <input type="text" name="middle_name" id="modal-middle-name" required>
-                    <br>
+                    <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
+                    <div class="name-fields">
+                    <input type="text" name="last_name" id="modal-last-name" maxlength="50" placeholder="Enter Last Name" required>
+                    <input type="text" name="first_name" id="modal-first-name" maxlength="50" placeholder="Enter First Name" required>
+                    <input type="text" name="middle_name" id="modal-middle-name" maxlength="2" placeholder="Enter Middle Initial">
+                    </div>
                     <label for="contact">Contact:</label>
                     <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
                         maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>

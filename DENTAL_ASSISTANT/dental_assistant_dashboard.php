@@ -14,6 +14,7 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+
 ?>
 
 <!DOCTYPE html>
@@ -285,7 +286,7 @@ if (!$con) {
                     <th>Time</th>
                     <th style="font-size: 15px;">Rescheduled Date</th>
                     <th style="font-size: 15px;">Rescheduled Time</th>
-                    <th>Type Of Service</th>
+                    <th>Service</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -302,13 +303,13 @@ if (!$con) {
                         $timeToDisplay = (!empty($row['time']) && $row['time'] !== '00:00:00') ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                         echo "<tr>
-            <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+            <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
             <td>{$row['contact']}</td>
-            <td style='width: 90px' >{$dateToDisplay}</td>
-            <td style='width: 90px' >{$timeToDisplay}</td>
-            <td >{$modified_date}</td>
-            <td>{$modified_time}</td>
-            <td>{$row['service_name']}</td>
+            <td style='width: 90px'>{$dateToDisplay}</td>
+            <td style='width: 90px'>{$timeToDisplay}</td>
+            <td style='width: 110px'>{$modified_date}</td>
+            <td style='width: 110px'>{$modified_time}</td>
+            <td style='font-size: 15px'>{$row['service_name']}</td>
             <td>{$row['status']}</td>
                     </tr>";
                     }

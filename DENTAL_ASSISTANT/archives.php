@@ -158,7 +158,7 @@ if (!$con) {
                         <th>Time</th>
                         <th style="font-size: 15px;">Rescheduled Date</th>
                         <th style="font-size: 15px;">Rescheduled Time</th>
-                        <th>Type Of Service</th>
+                        <th>Service</th>
                         <th>Status</th>
                     </tr>
                 </thead>

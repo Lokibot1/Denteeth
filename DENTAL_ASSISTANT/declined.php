@@ -51,19 +51,22 @@ if (isset($_POST['update'])) {
         // Update query for tbl_appointments
         $update_appointment_query = "UPDATE tbl_appointments 
                                      SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
-                                     WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
+                                     WHERE id=$id";
 
         // Execute both queries
-         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-            // Redirect to the same page after updating
-            header("Location: pending.php");
+        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+            // Display success message and redirect using JavaScript
+            echo "<script>
+                alert('Record updated successfully!');
+                window.location.href = 'pending.php';
+            </script>";
             exit();
         } else {
-            echo "Error updating record: " . mysqli_error($con);
+            // Display error if the query fails
+            echo "<script>alert('Error updating record: " . mysqli_error($con) . "');</script>";
         }
     }
 }
-
 date_default_timezone_set('Asia/Hong_Kong');
 
 if (isset($_POST['delete'])) {
@@ -416,7 +419,8 @@ $result = mysqli_query($con, $query);
                     <th>Time</th>
                     <th style="font-size: 15px;">Rescheduled Date</th>
                     <th style="font-size: 15px;">Rescheduled Time</th>
-                    <th>Type Of Service</th>
+                    <th>Service</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -431,16 +435,16 @@ $result = mysqli_query($con, $query);
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                         echo "<tr>
-                        <td style='width:200px; padding:0px 0px''>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td style='padding:0px 0px'>{$row['contact']}</td>
-                        <td style='width: 90px'>{$dateToDisplay}</td>
-                        <td style='padding:0px 0px'>{$timeToDisplay}</td>
-                        <td style='padding:0px 0px'>{$modified_date}</td>
-                        <td style='padding:0px 0px'>{$modified_time}</td>
-                        <td style='padding:0px 0px'a>{$row['service_name']}</td>
-                        <td>
+                        <td style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td >{$row['contact']}</td>
+                        <td style=' width:110px;'>{$dateToDisplay}</td>
+                        <td style=' width:110px;'>{$timeToDisplay}</td>
+                        <td style=' width:110px;'>{$modified_date}</td>
+                        <td style=' width:110px;'>{$modified_time}</td>
+                        <td style=' font-size: 15px'>{$row['service_name']}</td>
+                        <td style=' width: 200px;'>
                         <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                        style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                        style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                         </form>";
@@ -448,14 +452,14 @@ $result = mysqli_query($con, $query);
                             echo "<form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                                 <input type='submit' name='restore' value='Restore' 
-                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>
                             </form>";
                         }
                         if ($row['status'] != 'Delete') {
                             echo "<form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='delete' value='Delete' 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>
                         </form>";
                         }
 
@@ -473,18 +477,14 @@ $result = mysqli_query($con, $query);
             <div class="modal-content">
                 <span class="close" onclick="closeModal()">&times;</span>
                 <form method="POST" action="">
-                    <h1>EDIT DELAILS</h1><br>
+                    <h1>EDIT DETAILS</h1><br>
                     <input type="hidden" name="id" id="modal-id">
-                    <br>
-                    <label for="modal-first-name">First Name:</label>
-                    <input type="text" name="first_name" id="modal-first-name" required>
-                    <br>
-                    <label for="modal-last-name">Last Name:</label>
-                    <input type="text" name="last_name" id="modal-last-name" required>
-                    <br>
-                    <label for="modal-middle-name">Middle Name:</label>
-                    <input type="text" name="middle_name" id="modal-middle-name" required>
-                    <br>
+                    <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
+                <div class="name-fields">
+                  <input type="text" name="last_name" id="modal-last-name" maxlength="50" placeholder="Enter Last Name" required>
+                  <input type="text" name="first_name" id="modal-first-name" maxlength="50" placeholder="Enter First Name" required>
+                  <input type="text" name="middle_name" id="modal-middle-name" maxlength="2" placeholder="Enter Middle Initial">
+                </div>
                     <label for="contact">Contact:</label>
                     <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
                         maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
@@ -501,7 +501,7 @@ $result = mysqli_query($con, $query);
                         <option value="15:00 PM">03:00 PM</option>
                         <option value="16:30 PM">04:30 PM</option>
                     </select>
-                    <label for="service_type">Type Of Service:</label>
+                    <label for="service_type">Types of Services:</label>
                     <select name="service_type" id="modal-service_type" required>
                         <option value="">--Select Service Type--</option>
                         <option value="1">All Porcelain Veneers & Zirconia</option>

@@ -176,9 +176,9 @@ if (isset($_POST['update'])) {
                         <th>Time</th>
                         <th style="font-size: 15px;">Rescheduled Date</th>
                         <th style="font-size: 15px;">Rescheduled Time</th>
-                        <th>Type of Service</th>
+                        <th>Service</th>
                         <th>Price</th>
-                        <th>Completion Status</th>
+                        <th style="font-size: 15px;">Completion Status</th>
                         <th>Note</th>
                     </tr>
                 </thead>
@@ -210,7 +210,7 @@ if (isset($_POST['update'])) {
                 <td>{$completion_status}</td>
                 <td>
                         <button type='button' onclick='openModal(\"{$row['note']}\")'
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
                             View
                         </button>
                     </td>

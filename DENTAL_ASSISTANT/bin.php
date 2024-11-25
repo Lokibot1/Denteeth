@@ -292,7 +292,7 @@ $result = mysqli_query($con, $query);
                             $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                             echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
                         <td>{$dateToDisplay}</td>
                         <td>{$timeToDisplay}</td>

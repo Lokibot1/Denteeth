@@ -526,8 +526,8 @@ $result = mysqli_query($con, $query);
 
                                 echo "<tr>
                         <td style='width:200px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
+                        <td style='width:110px;'>{$row['contact']}</td>
+                        <td style='width:90px;'>{$dateToDisplay}</td>
                         <td>{$timeToDisplay}</td>
                         <td>{$modified_date}</td>
                         <td>{$modified_time}</td>
