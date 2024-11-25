@@ -509,8 +509,8 @@ $result = mysqli_query($con, $query);
                             <th>Contact</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th>Modified_Date</th>
-                            <th>Modified_Time</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
                             <th>Type Of Service</th>
                             <th>Actions</th>
                         </tr>
@@ -525,7 +525,7 @@ $result = mysqli_query($con, $query);
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width:200px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
                         <td>{$dateToDisplay}</td>
                         <td>{$timeToDisplay}</td>

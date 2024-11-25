@@ -283,8 +283,8 @@ if (!$con) {
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Reschedule Date</th>
-                    <th>Reschedule Time</th>
+                    <th style="font-size: 15px;">Rescheduled Date</th>
+                    <th style="font-size: 15px;">Rescheduled Time</th>
                     <th>Type Of Service</th>
                     <th>Status</th>
                 </tr>
@@ -302,11 +302,11 @@ if (!$con) {
                         $timeToDisplay = (!empty($row['time']) && $row['time'] !== '00:00:00') ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                         echo "<tr>
-            <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+            <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
             <td>{$row['contact']}</td>
-            <td>{$dateToDisplay}</td>
-            <td>{$timeToDisplay}</td>
-            <td>{$modified_date}</td>
+            <td style='width: 90px' >{$dateToDisplay}</td>
+            <td style='width: 90px' >{$timeToDisplay}</td>
+            <td >{$modified_date}</td>
             <td>{$modified_time}</td>
             <td>{$row['service_name']}</td>
             <td>{$row['status']}</td>

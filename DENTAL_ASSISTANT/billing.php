@@ -358,8 +358,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Reschedule Date</th>
-                        <th>Reschedule Time</th>
+                        <th style="font-size: 15px;">Rescheduled Date</th>
+                        <th style="font-size: 15px;">Rescheduled Time</th>
                         <th>Type of Service</th>
                         <th>Status</th>
                         <th>Price</th>
@@ -398,7 +398,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             }
 
                             echo "<tr>
-                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                     <td>{$row['contact']}</td>
                     <td>{$dateToDisplay}</td>
                     <td>{$timeToDisplay}</td>
@@ -407,9 +407,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <td>{$row['service_name']}</td>
                     <td>{$completionStatus}</td>
                     <td>{$priceToDisplay}</td>
-                    <td>
+                    <td style='width: 200px'>
                         <button type='button' onclick='openModal(\"{$row['note']}\")'
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px;  cursor:pointer;'>
                             View
                         </button>
                     </td>
@@ -422,7 +422,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 echo "<form method='POST' action='' style='display:inline;'>
                         <input type='hidden' name='id' value='{$row['id']}'>
                         <input type='submit' name='approve' value='Approve'
-                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px;  cursor:pointer;'>
                     </form>";
                             }
 

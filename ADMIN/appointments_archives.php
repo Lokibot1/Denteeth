@@ -175,8 +175,8 @@ if (isset($_POST['update'])) {
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Modified Date</th>
-                        <th>Modified Time</th>
+                        <th style="font-size: 15px;">Rescheduled Date</th>
+                        <th style="font-size: 15px;">Rescheduled Time</th>
                         <th>Type of Service</th>
                         <th>Price</th>
                         <th>Completion Status</th>
@@ -200,7 +200,7 @@ if (isset($_POST['update'])) {
                             $completion_status = ($row['completion'] == 2) ? 'Completed' : (!empty($row['completion']) ? ucfirst($row['completion']) : 'N/A');
 
                             echo "<tr>
-                <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                <td style='width:200px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                 <td>{$row['contact']}</td>
                 <td>{$dateToDisplay}</td>
                 <td>{$timeToDisplay}</td>

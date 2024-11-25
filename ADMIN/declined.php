@@ -416,10 +416,9 @@ $result = mysqli_query($con, $query);
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Reschedule Date</th>
-                    <th>Reschedule Time</th>
+                    <th style="font-size: 15px;">Rescheduled Date</th>
+                    <th style="font-size: 15px;">Rescheduled Time</th>
                     <th>Type Of Service</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>

@@ -419,8 +419,8 @@ $result = mysqli_query($con, $query);
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Reschedule Date</th>
-                    <th>Reschedule Time</th>
+                    <th style="font-size: 15px;">Rescheduled Date</th>
+                    <th style="font-size: 15px;">Rescheduled Time</th>
                     <th>Type Of Service</th>
                     <th>Actions</th>
                 </tr>
@@ -437,16 +437,16 @@ $result = mysqli_query($con, $query);
                         $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                         echo "<tr>
-                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                     <td>{$row['contact']}</td>
-                    <td>{$dateToDisplay}</td>
-                    <td>{$timeToDisplay}</td>
-                    <td>{$modified_date}</td>
-                    <td>{$modified_time}</td>
+                    <td style='width: 110px'>{$dateToDisplay}</td>
+                    <td style='width: 100px'>{$timeToDisplay}</td>
+                    <td style='width: 100px'>{$modified_date}</td>
+                    <td style='width: 100px'>{$modified_time}</td>
                     <td>{$row['service_name']}</td>
-                    <td>
+                    <td style='width: 250px'>
                         <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                        style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px;margin:7px 0px; cursor:pointer;'>Update</button>
+                        style='background-color:#083690; color:white; border:none; padding:7px 5px; border-radius:10px; cursor:pointer;'>Update</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                         </form>";
@@ -455,14 +455,14 @@ $result = mysqli_query($con, $query);
                             echo "<form method='POST' action='' style='display:inline;'>
                         <input type='hidden' name='id' value='{$row['id']}'>
                         <input type='submit' name='approve' value='Approve' 
-                        style='background-color:green; color:white; border:none; padding:7px 5px; border-radius:10px; margin:7px 0px; cursor:pointer;'>
+                        style='background-color:green; color:white; border:none; padding:7px 5px; border-radius:10px; cursor:pointer;'>
                     </form>";
                         }
                         if ($row['status'] != 'Decline') {
                             echo "<form method='POST' action='' style='display:inline;'>
                         <input type='hidden' name='id' value='{$row['id']}'>
                         <input type='submit' name='decline' value='Decline' 
-                        style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 5px; border-radius:10px; margin:7px 0px; cursor:pointer;'>
+                        style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 5px; border-radius:10px; cursor:pointer;'>
                     </form>";
                         }
 

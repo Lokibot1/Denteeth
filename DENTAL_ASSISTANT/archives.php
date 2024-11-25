@@ -156,8 +156,8 @@ if (!$con) {
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Reschedule Date</th>
-                        <th>Reschedule Date</th>
+                        <th style="font-size: 15px;">Rescheduled Date</th>
+                        <th style="font-size: 15px;">Rescheduled Time</th>
                         <th>Type Of Service</th>
                         <th>Status</th>
                     </tr>
@@ -178,10 +178,10 @@ if (!$con) {
                             $timeToDisplayFormattedModified = date("h:i A", strtotime($modified_time));
 
                             echo "<tr>
-                    <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                     <td>{$row['contact']}</td>
-                    <td>{$dateToDisplay}</td>
-                    <td>{$timeToDisplayFormatted}</td>
+                    <td style='width: 90px'>{$dateToDisplay}</td>
+                    <td style='width: 90px'>{$timeToDisplayFormatted}</td>
                     <td>{$modified_date}</td>
                     <td>{$timeToDisplayFormattedModified}</td>
                     <td>{$row['service_name']}</td>

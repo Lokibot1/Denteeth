@@ -498,8 +498,8 @@ $result = mysqli_query($con, $query);
                             <th>Contact</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th>Rescheduled Date</th>
-                            <th>Rescheduled Time</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
                             <th>Type Of Service</th>
                             <th>Actions</th>
                         </tr>
@@ -523,7 +523,7 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer;'>Update</button>
                         </td>
                     </tr>";
                             }
@@ -556,8 +556,8 @@ $result = mysqli_query($con, $query);
                             <th>Contact</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th>Modified_Date</th>
-                            <th>Modified_Time</th>
+                            <th>Rescheduled Date</th>
+                            <th>Rescheduled Time</th>
                             <th>Type Of Service</th>
                             <th>Actions</th>
                         </tr>
@@ -581,7 +581,7 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer;'>Update</button>
                         </td>
                     </tr>";
                             }
@@ -616,8 +616,8 @@ $result = mysqli_query($con, $query);
                             <th>Contact</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th>Modified_Date</th>
-                            <th>Modified_Time</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
                             <th>Type Of Service</th>
                             <th>Actions</th>
                         </tr>
@@ -641,7 +641,7 @@ $result = mysqli_query($con, $query);
                         <td>{$row['service_name']}</td>
                         <td>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px;  cursor:pointer;'>Update</button>
                         </td>
                     </tr>";
                             }

@@ -265,10 +265,9 @@ $result = mysqli_query($con, $query);
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th>Reschedule Date</th>
-                        <th>Reschedule Time</th>
+                        <th style="font-size: 15px;">Rescheduled Date</th>
+                        <th style="font-size: 15px;">Rescheduled Time</th>
                         <th>Type Of Service</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -282,36 +281,15 @@ $result = mysqli_query($con, $query);
                             $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                             echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width:200px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
                         <td>{$dateToDisplay}</td>
                         <td>{$timeToDisplay}</td>
                         <td>{$modified_date}</td>
                         <td>{$modified_time}</td>
                         <td>{$row['service_name']}</td>
-                        <td>";
-
-                            // Restore and Delete buttons
-                            if ($row['status'] != 'Restore') {
-                                echo "<form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='restore' value='Restore' 
-                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
                             </form>";
                             }
-
-                            if ($row['status'] != 'Delete') {
-                                echo "<form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='delete' value='Delete' 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
-                            </form>";
-                            }
-
-                            echo "</td></tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='8'>No records found</td></tr>";
                     }
                     ?>
                 </tbody>

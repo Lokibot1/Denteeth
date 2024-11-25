@@ -187,22 +187,26 @@ input[type="text"], input[type="date"], select {
 table,
 th,
 td {
-    font-size: 15px;
     border: 1px solid black;
     background-color: #FDF3D6;
     border-collapse: collapse;
-    text-align: center;
-    padding: 7px;
 }
 
 table {
     width: 100%;
 }
 
-td {
-    line-height: 20px;
+th {
+    font-size: 20px;
+    text-align: center;
 }
 
+td {
+    text-align: left;
+    font-size: 17px;
+    padding: 10px 15px; /* More balanced padding */
+}
+    
 .hidden-input {
     display: none;
 }
