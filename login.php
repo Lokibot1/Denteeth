@@ -82,9 +82,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <h1>LOG IN</h1>
         <form action="login.php" method="POST" oninput="hideErrorMessage()">
             <label for="username"></label>
-            <input type="text" id="username" name="username" placeholder="Username" required><br><br>
+            <input type="text" id="username" name="username" placeholder="Username" required 
+                oncopy="return false" onpaste="return false" oncut="return false"><br><br>
             <label for="password"></label>
-            <input type="password" id="password" name="password" placeholder="Password" required><br><br>
+            <input type="password" id="password" name="password" placeholder="Password" required 
+                oncopy="return false" onpaste="return false" oncut="return false"><br><br>
 
             <?php if (!empty($error_message)): ?>
                 <p id="error-message" style="color: red; margin-bottom: 30px;"><?php echo $error_message; ?></p>
@@ -95,21 +97,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <script>
-    function hideErrorMessage() {
-    const errorMessage = document.getElementById('error-message');
-    if (errorMessage) {
-        errorMessage.style.display = 'none';
-    }
-}
+        function hideErrorMessage() {
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                errorMessage.style.display = 'none';
+            }
+        }
 
-    window.onload = function() {
-    const errorMessage = document.getElementById('error-message');
-    if (errorMessage) {
-        errorMessage.style.display = 'block';
-    }
-};
+        window.onload = function() {
+            const errorMessage = document.getElementById('error-message');
+            if (errorMessage) {
+                errorMessage.style.display = 'block';
+            }
+        };
+    </script>
+</div>
 
-</script>
 
         <div id="s-bx">
             <div class="blk">
