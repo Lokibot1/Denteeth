@@ -22,7 +22,7 @@ if (!$con) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="ad.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -158,7 +158,7 @@ if (!$con) {
                         <th>Time</th>
                         <th style="font-size: 15px;">Rescheduled Date</th>
                         <th style="font-size: 15px;">Rescheduled Time</th>
-                        <th>Type Of Service</th>
+                        <th>Service</th>
                         <th>Status</th>
                     </tr>
                 </thead>
@@ -178,13 +178,13 @@ if (!$con) {
                             $timeToDisplayFormattedModified = date("h:i A", strtotime($modified_time));
 
                             echo "<tr>
-                    <td style='width:200px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                     <td>{$row['contact']}</td>
-                    <td>{$dateToDisplay}</td>
-                    <td>{$timeToDisplayFormatted}</td>
-                    <td>{$modified_date}</td>
-                    <td>{$timeToDisplayFormattedModified}</td>
-                    <td>{$row['service_name']}</td>
+                    <td style='width:110px;'>{$dateToDisplay}</td>
+                    <td style='width:110px;'>{$timeToDisplayFormatted}</td>
+                    <td style='width:110px;'>{$modified_date}</td>
+                    <td style='width:110px;'>{$timeToDisplayFormattedModified}</td>
+                    <td style='font-size: 15px'>{$row['service_name']}</td>
                     <td>{$row['status']}</td>
                 </tr>";
                         }

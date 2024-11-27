@@ -76,7 +76,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="ad.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -210,7 +210,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                     <tr>
                         <th>Name</th>
                         <th>Contact</th>
-                        <th>Type Of Service</th>
+                        <th>Service</th>
                         <th>Date</th>
                         <th>Bill</th>
                         <th>Amount Paid</th>
@@ -227,10 +227,10 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                             $outstanding_balance = "₱" . number_format($row['outstanding_balance'], 2);
 
                             echo "<tr>
-                            <td style='width:200px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                            <td style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                             <td>{$row['contact']}</td>
-                            <td>{$row['service_name']}</td>
-                            <td>{$row['date']}</td>
+                            <td style='font-size:15px;'>{$row['service_name']}</td>
+                            <td style='width:110px;'>{$row['date']}</td>
                             <td>{$bill}</td>
                             <td>{$paid}</td>
                             <td>{$outstanding_balance}</td>

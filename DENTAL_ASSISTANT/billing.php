@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="dental.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -361,7 +361,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <th style="font-size: 15px;">Rescheduled Date</th>
                         <th style="font-size: 15px;">Rescheduled Time</th>
                         <th>Service</th>
-                        <th>Status</th>
                         <th>Price</th>
                         <th>Note</th>
                         <th>Action</th>
@@ -400,16 +399,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             echo "<tr>
                     <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                     <td >{$row['contact']}</td>
-                    <td style='width: 100px'>{$dateToDisplay}</td>
-                    <td style='width: 100px'>{$timeToDisplay}</td>
-                    <td style='width: 100px'>{$modified_date}</td>
-                    <td style='width: 100px'>{$modified_time}</td>
+                    <td style='width: 110px'>{$dateToDisplay}</td>
+                    <td style='width: 110px'>{$timeToDisplay}</td>
+                    <td style='width: 110px'>{$modified_date}</td>
+                    <td style='width: 110px'>{$modified_time}</td>
                     <td style='font-size: 15px;'>{$row['service_name']}</td>
-                    <td>{$completionStatus}</td>
                     <td>{$priceToDisplay}</td>
-                    <td style='width: 10px'>
+                    <td>
                         <button type='button' onclick='openModal(\"{$row['note']}\")'
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                            style='background-color:#083690; color:white; border:none; padding:10px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
                             View
                         </button>
                     </td>
@@ -422,7 +420,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 echo "<form method='POST' action='' style='display:inline;'>
                         <input type='hidden' name='id' value='{$row['id']}'>
                         <input type='submit' name='approve' value='Approve'
-                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                            style='background-color:green; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
                     </form>";
                             }
 

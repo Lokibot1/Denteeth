@@ -151,7 +151,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="dental.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -442,9 +442,9 @@ $result = mysqli_query($con, $query);
                         <td style=' width:110px;'>{$modified_date}</td>
                         <td style=' width:110px;'>{$modified_time}</td>
                         <td style=' font-size: 15px'>{$row['service_name']}</td>
-                        <td style=' width: 200px;'>
+                        <td style=' width: 180px;'>
                         <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                        style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
+                        style='background-color:#083690; color:white; border:none; padding:10px 5px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
                         <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                         </form>";
@@ -452,14 +452,14 @@ $result = mysqli_query($con, $query);
                             echo "<form method='POST' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                                 <input type='submit' name='restore' value='Restore' 
-                                style='background-color:green; color:white; border:none;  padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>
+                                style='background-color:green; color:white; border:none;  padding:10px 5px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>
                             </form>";
                         }
                         if ($row['status'] != 'Delete') {
                             echo "<form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='delete' value='Delete' 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:10px 5px; border-radius:10px; cursor:pointer;  box-shadow: 1px 2px 5px 0px #414141;'>
                         </form>";
                         }
 

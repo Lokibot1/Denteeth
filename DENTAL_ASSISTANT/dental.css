@@ -15,6 +15,7 @@ nav {
     width: 100%;
     background-color: #000000;
     position: fixed;
+    overflow: hidden;
     z-index: 1000;
 }
 
@@ -29,12 +30,11 @@ nav .logo {
 nav .logo:hover {
     color: #ffff;
 }
-
 .s-buttons {
     display: flex;
     justify-content: flex-end; 
     align-items: center;       
-    margin: 18px 10px;
+    margin: 18px 5px;
     gap: 10px;
 }
 
@@ -70,6 +70,7 @@ nav .logo:hover {
     text-shadow: #FF9F00 2px 2px 2px;
 }
 
+
 /* Sidebar */
 .sidebar {
     position: fixed;
@@ -87,13 +88,19 @@ nav .logo:hover {
     text-shadow: none;
 }
 
+.sidebar h3:hover {
+    color: #FF9F00;
+    text-shadow: 0px 0px 9px #FF9F00;
+    transition: color .3s, text-shadow .3s;
+}
+
 .sidebar ul {
     list-style: none;
     padding: 0;
 }
 
 .sidebar li {
-    margin-bottom: 40px;
+    margin-bottom: 50px;
     font-size: 20px;
 }
 
@@ -146,6 +153,7 @@ a:hover {
     transition: color .3s, text-shadow .3s;
 }
 /* Search Bar */
+
 .search-form {
     display: flex;
     gap: 15px;
@@ -204,9 +212,10 @@ th {
 td {
     text-align: left;
     font-size: 17px;
-    padding: 10px 15px; /* More balanced padding */
+    padding: 20px 5px;
 }
-    
+
+
 .hidden-input {
     display: none;
 }
@@ -226,8 +235,9 @@ td {
 }
 
 textarea {
+    font-size: 20px;
     width: 97%;
-    height: 250px;
+    height: 300px;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #ccc;
@@ -246,37 +256,62 @@ textarea {
     height: 100%;
     overflow: auto;
     background-color: rgba(0, 0, 0, 0.6);
-    /* Semi-transparent background */
     backdrop-filter: blur(5px);
 }
 
 .modal-content {
     background-color: #F9F2B4;
-    font-size: 19px;
-    color: #333;
-    padding: 20px;
+    color: #0a0a0a;
+    padding: 50px 50px;
     border-radius: 5px;
     width: 70%;
-    height: 77%;
+    height: 70%;
     overflow: auto;
+}
+
+.body{
+    height: 80%;
+    padding: 20px 20px;
+    background-color: #FDF3D6;
+    border: 1px solid #000000;
 }
 
 .close {
     cursor: pointer;
-    font-size: 24px;
+    font-size: 30px;
     float: right;
+}
+.labels {
+    display: flex;
+    gap: 300px; 
+    align-items: center;
+}
+.bill-fields {
+    display: flex;
+    gap: 30px; 
+    align-items: center;
+}
+.name-fields {
+    display: flex;
+    gap: 30px; 
+    align-items: center;
+}
+
+#modal-last-name,
+#modal-first-name,
+#modal-middle-name {
+    width: 600px; 
 }
 
 .modal-content input[type="text"],
 .modal-content input[type="time"],
 .modal-content input[type="date"],
 .modal-content input[type="file"],
-.modal-content input[type="password"],
 .modal-content select {
     width: 100%;
     padding: 10px;
     margin: 5px 0 15px 0;
-    border: 1px solid #ccc;
+    border: 2px solid #000000;
     border-radius: 5px;
     box-sizing: border-box;
 }
@@ -285,30 +320,29 @@ textarea {
     width: 30%;
     padding: 10px;
     margin: 5px 1% 15px 0;
-    border: 1px solid #ccc;
+    border: 2px solid #0a0a0a;
     border-radius: 5px;
     box-sizing: border-box;
     display: inline-block;
 }
 
 .modal-content input[type="submit"],
-.modal-content button,
 .modal-content button[type="submit"] {
     background-color: #0A2C16;
+    box-shadow: 1px 2px 5px 0px #414141;
     color: white;
     padding: 20px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
-.modal-content button{
-    padding: 10px 10px;
-    margin-bottom: 5px;
+
+.modal-content input[type="submit"]:hover {
+    background-color: #FF9F00;
 }
-.modal-content input[type="submit"]:hover,
-.modal-content button:hover,
-.modal-content button[type="submit"]:hover {
-    background-color: #0abb48;
+
+#modalText{
+    font-size: 20px;
 }
 
 .img-box {
@@ -366,42 +400,21 @@ textarea {
     grid-template-columns: repeat(3, 1fr);
 }
 
-.add-user-btn {
-    display: inline-block;
-    padding: 10px 15px;
-    margin: 5px;
-    border: none;
-    border-radius: 5px;
-    background-color: #0A2C16;
-    /* Bootstrap primary color */
-    color: white;
-    text-decoration: none;
-    transition: background-color 0.3s;
-}
-
-.add-user-btn:hover {
-    background-color: #FF9F00;
-    /* Darker shade for hover */
-}
-
-
-.centered-table {
-    padding: 10px;
-    width: 100%;
-}
 .managehead {
     display: flex;
     justify-content: space-between;
-    align-items: center; 
+    align-items: center;
     padding: 10px;
+    margin-bottom: 20px;
 }
 
+/* Pagination styling */
 .pagination-container {
-    text-align: left;   
+    display: flex;
+    align-items: center;
 }
 
 .pagination-btn {
-    display: inline-block;
     padding: 10px 15px;
     margin: 0 5px;
     border: none;
@@ -415,6 +428,17 @@ textarea {
 .pagination-btn:hover {
     background-color: #FF9F00;
 }
+
+
+.centered-table {
+    padding: 10px;
+    width: 100%;
+}
+
+.pagination-container {
+    text-align: right;
+}
+
 .modal2 {
     display: none;
     position: fixed;
@@ -439,6 +463,7 @@ textarea {
 }
 div h3{
     margin-left: 5px;
+    color: #fff;
 }
 /* Style the tab */
 .tab {
@@ -488,16 +513,6 @@ div h3{
     border: 1px solid #094514;
     background-color: #094514;
     margin-top: -1px;
-}
-.labels {
-    display: flex;
-    gap: 300px; 
-    align-items: center;
-}
-.bill-fields {
-    display: flex;
-    gap: 30px; 
-    align-items: center;
 }
 .notification {
     position: fixed;

@@ -15,7 +15,7 @@ if (!$con) {
 }
 
 // Handle update request
-// Handle update request
+
 if (isset($_POST['update'])) {
     // Get form data from modal
     $id = $_POST['id'];
@@ -153,7 +153,7 @@ $result = mysqli_query($con, $query);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="doc.css">
+    <link rel="stylesheet" href="doctor.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -373,7 +373,7 @@ $result = mysqli_query($con, $query);
                     <th>Contact</th>
                     <th>Date</th>
                     <th>Time</th>
-                    <th>Type Of Service</th>
+                    <th>Service</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -387,26 +387,23 @@ $result = mysqli_query($con, $query);
                         $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
 
                         echo "<tr>
-                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
-                        <td>{$dateToDisplay}</td>
-                        <td>{$timeToDisplayFormatted}</td>
+                        <td style='width:110px;'>{$dateToDisplay}</td>
+                        <td style='width:110px;'>{$timeToDisplayFormatted}</td>
                         <td>{$row['service_name']}</td>
-                        <td>
-                            <!-- Update Button -->
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                        <td style='width:130px;'>
 
                             <!-- Decline Button -->
                             <form method='POST' id='declined' action='' style='display:inline;'>
                                 <input type='hidden' name='id' value='{$row['id']}'>
                                 <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
-                                style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                                style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:10px 9px; border-radius:10px;box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
                             </form>
 
                             <!-- Finish Button -->
                             <button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Finish</button>
+                            style='background-color:green; color:white; border:none; padding:10px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Finish</button>
                         </td>
                     </tr>";
                     }
@@ -414,8 +411,6 @@ $result = mysqli_query($con, $query);
                     echo "<tr><td colspan='6'>No records found</td></tr>";
                 }
                 ?>        
-                <div id="declined" class="notification" style="display: none;">
-                <p>Successfully Declined!</p>
             </div>
             </tbody>
         </table>
@@ -495,9 +490,6 @@ $result = mysqli_query($con, $query);
                 }
             });
 
-            document.getElementById('proceed').addEventListener('click', function () {
-              showNotification();
-            });
             document.getElementById('proceed').addEventListener('click', function () {
               showNotification();
             });

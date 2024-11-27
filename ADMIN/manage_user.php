@@ -92,7 +92,7 @@ if (isset($_POST['delete'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="ad.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -377,6 +377,7 @@ if (isset($_POST['delete'])) {
                     <th>Username</th>
                     <th>Password</th>
                     <th>Role</th>
+                    <th>Action</th>
                 </tr>
                 <?php
                 // Fetch and display user data
@@ -387,11 +388,11 @@ if (isset($_POST['delete'])) {
             <td>{$row['acc_role']}</td>
             <td>
                 <button type='button' onclick='openModal({$row['id']}, \"{$row['username']}\", \"{$row['password']}\", \"{$row['acc_role']}\")'
-                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Update</button>
+                style='background-color:#083690; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Update</button>
                 <form method='POST' action='' style='display:inline;'>
                     <input type='hidden' name='id' value='{$row['id']}'>
                     <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\"
-                    style='background-color: rgb(196, 0, 0); color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>
+                    style='background-color: rgb(196, 0, 0); color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
                 </form>
             </td>
           </tr>";

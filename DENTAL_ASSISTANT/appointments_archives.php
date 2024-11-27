@@ -41,7 +41,7 @@ if (isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="dental_assistant.css">
+    <link rel="stylesheet" href="dental.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -178,7 +178,6 @@ if (isset($_POST['update'])) {
                         <th style="font-size: 15px;">Rescheduled Time</th>
                         <th>Service</th>
                         <th>Price</th>
-                        <th style="font-size: 15px;">Completion Status</th>
                         <th>Note</th>
                     </tr>
                 </thead>
@@ -207,10 +206,9 @@ if (isset($_POST['update'])) {
                 <td>{$modified_time}</td>
                 <td>{$row['service_name']}</td>
                 <td>₱{$price}</td>
-                <td>{$completion_status}</td>
                 <td>
                         <button type='button' onclick='openModal(\"{$row['note']}\")'
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                            style='background-color:#083690; color:white; border:none; padding:10px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
                             View
                         </button>
                     </td>
