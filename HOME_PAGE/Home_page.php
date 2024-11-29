@@ -574,6 +574,26 @@ if (isset($_POST['update'])) {
           </div>
 
           <script>
+                        const contactInput = document.getElementById('modal-contact');
+
+// Pre-fill "09" when the page loads
+window.addEventListener('load', () => {
+  if (!contactInput.value) {
+    contactInput.value = '09';
+  }
+});
+
+// Prevent deletion of "09"
+contactInput.addEventListener('input', (event) => {
+  if (!contactInput.value.startsWith('09')) {
+    contactInput.value = '09';
+  }
+});
+
+// Ensure the cursor stays at the end when editing
+contactInput.addEventListener('focus', () => {
+  contactInput.setSelectionRange(contactInput.value.length, contactInput.value.length);
+});
             document.getElementById('bookBtn').addEventListener('click', function (event) {
               if (validateForm()) {
                 document.getElementById('termsPopup').style.display = 'block';
