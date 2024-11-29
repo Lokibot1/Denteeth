@@ -16,6 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = isset($_POST['username']) ? $_POST['username'] : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     $role = isset($_POST['role']) ? $_POST['role'] : '';
+    $firstName = isset($_POST['firstname']) ? $_POST['firstname'] : ''; 
+    $lastName = isset($_POST['lastname']) ? $_POST['lastname'] : '';     
+    $middleName = isset($_POST['middlename']) ? $_POST['middlename'] : ''; 
 
     // Hash password if it's provided
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -34,9 +37,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows > 0) {
         } else {
             // Update the user with the hashed password
-            $updateQuery = "UPDATE tbl_users SET username = ?, password = ?, role = ? WHERE id = ?";
+            $updateQuery = "UPDATE tbl_users SET username = ?, password = ?, role = ?, firstname = ?, lastname = ?, middlename = ? WHERE id = ?";
             $updateStmt = $con->prepare($updateQuery);
-            $updateStmt->bind_param("sssi", $username, $hashedPassword, $role, $id);
+            $updateStmt->bind_param("ssssssi", $username, $hashedPassword, $role, $firstName, $lastName, $middleName, $id);
 
             if ($updateStmt->execute()) {
             } else {
@@ -56,9 +59,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($result->num_rows > 0) {
         } else {
             // Insert new user with hashed password
-            $insertQuery = "INSERT INTO tbl_users (username, password, role) VALUES (?, ?, ?)";
+            $insertQuery = "INSERT INTO tbl_users (username, password, role, firstname, lastname, middlename) VALUES (?, ?, ?, ?, ?, ?)";
             $insertStmt = $con->prepare($insertQuery);
-            $insertStmt->bind_param("sss", $username, $hashedPassword, $role);
+            $insertStmt->bind_param("ssssss", $username, $hashedPassword, $role, $firstName, $lastName, $middleName);
 
             if ($insertStmt->execute()) {
             } else {
@@ -350,20 +353,26 @@ if (isset($_POST['delete'])) {
                     <span class="close">&times;</span>
                     <h2 id="modalTitle">Add New User</h2>
                     <form id="userForm" method="POST" action="">
-                        <input type="hidden" name="id" id="userId">
-                        <label>Username:</label>
-                        <input type="text" name="username" id="username" required><br>
-                        <label>Password:</label>
-                        <input type="password" name="password" id="password" required><br>
-                        <label for="role">Select Role:</label>
-                        <select id="role" name="role">
-                            <option value="">--Select Service Type--</option>
-                            <option value="1">Admin</option>
-                            <option value="2">Doctor</option>
-                            <option value="3">Dental Assistant</option>
-                        </select>
-                        <button type="submit" id="submitBtn">Add User</button>
-                    </form>
+                    <input type="hidden" name="id" id="userId">
+                    <label>First Name:</label>
+                    <input type="text" name="firstname" id="firstname" required><br>
+                    <label>Middle Name:</label>
+                    <input type="text" name="middlename" id="middlename"><br>
+                    <label>Last Name:</label>
+                    <input type="text" name="lastname" id="lastname" required><br>
+                    <label>Username:</label>
+                    <input type="text" name="username" id="username" required><br>
+                    <label>Password:</label>
+                    <input type="password" name="password" id="password" required><br>
+                    <label for="role">Select Role:</label>
+                    <select id="role" name="role">
+                        <option value="">--Select Role--</option>
+                        <option value="1">Admin</option>
+                        <option value="2">Doctor</option>
+                        <option value="3">Dental Assistant</option>
+                   </select>
+                          <button type="submit" id="submitBtn">Add User</button>
+                   </form>
                 </div>
             </div>
             <div id="notification" class="notification" style="display: none;">
@@ -374,8 +383,7 @@ if (isset($_POST['delete'])) {
             <!-- Display Table -->
             <table class="table table-bordered">
                 <tr>
-                    <th>Username</th>
-                    <th>Password</th>
+                    <th>Name</th>
                     <th>Role</th>
                     <th>Action</th>
                 </tr>
@@ -383,17 +391,16 @@ if (isset($_POST['delete'])) {
                 // Fetch and display user data
                 while ($row = mysqli_fetch_assoc($result)) {
                     echo "<tr>
-            <td>{$row['username']}</td>
-            <td>{$row['password']}</td>
+            <td style='width:330px;'>{$row['lastname']}, {$row['firstname']} {$row['middlename']}</td>
             <td>{$row['acc_role']}</td>
-            <td>
-                <button type='button' onclick='openModal({$row['id']}, \"{$row['username']}\", \"{$row['password']}\", \"{$row['acc_role']}\")'
-                style='background-color:#083690; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Update</button>
-                <form method='POST' action='' style='display:inline;'>
-                    <input type='hidden' name='id' value='{$row['id']}'>
-                    <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\"
-                    style='background-color: rgb(196, 0, 0); color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
-                </form>
+            <td style='width:110px'>
+            <button type='button' onclick='openModal({$row['id']}, \"{$row['firstname']}\", \"{$row['middlename']}\", \"{$row['lastname']}\", \"{$row['username']}\", \"{$row['role']}\")'
+            style='background-color:#083690; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Update</button>
+            <form method='POST' action='' style='display:inline;'>
+                <input type='hidden' name='id' value='{$row['id']}'>
+                <input type='submit' name='delete' value='Delete' onclick=\"return confirm('Are you sure you want to delete this record?');\" 
+                style='background-color: rgb(196, 0, 0); color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+            </form>
             </td>
           </tr>";
                 }
