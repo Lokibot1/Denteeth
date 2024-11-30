@@ -62,7 +62,7 @@ body {
 
 .popup-content {
     padding: 20px;
-    text-align: justify n  ;
+    text-align: justify;
     overflow-y: auto;
     flex-grow: 1;
     line-height: 1.6;

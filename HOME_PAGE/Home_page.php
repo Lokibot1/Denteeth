@@ -89,16 +89,76 @@ if (isset($_POST['update'])) {
               VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time_24hr', '$service_type')
           ";
 
-      if (mysqli_query($con, $insert_appointment_query)) {
-        header("Location: Home_page.php");
-        exit();
-      } else {
-        echo "Error updating appointment record: " . mysqli_error($con);
-      }
+    if (mysqli_query($con, $insert_appointment_query)) {
+      // Display success page then redirect
+      echo "
+    <div id='success-toast' style='
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #FF9F00;
+        padding: 20px 50px;
+        font-size: 60px;
+        font-weight: bold;
+        border-radius: 10px;
+        text-align: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden; 
+        transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    '>
+        <!-- Replace PNG with GIF -->
+        <img src=\"img/teeth.gif\" alt=\"Success Animation\" style=\"
+            width: 300px; 
+            height: 300px; 
+        \">
+        <span class='success-text'>Booked Successfully!</span>
+    </div>
+
+    <style>
+        /* Font style for success text */
+        .success-text {
+            font-family: 'Montserrat', sans-serif; 
+        }
+    </style>
+
+    <script>
+        const toast = document.getElementById('success-toast');
+        // Show the toast with fade-in effect
+        setTimeout(() => {
+            toast.style.opacity = '1'; // Gradually become visible
+            toast.style.visibility = 'visible'; // Ensure it's interactable
+        }, 100); // Slight delay to ensure transition works
+
+        // Hide the toast with fade-out effect
+        setTimeout(() => {
+            toast.style.opacity = '0'; // Gradually become invisible
+            toast.style.visibility = 'hidden'; // Ensure it's not interactable
+        }, 5000); // Visible for 5 seconds before fading out
+
+        // Redirect after fade-out completes
+        setTimeout(() => {
+            window.location.href = 'Home_page.php';
+        }, 7000); // Adjust timing for fade-out duration
+    </script>
+";
+
+// Link to Google Fonts for Montserrat font
+echo "<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap' rel='stylesheet'>";
+
+exit();
     } else {
-      echo "Error updating patient record: " . mysqli_error($con);
+      echo "Error updating appointment record: " . mysqli_error($con);
     }
+  } else {
+    echo "Error updating patient record: " . mysqli_error($con);
   }
+}
 }
 
 ?>
@@ -175,7 +235,7 @@ if (isset($_POST['update'])) {
 
         <div id="s-bx">
           <div class="s-img">
-            <img src="img/logo.png" alt="">
+            <img src="img/ngipin.png" alt="">
           </div>
           <h1>EHM</h1>
           <h2>Dental Clinic
@@ -566,34 +626,30 @@ if (isset($_POST['update'])) {
                   </div>
                 </div>
               </form>
-
-              <div id="notification" class="notification" style="display: none;">
-                <p>Your appointment has been successfully booked!</p>
-              </div>
             </div>
           </div>
 
           <script>
-                        const contactInput = document.getElementById('modal-contact');
+          const contactInput = document.getElementById('modal-contact');
 
-// Pre-fill "09" when the page loads
-window.addEventListener('load', () => {
-  if (!contactInput.value) {
-    contactInput.value = '09';
-  }
-});
+            // Pre-fill "09" when the page loads
+            window.addEventListener('load', () => {
+              if (!contactInput.value) {
+                contactInput.value = '09';
+              }
+            });
 
-// Prevent deletion of "09"
-contactInput.addEventListener('input', (event) => {
-  if (!contactInput.value.startsWith('09')) {
-    contactInput.value = '09';
-  }
-});
+            // Prevent deletion of "09"
+            contactInput.addEventListener('input', (event) => {
+              if (!contactInput.value.startsWith('09')) {
+                contactInput.value = '09';
+              }
+            });
 
-// Ensure the cursor stays at the end when editing
-contactInput.addEventListener('focus', () => {
-  contactInput.setSelectionRange(contactInput.value.length, contactInput.value.length);
-});
+            // Ensure the cursor stays at the end when editing
+            contactInput.addEventListener('focus', () => {
+              contactInput.setSelectionRange(contactInput.value.length, contactInput.value.length);
+            });
             document.getElementById('bookBtn').addEventListener('click', function (event) {
               if (validateForm()) {
                 document.getElementById('termsPopup').style.display = 'block';
@@ -610,22 +666,6 @@ contactInput.addEventListener('focus', () => {
               document.getElementById('termsPopup').style.display = 'none';
               showNotification();
             });
-
-            function showNotification() {
-              const notification = document.getElementById('notification');
-              notification.style.display = 'block';
-
-              // Start fading out after 3 seconds
-              setTimeout(() => {
-                  notification.style.opacity = '0';
-              }, 5000);
-
-              // Hide completely after fading
-              setTimeout(() => {
-                  notification.style.display = 'none';
-                  notification.style.opacity = '1'; // Reset for next use
-              }, 3500);
-          }
             function validateForm() {
               const form = document.getElementById('appointmentForm');
               const inputs = form.querySelectorAll('input[required], select[required]');

@@ -14,26 +14,7 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle update request
-if (isset($_POST['update'])) {
-    // Get form data from modal
-    $id = $_POST['id'];
-    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
-    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
-    $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
-    $contact = mysqli_real_escape_string($con, $_POST['contact']);
-    $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
-    $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
-    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
-    $note = mysqli_real_escape_string($con, $_POST['note']);
-    $price = mysqli_real_escape_string($con, $_POST['price']);
-
-
-}
-
-
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -87,7 +68,7 @@ if (isset($_POST['update'])) {
         <div class="content-box">
             <?php
             // Set the number of results per page
-            $resultsPerPage = 9;
+            $resultsPerPage = 18;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -100,12 +81,11 @@ if (isset($_POST['update'])) {
             $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
 
             // SQL query to count total records with filtering
-            $countQuery = "SELECT COUNT(*) as total 
-            FROM tbl_archives a
-            JOIN tbl_service_type s ON a.service_type = s.id
-            JOIN tbl_patient p ON a.name = p.id
-            WHERE a.completion = '2'
-        ";
+            $countQuery = "SELECT COUNT(*) as total FROM tbl_archives a
+                JOIN tbl_service_type s ON a.service_type = s.id
+                JOIN tbl_patient p ON a.name = p.id
+                JOIN tbl_status t ON a.completion = t.id
+                WHERE a.completion IN ('1', '2', '3')";
 
             // Add name filter if specified
             if ($filterName) {
@@ -123,13 +103,14 @@ if (isset($_POST['update'])) {
             
             // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
-                   s.service_type AS service_name, 
-                   p.first_name, p.middle_name, p.last_name
-            FROM tbl_archives a
-            JOIN tbl_service_type s ON a.service_type = s.id
-            JOIN tbl_patient p ON a.name = p.id
-            WHERE a.completion = '2'
-        ";
+                s.service_type AS service_name, 
+                p.first_name, p.middle_name, p.last_name, 
+                t.status     
+                FROM tbl_archives a
+                JOIN tbl_service_type s ON a.service_type = s.id
+                JOIN tbl_patient p ON a.name = p.id
+                JOIN tbl_status t ON a.completion = t.id
+                WHERE a.completion IN ('1', '2', '3')";
 
             // Add name filter if specified
             if ($filterName) {
@@ -141,8 +122,8 @@ if (isset($_POST['update'])) {
                 $query .= " AND a.date = '$filterDate'";
             }
 
-            $query .= " LIMIT $resultsPerPage OFFSET $startRow";
-
+            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to results per page
+            
             $result = mysqli_query($con, $query);
             ?><br><br><br>
             <div class="managehead">
@@ -167,6 +148,7 @@ if (isset($_POST['update'])) {
                 </div>
             </div>
             <br><br>
+            <!-- Table -->
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -177,88 +159,43 @@ if (isset($_POST['update'])) {
                         <th style="font-size: 15px;">Rescheduled Date</th>
                         <th style="font-size: 15px;">Rescheduled Time</th>
                         <th>Service</th>
-                        <th>Price</th>
-                        <th>Note</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
-                            $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
-                            $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+                            // Check if modified_date and modified_time are empty
+                            $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
+                            $modified_time = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
 
-                            $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
-                            $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
+                            $dateToDisplay = !empty($row['date']) ? $row['date'] : $row['date'];
+                            $timeToDisplay = !empty($row['time']) ? $row['time'] : $row['time'];
 
-                            $note = !empty($row['note']) ? $row['note'] : 'N/A';
-                            $price = isset($row['price']) ? number_format($row['price'], 2) : 'N/A';
-
-                            // Check completion status and replace 2 with 'Completed'
-                            $completion_status = ($row['completion'] == 2) ? 'Completed' : (!empty($row['completion']) ? ucfirst($row['completion']) : 'N/A');
+                            // Format time to HH:MM AM/PM
+                            $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+                            $timeToDisplayFormattedModified = date("h:i A", strtotime($modified_time));
 
                             echo "<tr>
-                <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                <td>{$row['contact']}</td>
-                <td  style='width: 90px'>{$dateToDisplay}</td>
-                <td  style='width: 90px'>{$timeToDisplay}</td>
-                <td >{$modified_date}</td>
-                <td>{$modified_time}</td>
-                <td>{$row['service_name']}</td>
-                <td>₱{$price}</td>
-                <td>
-                        <button type='button' onclick='openModal(\"{$row['note']}\")'
-                            style='background-color:#083690; color:white; border:none; padding:10px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
-                            View
-                        </button>
-                    </td>
-            </tr>";
+                    <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td>{$row['contact']}</td>
+                    <td style='width: 90px'>{$dateToDisplay}</td>
+                    <td style='width: 90px'>{$timeToDisplayFormatted}</td>
+                    <td>{$modified_date}</td>
+                    <td>{$timeToDisplayFormattedModified}</td>
+                    <td>{$row['service_name']}</td>
+                    <td>{$row['status']}</td>
+                </tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='11'>No records found</td></tr>";
+                        echo "<tr><td colspan='8'>No records found</td></tr>";
                     }
                     ?>
                 </tbody>
             </table>
-
-            <!-- Modal Structure -->
-            <div id="myModal" class="modal">
-                <div class="modal-content">
-                    <span class="close">&times;</span>
-                    <h2 style="color: #0a0a0a;">NOTES:</h2>
-                    <br>
-                    <div class="body">
-                        <p id="modalText">note text</p>
-                    </div>
-                </div>
-            </div>
-
-            <script>
-                // Get modal elements
-                const modal = document.getElementById("myModal");
-                const closeModalSpan = document.querySelector(".close");
-                const modalText = document.getElementById("modalText");
-
-                // Open modal function
-                function openModal(note) {
-                    modalText.textContent = note;
-                    modal.style.display = "block";
-                }
-
-                // Close modal on 'X' click
-                closeModalSpan.addEventListener("click", () => {
-                    modal.style.display = "none";
-                });
-
-                // Close modal if clicked outside content
-                window.addEventListener("click", (event) => {
-                    if (event.target === modal) {
-                        modal.style.display = "none";
-                    }
-                });
-            </script>
+            <br><br>
         </div>
-    </div>
 </body>
 
 </html>

@@ -105,14 +105,14 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
         <aside class="sidebar">
             <ul>
                 <br>
-                <a class="active" href="archives.php">
+                <a class="active" href="dental_archives.php">
                     <h3>DENTAL ASSISTANT<br>ARCHIVES</h3>
                 </a>
                 <br>
                 <br>
                 <hr>
                 <br>
-                <li><a href="appointments_archives.php">Archives</a></a></li>
+                <li><a href="archives.php">Archives</a></a></li>
                 <li><a href="transaction.php">Packages Transaction History</a></a></li>
                 <li><a href="bin.php">Appointments Bin</a></li>
             </ul>

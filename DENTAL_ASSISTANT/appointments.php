@@ -51,51 +51,21 @@ if (isset($_POST['update'])) {
         // Update query for tbl_appointments
         $update_appointment_query = "UPDATE tbl_appointments 
                                      SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
-                                     WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
+                                     WHERE id=$id";
 
         // Execute both queries
-         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-            // Redirect to the same page after updating
-            header("Location: pending.php");
+        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+            // Display success message and redirect using JavaScript
+            echo "<script>
+                alert('Record updated successfully!');
+                window.location.href = 'appointments.php';
+            </script>";
             exit();
         } else {
-            echo "Error updating record: " . mysqli_error($con);
+            // Display error if the query fails
+            echo "<script>alert('Error updating record: " . mysqli_error($con) . "');</script>";
         }
     }
-}
-if (isset($_POST['accept'])) {
-    // Check if the connection exists
-    if (!$con) {
-        die("Connection failed: " . mysqli_connect_error());
-    }
-
-    // Get the appointment ID from the form
-    $id = $_POST['id'];
-
-    // Prepare the query to update the status to 'finished' using a prepared statement
-    $stmt = $con->prepare("UPDATE tbl_appointments SET status=? WHERE id=?");
-    $status = 3; // Assuming '4' represents finished
-    $stmt->bind_param("ii", $status, $id);
-
-    // Execute the query
-    if ($stmt->execute()) {
-        // Redirect back to the dashboard
-        header("Location: pending.php");
-        exit();
-    } else {
-        echo "Error updating status: " . $stmt->error;
-    }
-
-    $stmt->close();
-}
-if (isset($_POST['decline'])) {
-    $id = $_POST['id'];
-    $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
-    mysqli_query($con, $deleteQuery);
-
-    // Redirect to refresh the page and show updated records
-    header("Location: pending.php");
-    
 }
 
 // SQL query to count total records

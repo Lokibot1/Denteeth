@@ -117,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div id="s-bx">
             <div class="blk">
                 <div class="s-img">
-                    <img src="HOME_PAGE/img/logo.png" alt="Logo">
+                    <img src="HOME_PAGE/img/ngipin.png" alt="Logo">
                 </div>
                 <h1>EHM</h1>
                 <h2>Dental Clinic<br> ┈┈┈┈┈┈ <br> Laboratory</h2>

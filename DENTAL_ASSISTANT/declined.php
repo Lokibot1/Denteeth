@@ -73,13 +73,18 @@ if (isset($_POST['delete'])) {
     // Get the ID from the form data
     $id = $_POST['id'];
 
+    // Echo a confirmation alert using JavaScript
+    echo "<script>
+        if (confirm('Are you sure you want to delete this record?')) {
+            // Continue processing in PHP if confirmed
+    ";
+
     // Fetch the appointment data to transfer to the bin
     $appointment_query = "SELECT * FROM tbl_appointments WHERE id=$id";
 
     $appointment_result = mysqli_query($con, $appointment_query);
 
     if ($appointment_row = mysqli_fetch_assoc($appointment_result)) {
-        $id = $_POST['id'];
         $name = mysqli_real_escape_string($con, $appointment_row['name']);
         $contact = mysqli_real_escape_string($con, $appointment_row['contact']);
         $date = mysqli_real_escape_string($con, $appointment_row['date']);
@@ -92,7 +97,7 @@ if (isset($_POST['delete'])) {
         // Set the current date and time for deleted_at
         $deleted_at = date('Y-m-d H:i:s');
 
-        // Insert into tbl_appointments_bin including the deleted_at field
+        // Insert into tbl_bin including the deleted_at field
         $insert_archives_query = "INSERT INTO tbl_bin (id, name, contact, date, time, modified_date, modified_time, service_type, status, deleted_at)
                              VALUES ('$id', '$name', '$contact', '$date', '$time', '$modified_date', '$modified_time', '$service_type', '$status', '$deleted_at')";
 
@@ -103,27 +108,44 @@ if (isset($_POST['delete'])) {
 
             // Execute the delete query
             if (mysqli_query($con, $delete_appointment_query)) {
-                // Redirect to the same page after deleting
-                header("Location: declined.php");
-                exit();
+                // Display a success message and redirect
+                echo "
+                    alert('Successfully deleted the record.');
+                    window.location.href = 'declined.php';
+                ";
             } else {
-                echo "Error deleting appointment record: " . mysqli_error($con);
+                echo "alert('Error deleting appointment record: " . mysqli_error($con) . "');";
             }
         } else {
-            echo "Error transferring appointment record to Archives: " . mysqli_error($con);
+            echo "alert('Error transferring appointment record to Archives: " . mysqli_error($con) . "');";
         }
     } else {
-        echo "No appointment found with this ID.";
+        echo "alert('No appointment found with this ID.');";
     }
+
+    echo "}
+    </script>";
 }
+
 
 if (isset($_POST['restore'])) {
     $id = $_POST['id'];
-    $deleteQuery = "UPDATE tbl_appointments SET status = '1' WHERE id = $id";
-    mysqli_query($con, $deleteQuery);
 
-    // Redirect to refresh the page and show updated records
-    header("Location: declined.php");
+    // Update the record to set status to '1' (restored)
+    $restoreQuery = "UPDATE tbl_appointments SET status = '1' WHERE id = $id";
+    if (mysqli_query($con, $restoreQuery)) {
+        // Display success alert and redirect
+        echo "<script>
+            alert('Record successfully restored.');
+            window.location.href = 'declined.php';
+        </script>";
+    } else {
+        // Display error alert if the query fails
+        echo "<script>
+            alert('Error restoring record: " . mysqli_error($con) . "');
+            window.location.href = 'declined.php';
+        </script>";
+    }
 }
 
 // SQL query to count total records
@@ -142,6 +164,7 @@ $query = "SELECT a.*,
           LIMIT 15";  // Limit to 15 rows
 
 $result = mysqli_query($con, $query);
+
 
 ?>
 
