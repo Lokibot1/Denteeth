@@ -1,13 +1,11 @@
 <?php
 session_start();
-$error_message = '';
-$username_value = '';
+
+// Retrieve error message if it exists
+$error_message = isset($_SESSION['error_message']) ? $_SESSION['error_message'] : '';
+unset($_SESSION['error_message']); // Clear after retrieving
 
 include("dbcon.php");
-// Check connection
-if ($con->connect_error) {
-    die("Connection failed: " . $con->connect_error);
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $input_username = $_POST['username'];
@@ -38,14 +36,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            $error_message = "Invalid username or password.";
+            $_SESSION['error_message'] = "Invalid username or password.";
         }
+    } else {
+        $_SESSION['error_message'] = "Invalid username or password.";
+    }
 
     $stmt->close();
     $con->close();
-    }
+
+    // Redirect back to login page
+    header("Location: login.php");
+    exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -88,9 +93,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <input type="password" id="password" name="password" placeholder="Password" required 
                 oncopy="return false" onpaste="return false" oncut="return false"><br><br>
 
-            <?php if (!empty($error_message)): ?>
-                <p id="error-message" style="color: red; margin-bottom: 30px;"><?php echo $error_message; ?></p>
-            <?php endif; ?>
+                <?php if (!empty($error_message)): ?>
+                        <p id="error-message" style="color: red; margin-bottom: 30px;">
+                            <?php echo htmlspecialchars($error_message); ?>
+                        </p>
+                    <?php endif; ?>
 
             <button type="submit">SIGN IN</button>
         </form>
@@ -98,7 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <script>
         function hideErrorMessage() {
-            const errorMessage = document.getElementById('error-message');
+            const errorMessage = document.getElementById('error_message');
             if (errorMessage) {
                 errorMessage.style.display = 'none';
             }
