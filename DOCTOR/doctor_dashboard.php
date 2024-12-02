@@ -437,12 +437,11 @@ $result = mysqli_query($con, $query);
                     <textarea id="note" name="note"
                         placeholder="Enter your note here..."></textarea>
                     <br>
-                    <div id="totalPriceContainer">
-                        <p><strong>Total Price: ₱</strong><span id="totalPrice"
-                            style="font-weight: bold; font-size: 25px;">0</span></p>
-                    </div>
+                    <label style="font-size: 20px; font-weight: bold;" for="price">Total Price (₱):</label>
                     <br>
-                    <input type="number" id="price" name="price" style="display: none;" readonly>
+                    <input type="number" id="price" name="price"
+                        style="width: 100%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                    <br>
                     <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
                 </form>
             </div>
@@ -451,10 +450,6 @@ $result = mysqli_query($con, $query);
             <p>Successfully Submitted!</p>
         </div>
         <script>
-            const servicePrices = {
-                1: 30000, 2: 30000, 3: 2000, 4: 100000, 5: 20000,
-                6: 30000, 7: 1500, 8: 2000, 9: 280000, 10: 40000, 11: 40000
-            };
 
             function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
                 document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
@@ -462,22 +457,11 @@ $result = mysqli_query($con, $query);
                 document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
                 document.getElementById('modalService').innerText = service;
 
-                const servicePrice = servicePrices[getServiceIdFromName(service)] || 0;
-                document.getElementById('price').value = servicePrice;
-                document.getElementById('totalPrice').innerText = servicePrice;
+                document.getElementById('price').value='';
 
                 document.querySelector("#newServiceForm input[name='id']").value = id;
-                document.getElementById('finishModal').style.display = 'block';
-            }
 
-            function getServiceIdFromName(serviceName) {
-                const services = {
-                    "All Porcelain Veneers & Zirconia": 1, "Crown & Bridge": 2, "Dental Cleaning": 3,
-                    "Dental Implants": 4, "Dental Whitening": 5, "Dentures": 6,
-                    "Extraction": 7, "Full Exam & X-Ray": 8, "Orthodontic Braces": 9,
-                    "Restoration": 10, "Root Canal Treatment": 11
-                };
-                return services[serviceName] || null;
+                document.getElementById('finishModal').syle.display = 'block';
             }
 
             document.querySelector('.close').addEventListener('click', () => {
@@ -496,18 +480,16 @@ $result = mysqli_query($con, $query);
 
             function showNotification() {
               const notification = document.getElementById('notification, declined');
-              notification.style.display = 'block';
-
-              // Start fading out after 3 seconds
-              setTimeout(() => {
-                  notification.style.opacity = '0';
-              }, 5000);
-
-              // Hide completely after fading
-              setTimeout(() => {
-                  notification.style.display = 'none';
-                  notification.style.opacity = '1'; // Reset for next use
-              }, 3500);
+              if(notification){
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.opacity='0';
+                }, 3000);
+                setTimeout(() => {
+                    notification.style.display='none';
+                    notification.style.opacity = '1'
+                }, 3500);
+              }
           }
         </script>
 

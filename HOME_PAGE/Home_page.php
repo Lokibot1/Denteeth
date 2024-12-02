@@ -788,6 +788,150 @@ exit();
       </center>
     </div>
   </section>
+  <section>
+    <div class="color">
+    <h1 id="hdr-txt1">Meet Our Team</h1>
+    <div class="body">
+    <div class="person" style="--color: #D7A9A8">
+    <div class="p-container">
+      <div class="conianer-inner">
+        <div class="circle"></div>
+        <img src="img/ali1.png">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="info">
+    <h1>Allyah Laroa</h1>
+    <p>Back-End Developer</p>
+    <a href="https://www.instagram.com/iluv.lunaa_/followers/"> 
+    <i class="fa-brands fa-instagram"></i> @iluv.lunaa_
+    </a>
+    <a href="">
+    <i class="fa-brands fa-github"></i>
+    </a>
+    <a style="font-size:13px">
+    <i class="fa-regular fa-envelope"></i> laroa.allyah.montalbo@gmail.com
+    </a>
+  </div>
+  </div>
+
+  <div class="person" style="--color: #58423f">
+    <div class="p-container">
+      <div class="conianer-inner">
+        <div class="circle"></div>
+        <img src="img\kiki1.png">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="info">
+    <h1>Brent Kian Rasonabe</h1>
+    <p>Graphics Designer and UI/UX Developer</p>
+    <a href="https://www.instagram.com/brentkian.js/"> 
+    <i class="fa-brands fa-instagram"></i> @brentkian.js
+    </a>
+    <a href="">
+    <i class="fa-brands fa-github"></i>
+    </a>
+    <a style="font-size:13px">
+    <i class="fa-regular fa-envelope"></i> rasonabe.brentkian.magtahas@gmail.com
+    </a>
+  </div>
+  </div>
+
+  <div class="person" style="--color:  #0D2B1D">
+    <div class="p-container">
+      <div class="conianer-inner">
+        <div class="circle"></div>
+        <img src="img/sarah.png">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="info">
+    <h1>Sarah Pedillaga</h1>
+    <p>Documentation and Quality Assurance</p>
+    <a href=" https://www.instagram.com/sachii_fice/">
+    <i class="fa-brands fa-instagram"></i> @ sachii_fice
+    </a>
+    <a href=" https://github.com/sachiishimi">
+    <i class="fa-brands fa-github"></i> @ sachiishimi
+    </a>
+    <a style="font-size:13px">
+    <i class="fa-regular fa-envelope"></i> pedillaga.sarah.sunio@gmail.com
+    </a>
+  </div>
+  </div>
+
+  <div class="person" style="--color: #383838">
+    <div class="p-container">
+      <div class="conianer-inner">
+        <div class="circle"></div>
+        <img src="img/justin1.png">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="info">
+    <h1>Justin Reyes</h1>
+    <p>Project Manager and Lead Developer</p>
+    <a href="https://www.instagram.com/brentkian.js/">
+    <i class="fa-brands fa-instagram"></i>
+    </a>
+    <a href="https://github.com/xionnnnn">
+    <i class="fa-brands fa-github"></i> @xionnnnn
+    </a>
+    <a style="font-size:13px">
+    <i class="fa-regular fa-envelope"></i>  reyesjustintrinidad88@gmail.com
+    </a>
+    </div>
+  </div>
+
+  <div class="person" style="--color: #4a235a">
+    <div class="p-container">
+      <div class="conianer-inner">
+        <div class="circle"></div>
+        <img src="img\loki2.png">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="info">
+    <h1>Brian Dijamco</h1>
+    <p>Business Analyst and Lead Documentation</p>
+    <a href="https://www.instagram.com/defnotloki1/">
+    <i class="fa-brands fa-instagram"></i> @defnotloki1
+    </a>
+    <a href="https://github.com/Lokibot1">
+    <i class="fa-brands fa-github"></i> @Lokibot1
+    </a>
+    <a style="font-size:13px">
+    <i class="fa-regular fa-envelope"></i>
+    dijamco.brian.abrenica@gmail.com
+    </a>
+  </div>
+  </div>
+
+  <div class="person" style="--color: #782a2b">
+    <div class="p-container">
+      <div class="conianer-inner">
+        <div class="circle"></div>
+        <img src="img\jaja1.png">
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="info">
+    <h1>Julia Salgado</h1>
+    <p>Front-End Developer</p>
+    <a href="https://www.instagram.com/jolya_aaa/">
+    <i class="fa-brands fa-instagram"></i> @Jolya_aaa
+    </a>
+    <a href="https://github.com/jsjs2324">
+    <i class="fa-brands fa-github"> </i> @jsjs2324
+    </a>
+    <a style="font-size:13px">
+    <i class="fa-regular fa-envelope"></i>
+    salgado.julia.hernandez@gmail.com
+    </a>
+  </div>
+  </div>
+  </section>
 
   <div class="btnup">
     <a href="#Homepage">
@@ -796,8 +940,4 @@ exit();
   </div>
 
 </body>
-
-</html>
-</body>
-
 </html>
