@@ -1316,6 +1316,8 @@ select:focus {
     }
 }
 
+/*meet our team*/
+
 .body {
     display: flex;
     flex-wrap: wrap;
@@ -1371,28 +1373,26 @@ select:focus {
   .person h1 {
     color: #464646;
     margin: 16px 0 0 0;
-    font-size: 20px;
+    font-size: 25px;
   }
   .person p {
     font-family: arial;
     color: #6e6e6e;
-    font-size: 14px;
+    font-size: 15px;
     margin-top: 5px;
     text-align: center;
   }
   .person i {
-    font-size: 25px;
+    font-size: 30px;
   }
   .person a{
     font-size:16px;
     color: #6e6e6e;
+    margin-left: 10px;
   }
   .info{
     text-align: center;
     width: 900px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
   }
   /* hover */
   .p-container:hover {
@@ -1401,66 +1401,90 @@ select:focus {
   .p-container:hover img {
     transform: translateY(0) scale(1.3);
   }
-  @media (max-width: 768px) {
+  @media screen and (max-width: 768px) {
     .body {
-        flex-direction: column;
-        height: auto;
-        padding: 20px;
+      flex-direction: column;
+      gap: 20px; /* Reduce the gap between elements */
+      margin-bottom: 10px;
     }
-
+  
+    .person {
+      width: 90%; /* Adjust the width for better fit */
+    }
+  
     .p-container {
-        transform: scale(0.8);
-        height: auto;
-        width: 300px;
-        margin-bottom: 1px;
+      width: 100%; /* Ensure it takes the full width of the container */
+      height: auto;
+      transform: scale(0.6); /* Slightly adjust the scale for better visibility */
     }
-
+  
     .circle {
-        height: 600px;
-        width: 600px;
-        top: 150px;
-        left: 9px;
+      height: 300px; /* Resize the circle */
+      width: 300px;
+      top: 150px;
+      left: 0; /* Center align */
     }
-
+  
     .person img {
-        width: 250px;
-        top: 120px;
-        left: 0;
-        transform: translateY(10px) scale(1.1);
+      width: 250px; /* Adjust image size */
+      top: 100px;
+      left: 10px; /* Align to the center */
+      transform: translateY(10px) scale(1.1); /* Slightly smaller scale for better fit */
     }
-
+  
+    .container-inner {
+      top: -150px; /* Adjust position to align with the smaller circle */
+    }
+  
     .person h1 {
-        font-size: 18px;
+      font-size: 20px; /* Reduce font size for better fit */
     }
-
+  
     .person p {
-        font-size: 12px;
+      font-size: 14px; /* Adjust text size */
+      margin-top: 5px;
     }
-}
-
-@media (max-width: 480px) {
-    .p-container {
-        transform: scale(0.7);
-        width: 300px;
+  
+    .divider {
+      width: 100px; /* Adjust the width of the divider */
     }
-
+  
+    .info {
+      width: 100%; /* Make it full-width */
+      padding: 10px; /* Add padding for better alignment */
+    }
+  
+    /* Hover adjustments for mobile */
+    .p-container:hover {
+      transform: scale(0.6); /* Keep hover scale reasonable for mobile */
+    }
+    .p-container:hover img {
+      transform: translateY(0) scale(1.2); /* Slightly smaller hover effect */
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
     .circle {
-        height: 300px;
-        width: 300px;
-        top: 120px;
-        left: 1px;
+      height: 250px; /* Further resize the circle */
+      width: 250px;
+      top: 100px;
     }
-
+  
     .person img {
-        width: 250px;
-        top: 150px;
+      width: 200px; /* Further adjust image size */
+      top: 80px;
     }
-
+  
     .person h1 {
-        font-size: 16px;
+      font-size: 18px; /* Further reduce font size */
     }
-
+  
     .person p {
-        font-size: 10px;
+      font-size: 12px; /* Adjust text size for small screens */
     }
-}
+  
+    .divider {
+      width: 80px; /* Reduce divider size */
+    }
+  }
+  

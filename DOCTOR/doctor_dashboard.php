@@ -15,7 +15,7 @@ if (!$con) {
 }
 
 // Handle update request
-
+// Handle update request
 if (isset($_POST['update'])) {
     // Get form data from modal
     $id = $_POST['id'];
@@ -410,8 +410,10 @@ $result = mysqli_query($con, $query);
                 } else {
                     echo "<tr><td colspan='6'>No records found</td></tr>";
                 }
-                ?>        
-            </div>
+                ?>
+                <div id="declined" class="notification" style="display: none;">
+                    <p>Successfully Declined!</p>
+                </div>
             </tbody>
         </table>
         <br><br>
@@ -423,8 +425,11 @@ $result = mysqli_query($con, $query);
                 <hr>
                 <div id="modalDetails">
                     <p><strong>Name:</strong> <span id="modalName"></span></p>
+                    <br>
                     <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
+                    <br>
                     <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
+                    <br>
                     <p><strong>Current Service:</strong> <span id="modalService"></span></p>
                 </div>
                 <hr>
@@ -434,13 +439,13 @@ $result = mysqli_query($con, $query);
                     <label style="font-size: 20px; font-weight: bold;" for="note">Note:</label>
                     <br>
                     <br>
-                    <textarea id="note" name="note"
-                        placeholder="Enter your note here..."></textarea>
+                    <textarea id="note" name="note" placeholder="Enter your note here..."></textarea>
                     <br>
                     <label style="font-size: 20px; font-weight: bold;" for="price">Total Price (₱):</label>
                     <br>
                     <input type="number" id="price" name="price"
-                        style="width: 100%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                        style="width: 30%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                    <br>
                     <br>
                     <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
                 </form>
@@ -449,48 +454,59 @@ $result = mysqli_query($con, $query);
         <div id="notification" class="notification" style="display: none;">
             <p>Successfully Submitted!</p>
         </div>
-        <script>
-
+        <script>    
             function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
+                // Set modal details dynamically
                 document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
                 document.getElementById('modalContact').innerText = contact;
                 document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
                 document.getElementById('modalService').innerText = service;
 
-                document.getElementById('price').value='';
+                // Clear the price input field when opening the modal
+                document.getElementById('price').value = '';
 
+                // Set the hidden ID field in the form
                 document.querySelector("#newServiceForm input[name='id']").value = id;
 
-                document.getElementById('finishModal').syle.display = 'block';
+                // Display the modal
+                document.getElementById('finishModal').style.display = 'block';
             }
 
+            // Event listener to close the modal when the close button is clicked
             document.querySelector('.close').addEventListener('click', () => {
                 document.getElementById('finishModal').style.display = 'none';
             });
 
+            // Event listener to close the modal when clicking outside of it
             window.addEventListener('click', (event) => {
                 if (event.target == document.getElementById('finishModal')) {
                     document.getElementById('finishModal').style.display = 'none';
                 }
             });
 
+            // Event listener for the proceed button to trigger a notification
             document.getElementById('proceed').addEventListener('click', function () {
-              showNotification();
+                showNotification();
             });
 
+            // Function to show a notification message
             function showNotification() {
-              const notification = document.getElementById('notification, declined');
-              if(notification){
-                notification.style.display = 'block';
-                setTimeout(() => {
-                    notification.style.opacity='0';
-                }, 3000);
-                setTimeout(() => {
-                    notification.style.display='none';
-                    notification.style.opacity = '1'
-                }, 3500);
-              }
-          }
+                const notification = document.getElementById('notification, declined');
+                if (notification) {
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 3000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
+            }
         </script>
 
         <!-- Edit Modal -->

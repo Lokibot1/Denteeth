@@ -804,13 +804,13 @@ exit();
     <h1>Allyah Laroa</h1>
     <p>Back-End Developer</p>
     <a href="https://www.instagram.com/iluv.lunaa_/followers/"> 
-    <i class="fa-brands fa-instagram"></i> @iluv.lunaa_
+    <i class="fa-brands fa-instagram"></i> 
     </a>
     <a href="">
     <i class="fa-brands fa-github"></i>
     </a>
     <a style="font-size:13px">
-    <i class="fa-regular fa-envelope"></i> laroa.allyah.montalbo@gmail.com
+    <i class="fa-regular fa-envelope"></i> 
     </a>
   </div>
   </div>
@@ -827,13 +827,13 @@ exit();
     <h1>Brent Kian Rasonabe</h1>
     <p>Graphics Designer and UI/UX Developer</p>
     <a href="https://www.instagram.com/brentkian.js/"> 
-    <i class="fa-brands fa-instagram"></i> @brentkian.js
+    <i class="fa-brands fa-instagram"></i> 
     </a>
     <a href="">
     <i class="fa-brands fa-github"></i>
     </a>
     <a style="font-size:13px">
-    <i class="fa-regular fa-envelope"></i> rasonabe.brentkian.magtahas@gmail.com
+    <i class="fa-regular fa-envelope"></i> 
     </a>
   </div>
   </div>
@@ -850,13 +850,13 @@ exit();
     <h1>Sarah Pedillaga</h1>
     <p>Documentation and Quality Assurance</p>
     <a href=" https://www.instagram.com/sachii_fice/">
-    <i class="fa-brands fa-instagram"></i> @ sachii_fice
+    <i class="fa-brands fa-instagram"></i>
     </a>
     <a href=" https://github.com/sachiishimi">
-    <i class="fa-brands fa-github"></i> @ sachiishimi
+    <i class="fa-brands fa-github"></i>
     </a>
     <a style="font-size:13px">
-    <i class="fa-regular fa-envelope"></i> pedillaga.sarah.sunio@gmail.com
+    <i class="fa-regular fa-envelope"></i> 
     </a>
   </div>
   </div>
@@ -876,10 +876,10 @@ exit();
     <i class="fa-brands fa-instagram"></i>
     </a>
     <a href="https://github.com/xionnnnn">
-    <i class="fa-brands fa-github"></i> @xionnnnn
+    <i class="fa-brands fa-github"></i>
     </a>
     <a style="font-size:13px">
-    <i class="fa-regular fa-envelope"></i>  reyesjustintrinidad88@gmail.com
+    <i class="fa-regular fa-envelope"></i>  
     </a>
     </div>
   </div>
@@ -896,14 +896,13 @@ exit();
     <h1>Brian Dijamco</h1>
     <p>Business Analyst and Lead Documentation</p>
     <a href="https://www.instagram.com/defnotloki1/">
-    <i class="fa-brands fa-instagram"></i> @defnotloki1
+    <i class="fa-brands fa-instagram"></i> 
     </a>
     <a href="https://github.com/Lokibot1">
-    <i class="fa-brands fa-github"></i> @Lokibot1
+    <i class="fa-brands fa-github"></i> 
     </a>
     <a style="font-size:13px">
     <i class="fa-regular fa-envelope"></i>
-    dijamco.brian.abrenica@gmail.com
     </a>
   </div>
   </div>
@@ -920,14 +919,13 @@ exit();
     <h1>Julia Salgado</h1>
     <p>Front-End Developer</p>
     <a href="https://www.instagram.com/jolya_aaa/">
-    <i class="fa-brands fa-instagram"></i> @Jolya_aaa
+    <i class="fa-brands fa-instagram"></i> 
     </a>
     <a href="https://github.com/jsjs2324">
-    <i class="fa-brands fa-github"> </i> @jsjs2324
+    <i class="fa-brands fa-github"> </i> 
     </a>
     <a style="font-size:13px">
     <i class="fa-regular fa-envelope"></i>
-    salgado.julia.hernandez@gmail.com
     </a>
   </div>
   </div>
