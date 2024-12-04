@@ -13,57 +13,6 @@ include("../dbcon.php");
 if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
-// Handle update request
-// Handle update request
-if (isset($_POST['update'])) {
-    // Get form data from modal
-    $id = $_POST['id'];
-    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
-    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
-    $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
-    $contact = mysqli_real_escape_string($con, $_POST['contact']);
-    $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
-    $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
-    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
-
-    // Check for conflicts in both original date/time and modified date/time
-    $conflict_query = "SELECT id 
-        FROM tbl_appointments 
-        WHERE 
-            (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
-            (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
-        AND id != $id"; // Exclude the current appointment being updated
-
-    $conflict_result = mysqli_query($con, $conflict_query);
-
-    if (mysqli_num_rows($conflict_result) > 0) {
-        // Conflict found
-        echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
-    } else {
-        // No conflict - proceed with the update
-
-        // Update query for tbl_patient
-        $update_patient_query = "UPDATE tbl_patient 
-                                 SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
-                                 WHERE id=$id";
-
-        // Update query for tbl_appointments
-        $update_appointment_query = "UPDATE tbl_appointments 
-                                     SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '2', service_type='$service_type' 
-                                     WHERE id=$id";  // Assuming `id` is used as foreign key in tbl_appointments
-
-        // Execute both queries
-        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-            // Redirect to the same page after updating
-            header("Location: doctor_dashboard.php");
-            exit();
-        } else {
-            echo "Error updating record: " . mysqli_error($con);
-        }
-    }
-}
-
 if (isset($_POST['submit'])) {
     // Get and sanitize the posted data
     $id = intval($_POST['id']); // Appointment ID
@@ -442,12 +391,11 @@ $result = mysqli_query($con, $query);
                     <textarea id="note" name="note" placeholder="Enter your note here..."></textarea>
                     <br>
                     <label style="font-size: 20px; font-weight: bold;" for="price">Total Price (₱):</label>
-                    <br>
+                    <div class="price">
                     <input type="number" id="price" name="price"
                         style="width: 30%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
-                    <br>
-                    <br>
                     <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -507,81 +455,6 @@ $result = mysqli_query($con, $query);
                     }, 3500);
                 }
             }
-        </script>
-
-        <!-- Edit Modal -->
-        <div id="editModal" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal()">&times;</span>
-                <form method="POST" action="">
-                    <h1>EDIT DETAILS</h1><br>
-                    <input type="hidden" name="id" id="modal-id">
-                    <br>
-                    <label for="modal-first-name">First Name:</label>
-                    <input type="text" name="first_name" id="modal-first-name" required>
-                    <br>
-                    <label for="modal-last-name">Last Name:</label>
-                    <input type="text" name="last_name" id="modal-last-name" required>
-                    <br>
-                    <label for="modal-middle-name">Middle Name:</label>
-                    <input type="text" name="middle_name" id="modal-middle-name" required>
-                    <br>
-                    <label for="contact">Contact:</label>
-                    <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
-                        maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
-                    <label for="date">Date:</label>
-                    <input type="date" name="modified_date" id="modal-modified_date" required>
-                    <br>
-                    <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
-                    <select name="modified_time" id="modal-modified_time" required>
-                        <option value="09:00 AM">09:00 AM</option>
-                        <option value="10:30 AM">10:30 AM</option>
-                        <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
-                        <option value="12:30 PM">12:30 PM</option>
-                        <option value="13:30 PM">01:30 PM</option>
-                        <option value="15:00 PM">03:00 PM</option>
-                        <option value="16:30 PM">04:30 PM</option>
-                    </select>
-                    <label for="service_type">Type Of Service:</label>
-                    <select name="service_type" id="modal-service_type" required>
-                        <option value="">--Select Service Type--</option>
-                        <option value="1">All Porcelain Veneers & Zirconia</option>
-                        <option value="2">Crown & Bridge</option>
-                        <option value="3">Dental Cleaning</option>
-                        <option value="4">Dental Implants</option>
-                        <option value="5">Dental Whitening</option>
-                        <option value="6">Dentures</option>
-                        <option value="7">Extraction</option>
-                        <option value="8">Full Exam & X-Ray</option>
-                        <option value="9">Orthodontic Braces</option>
-                        <option value="10">Restoration</option>
-                        <option value="11">Root Canal Treatment</option>
-                    </select>
-                    <br>
-                    <input type="submit" name="update" value="Save">
-                </form>
-            </div>
-        </div>
-
-        <script>
-            // Open the modal and populate it with data
-            function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
-                document.getElementById('modal-id').value = id;
-                document.getElementById('modal-first-name').value = first_name;
-                document.getElementById('modal-middle-name').value = middle_name;
-                document.getElementById('modal-last-name').value = last_name;
-                document.getElementById('modal-contact').value = contact;
-                document.getElementById('modal-modified_date').value = modified_date;
-                document.getElementById('modal-modified_time').value = modified_time;
-                document.getElementById('modal-service_type').value = service_type;
-                document.getElementById('editModal').style.display = 'block';
-            }
-
-            // Close the modal
-            function closeModal() {
-                document.getElementById('editModal').style.display = 'none';
-            }
-
             // Switch between tabs
             function openTab(evt, tabName) {
                 var i, tabcontent, tablinks;
@@ -601,7 +474,6 @@ $result = mysqli_query($con, $query);
                 url.searchParams.set('tab', tabName); // Update 'tab' parameter
                 window.location.href = url.toString(); // Reload with updated URL
             }
-
         </script>
     </div>
 </body>

@@ -105,14 +105,14 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
         <aside class="sidebar">
             <ul>
                 <br>
-                <a class="active" href="dental_archives.php">
+                <a class="active" href="archives.php">
                     <h3>DENTAL ASSISTANT<br>ARCHIVES</h3>
                 </a>
                 <br>
                 <br>
                 <hr>
                 <br>
-                <li><a href="archives.php">Archives</a></a></li>
+                <li><a href="appointments_archives.php">Archives</a></a></li>
                 <li><a href="transaction.php">Packages Transaction History</a></a></li>
                 <li><a href="bin.php">Appointments Bin</a></li>
             </ul>
@@ -124,7 +124,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
         <div class="content-box">
             <?php
             // Set the number of results per page
-            $resultsPerPage = 7;
+            $resultsPerPage = 6;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -179,11 +179,12 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
             
             $result = mysqli_query($con, $query);
             ?><br><br><br>
-<div class="managehead">
-                 <!-- Search Form Container -->
+            <div class="managehead">
+                <!-- Search Form Container -->
                 <div class="f-search">
                     <form method="GET" action="" class="search-form">
-                        <input type="text" name="name" placeholder="Search by name" value="<?php echo htmlspecialchars($filterName); ?>" />
+                        <input type="text" name="name" placeholder="Search by name"
+                            value="<?php echo htmlspecialchars($filterName); ?>" />
                         <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
                         <button class="material-symbols-outlined" type="submit">search</button>
                     </form>
@@ -201,9 +202,8 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 </div>
             </div>
             <br>
-            <h2>Transaction History</h2>
-            <button id="openModalBtn" class="pagination-btn">Add New Transaction</button>
-            <br><br>
+            <h2>Packages Transaction History</h2>
+            <br>
             <!-- Table -->
             <table class="table table-bordered centered-table">
                 <thead>
@@ -215,6 +215,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                         <th>Bill</th>
                         <th>Amount Paid</th>
                         <th>Outstanding Balance</th>
+                        <th>Note</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -226,15 +227,28 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                             $bill = "₱" . number_format($row['bill'], 2);
                             $outstanding_balance = "₱" . number_format($row['outstanding_balance'], 2);
 
+                             // Validate modified_date and modified_time
+                            $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
+
+                            // Validate date and time
+                            $dateToDisplay = (!empty($row['date']) && $row['date'] !== '0000-00-00') ? $row['date'] : 'N/A';
+
                             echo "<tr>
                             <td style='width: 230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                             <td>{$row['contact']}</td>
                             <td>{$row['service_name']}</td>
                             <td>{$row['date']}</td>
+                            <td>{$modified_date}</td>
                             <td>{$bill}</td>
                             <td>{$paid}</td>
                             <td>{$outstanding_balance}</td>
-                        </tr>";
+                            <td>
+                        <button type='button' onclick='openModal(\"{$row['note']}\")'
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                            View
+                        </button>
+                    </td>
+            </tr>";
                         }
                     } else {
                         echo "<tr><td colspan='7'>No records found</td></tr>";
@@ -243,102 +257,42 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 </tbody>
             </table>
 
-            <br><br>
-
-            <!-- Modal for adding new transactions -->
-            <div id="transactionModal" class="modal">
+            <!-- Modal Structure -->
+            <div id="myModal" class="modal">
                 <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <h2>Add Transaction</h2>
-                    <form method="POST" action="">
-                        <label for="dropdown">Choose an option:</label>
-                        <select id="dropdown" name="dropdown" onchange="updateContact()">
-                            <option value="">Select a patient</option>
-                            <?php foreach ($dropdown_options as $id => $details): ?>
-                                <option value="<?php echo $id; ?>" data-contact="<?php echo $details['contact']; ?>">
-                                    <?php echo $details['name']; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-
-                        <br>
-                        <label for="modal-contact">Contact:</label>
-                        <input type="text" id="modal-contact" readonly>
-                        <input type="hidden" name="contact" id="modal-contact-hidden"> <!-- Hidden input for contact -->
-                        <br>
-                        <label for="typeOfService">Type of Service:</label>
-                        <input type="text" id="typeOfService" name="typeOfService" value="Orthodontic Braces" readonly>
-
-                        <label for="date">Date:</label>
-                        <input type="date" name="date" id="modal-date" required>
-                        <div class="labels">
-                            <label for="modal-bill">Bill:</label>
-                            <label for="modal-paid">Amount Paid:</label>
-                            <label for="modal-balance">Outstanding Balance:</label>
-                        </div>
-                        <div class="bill-fields">
-                            <input type="number" step="0.01" name="bill" id="modal-bill" required>
-                            <input type="number" step="0.01" name="paid" id="modal-paid" required>
-                            <input type="number" step="0.01" name="outstanding_balance" id="modal-balance" required>
-                        </div>
-                        <br>
-                        <button type="submit">Add</button>
-                    </form>
+                    <span class="close">&times;</span>
+                    <h2 style="color: #0a0a0a;">NOTES:</h2>
+                    <br>
+                    <div class="body">
+                        <p id="modalText">note text</p>
+                    </div>
                 </div>
             </div>
-                                                                           
+
             <script>
-                // Modal functions
-                const modal = document.getElementById("transactionModal");
-                const btn = document.getElementById("openModalBtn");
+                // Get modal elements
+                const modal = document.getElementById("myModal");
+                const closeModalSpan = document.querySelector(".close");
+                const modalText = document.getElementById("modalText");
 
-                btn.onclick = function () {
-                    openModal(); // Call openModal function when the button is clicked
+                // Open modal function
+                function openModal(note) {
+                    modalText.textContent = note;
+                    modal.style.display = "block";
                 }
 
-                function openModal() {
-                    document.getElementById('transactionModal').style.display = "block";
-                }
+                // Close modal on 'X' click
+                closeModalSpan.addEventListener("click", () => {
+                    modal.style.display = "none";
+                });
 
-                function closeModal() {
-                    document.getElementById('transactionModal').style.display = "none";
-                }
-
-                function updateContact() {
-                    const dropdown = document.getElementById('dropdown');
-                    const selectedOption = dropdown.options[dropdown.selectedIndex];
-                    const contactInput = document.getElementById('modal-contact');
-                    const hiddenContactInput = document.getElementById('modal-contact-hidden');
-
-                    // Get the contact from the selected option's data attribute
-                    const contact = selectedOption.getAttribute('data-contact');
-
-                    // Update the contact input field and the hidden field with the selected contact value
-                    contactInput.value = contact ? contact : '';  // If no selection, set contact to empty string
-                    hiddenContactInput.value = contact ? contact : '';  // Set the hidden input value
-                }
-
-                document.getElementById('add').addEventListener('click', function () {
-                    showNotification();
-                    });
-
-                    function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
-
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
-
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                // Close modal if clicked outside content
+                window.addEventListener("click", (event) => {
+                    if (event.target === modal) {
+                        modal.style.display = "none";
+                    }
+                });
             </script>
-
         </div>
     </div>
 </body>

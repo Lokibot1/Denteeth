@@ -63,7 +63,6 @@ if (isset($_POST['update'])) {
     }
 }
 
-
 if (isset($_POST['submit'])) {
     // Get and sanitize the posted data
     $id = intval($_POST['id']); // Appointment ID
@@ -118,7 +117,6 @@ if (isset($_POST['submit'])) {
         die("Error executing fetch query: " . $stmt->error);
     }
 }
-
 
 if (isset($_POST['decline'])) {
     $id = $_POST['id'];
@@ -642,13 +640,16 @@ $result = mysqli_query($con, $query);
 
             <div id="finishModal" class="modal" style="display: none;">
                 <div class="modal-content">
-                <button style="background-color: transparent;" class="close">&times;</button>
+                    <button style="background-color: transparent;" class="close">&times;</button>
                     <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
                     <hr>
                     <div id="modalDetails">
                         <p><strong>Name:</strong> <span id="modalName"></span></p>
+                        <br>
                         <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
+                        <br>
                         <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
+                        <br>
                         <p><strong>Current Service:</strong> <span id="modalService"></span></p>
                     </div>
                     <hr>
@@ -658,134 +659,74 @@ $result = mysqli_query($con, $query);
                         <label style="font-size: 20px; font-weight: bold;" for="note">Note:</label>
                         <br>
                         <br>
-                        <textarea id="note" name="note"
-                            placeholder="Enter your note here..."></textarea>
-                            <br>
-                        <div id="totalPriceContainer">
-                            <p><strong>Total Price: ₱</strong><span id="totalPrice"
-                                    style="font-weight: bold; font-size: 25px;">0</span></p>
-                        </div>
+                        <textarea id="note" name="note" placeholder="Enter your note here..."></textarea>
                         <br>
-                        <input type="number" id="price" name="price" style="display: none;" readonly>
-                        <button type="submit" name="submit">Proceed to Dental Assistant</button>
+                        
+                        <label style="font-size: 20px; font-weight: bold;" for="price">Total Price (₱):</label>
+                        <div class="price" >
+                        <input type="number" id="price" name="price"
+                            style="width: 30%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                        <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
+                        </div>
                     </form>
                 </div>
             </div>
-
+            <div id="notification" class="notification" style="display: none;">
+                <p>Successfully Submitted!</p>
+            </div>
             <script>
-                const servicePrices = {
-                    1: 30000, 2: 30000, 3: 2000, 4: 100000, 5: 20000,
-                    6: 30000, 7: 1500, 8: 2000, 9: 280000, 10: 40000, 11: 40000
-                };
-
                 function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
+                    // Set modal details dynamically
                     document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
                     document.getElementById('modalContact').innerText = contact;
                     document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
                     document.getElementById('modalService').innerText = service;
 
-                    const servicePrice = servicePrices[getServiceIdFromName(service)] || 0;
-                    document.getElementById('price').value = servicePrice;
-                    document.getElementById('totalPrice').innerText = servicePrice;
+                    // Clear the price input field when opening the modal
+                    document.getElementById('price').value = '';
 
+                    // Set the hidden ID field in the form
                     document.querySelector("#newServiceForm input[name='id']").value = id;
+
+                    // Display the modal
                     document.getElementById('finishModal').style.display = 'block';
                 }
 
-                function getServiceIdFromName(serviceName) {
-                    const services = {
-                        "All Porcelain Veneers & Zirconia": 1, "Crown & Bridge": 2, "Dental Cleaning": 3,
-                        "Dental Implants": 4, "Dental Whitening": 5, "Dentures": 6,
-                        "Extraction": 7, "Full Exam & X-Ray": 8, "Orthodontic Braces": 9,
-                        "Restoration": 10, "Root Canal Treatment": 11
-                    };
-                    return services[serviceName] || null;
-                }
-
+                // Event listener to close the modal when the close button is clicked
                 document.querySelector('.close').addEventListener('click', () => {
                     document.getElementById('finishModal').style.display = 'none';
                 });
 
+                // Event listener to close the modal when clicking outside of it
                 window.addEventListener('click', (event) => {
                     if (event.target == document.getElementById('finishModal')) {
                         document.getElementById('finishModal').style.display = 'none';
                     }
                 });
-            </script>
 
-            <!-- Edit Modal -->
-            <div id="editModal" class="modal">
-                <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <form method="POST" action="">
-                        <h1>EDIT DETAILS</h1><br>
-                        <input type="hidden" name="id" id="modal-id">
-                        <br>
-                        <label for="modal-first-name">First Name:</label>
-                        <input type="text" name="first_name" id="modal-first-name" required>
-                        <br>
-                        <label for="modal-last-name">Last Name:</label>
-                        <input type="text" name="last_name" id="modal-last-name" required>
-                        <br>
-                        <label for="modal-middle-name">Middle Name:</label>
-                        <input type="text" name="middle_name" id="modal-middle-name" required>
-                        <br>
-                        <label for="contact">Contact:</label>
-                        <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
-                            maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
-                        <label for="date">Date:</label>
-                        <input type="date" name="modified_date" id="modal-modified_date" required>
-                        <br>
-                        <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
-                        <select name="modified_time" id="modal-modified_time" required>
-                            <option value="09:00 AM">09:00 AM</option>
-                            <option value="10:30 AM">10:30 AM</option>
-                            <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
-                            <option value="12:30 PM">12:30 PM</option>
-                            <option value="13:30 PM">01:30 PM</option>
-                            <option value="15:00 PM">03:00 PM</option>
-                            <option value="16:30 PM">04:30 PM</option>
-                        </select>
-                        <label for="service_type">Type Of Service:</label>
-                        <select name="service_type" id="modal-service_type" required>
-                            <option value="">--Select Service Type--</option>
-                            <option value="1">All Porcelain Veneers & Zirconia</option>
-                            <option value="2">Crown & Bridge</option>
-                            <option value="3">Dental Cleaning</option>
-                            <option value="4">Dental Implants</option>
-                            <option value="5">Dental Whitening</option>
-                            <option value="6">Dentures</option>
-                            <option value="7">Extraction</option>
-                            <option value="8">Full Exam & X-Ray</option>
-                            <option value="9">Orthodontic Braces</option>
-                            <option value="10">Restoration</option>
-                            <option value="11">Root Canal Treatment</option>
-                        </select>
-                        <br>
-                        <input type="submit" name="update" value="Save">
-                    </form>
-                </div>
-            </div>
+                // Event listener for the proceed button to trigger a notification
+                document.getElementById('proceed').addEventListener('click', function () {
+                    showNotification();
+                });
 
-            <script>
-                // Open the modal and populate it with data
-                function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
-                    document.getElementById('modal-id').value = id;
-                    document.getElementById('modal-first-name').value = first_name;
-                    document.getElementById('modal-middle-name').value = middle_name;
-                    document.getElementById('modal-last-name').value = last_name;
-                    document.getElementById('modal-contact').value = contact;
-                    document.getElementById('modal-modified_date').value = modified_date;
-                    document.getElementById('modal-modified_time').value = modified_time;
-                    document.getElementById('modal-service_type').value = service_type;
-                    document.getElementById('editModal').style.display = 'block';
+                // Function to show a notification message
+                function showNotification() {
+                    const notification = document.getElementById('notification, declined');
+                    if (notification) {
+                        notification.style.display = 'block';
+
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 3000);
+
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 }
-
-                // Close the modal
-                function closeModal() {
-                    document.getElementById('editModal').style.display = 'none';
-                }
-
                 // Switch between tabs
                 function openTab(evt, tabName) {
                     var i, tabcontent, tablinks;

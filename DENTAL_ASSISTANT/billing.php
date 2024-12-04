@@ -1,8 +1,6 @@
 <?php
 session_start();
 
-
-
 // Check if the user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
     header("Location: ../login.php");
@@ -10,88 +8,78 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
 }
 
 // Database connection
-include("../dbcon.php");
+include("../dbcon.php"); 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $id = $_POST['id']; // Assuming 'id' is passed in the form data
+// Handle approve action
+if (isset($_POST['Approve'])) {
+    $id = $_POST['id'];
+    $UpdateQuery = "UPDATE tbl_archives SET completion = '2' WHERE id = $id";
+    if (mysqli_query($con, $UpdateQuery)) {
+        // Set a session variable for the success message
+        $_SESSION['notification'] = 'Record successfully approved and marked as complete.';
 
-    // Initialize variables
-    $service_type = '';
-    $name = '';
-    $contact = '';
-    $date = '';
-    $time = '';
-
-    // Fetch the service details from tbl_archives
-    $query = "SELECT name, contact, date, time, service_type FROM tbl_archives WHERE id = ?";
-    $stmt = mysqli_prepare($con, $query);
-
-    if (!$stmt) {
-        die("SQL Error (Prepare Failed): " . mysqli_error($con));
+        // Redirect to refresh the page and show updated records
+        header("Location: billing.php");
+        exit; // Make sure to stop further code execution after redirect
     }
+}
 
-    mysqli_stmt_bind_param($stmt, 'i', $id);
-    if (!mysqli_stmt_execute($stmt)) {
-        die("SQL Error (Execute Failed): " . mysqli_error($con));
-    }
+// On the billing.php or any page you want to show the notification
+if (isset($_SESSION['notification'])) {
+    echo "<div class='notification' style='background-color: green; color: white; padding: 10px; border-radius: 5px;'>
+            {$_SESSION['notification']}
+          </div>";
+    // Unset the session variable after displaying the message
+    unset($_SESSION['notification']);
+}
 
-    mysqli_stmt_bind_result($stmt, $name, $contact, $date, $time, $service_type);
-    if (!mysqli_stmt_fetch($stmt)) {
-        die("SQL Error (Fetch Failed or No Record Found): " . mysqli_error($con));
-    }
+if (isset($_POST['submit'])) {
+    $id = intval($_POST['id']);
+    $paid = floatval($_POST['paid']);
+    $outstanding_balance = floatval($_POST['outstanding_balance']);
 
-    mysqli_stmt_close($stmt);
+    $stmt = $con->prepare("SELECT * FROM tbl_archives WHERE id = ?");
+    $stmt->bind_param("i", $id);
 
-    if ($service_type == '9') { // Correct comparison operator
-        // Insert record into tbl_transaction_history
-        $insertQuery = "INSERT INTO tbl_transaction_history (id, name, contact, date, time, service_type) 
-                        VALUES (?, ?, ?, ?, ?, ?)";
-        $insertStmt = mysqli_prepare($con, $insertQuery);
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+        if ($result && $result->num_rows > 0) {
+            $appointment = $result->fetch_assoc();
 
-        if (!$insertStmt) {
-            die("SQL Error (Prepare Failed for Insert): " . mysqli_error($con));
+            $archive_stmt = $con->prepare("INSERT INTO tbl_transaction_history
+                (name, contact, service_type, date, modified_date, bill, paid, outstanding_balance, note) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $archive_stmt->bind_param(
+                "ssssssiis",
+                $appointment['name'],
+                $appointment['contact'],
+                $appointment['service_type'],
+                $appointment['date'],
+                $appointment['modified_date'],
+                $appointment['price'],
+                $paid,
+                $outstanding_balance,
+                $appointment['note']
+            );
+
+            if (!$archive_stmt->execute()) {
+                die("Error inserting into tbl_transaction_history: " . $archive_stmt->error);
+            }
+
+            $delete_stmt = $con->prepare("DELETE FROM tbl_archives WHERE id = ?");
+            $delete_stmt->bind_param("i", $id);
+
+            if (!$delete_stmt->execute()) {
+                die("Error deleting appointment: " . $delete_stmt->error);
+            }
+
+            header("Location: billing.php");
+            exit();
+        } else {
+            die("Error: Appointment not found.");
         }
-
-        mysqli_stmt_bind_param($insertStmt, 'isssss', $id, $name, $contact, $date, $time, $service_type);
-        if (!mysqli_stmt_execute($insertStmt)) {
-            die("SQL Error (Execute Failed for Insert): " . mysqli_error($con));
-        }
-
-        mysqli_stmt_close($insertStmt);
-
-        // Delete record from tbl_archives
-        $deleteQuery = "DELETE FROM tbl_archives WHERE id = ?";
-        $deleteStmt = mysqli_prepare($con, $deleteQuery);
-
-        if (!$deleteStmt) {
-            die("SQL Error (Prepare Failed for Delete): " . mysqli_error($con));
-        }
-
-        mysqli_stmt_bind_param($deleteStmt, 'i', $id);
-        if (!mysqli_stmt_execute($deleteStmt)) {
-            die("SQL Error (Execute Failed for Delete): " . mysqli_error($con));
-        }
-
-        mysqli_stmt_close($deleteStmt);
-
-        echo '<div style="left: 30%;" class="notification">Record successfully transferred to transaction history and deleted from archives.</div>';
     } else {
-        // Update completion to 2 in tbl_archives if not service_type = '9'
-        $updateQuery = "UPDATE tbl_archives SET completion = 2 WHERE id = ?";
-        $updateStmt = mysqli_prepare($con, $updateQuery);
-
-        if (!$updateStmt) {
-            die("SQL Error (Prepare Failed for Update): " . mysqli_error($con));
-        }
-
-        mysqli_stmt_bind_param($updateStmt, 'i', $id);
-        if (!mysqli_stmt_execute($updateStmt)) {
-            die("SQL Error (Execute Failed for Update): " . mysqli_error($con));
-        }
-
-        mysqli_stmt_close($updateStmt);
-
-        echo '<div class="notification">Payment Complete!</div>';
+        die("Error executing fetch query: " . $stmt->error);
     }
 }
 
@@ -120,7 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </a>
         <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="dental_archives.php"><i class="fas fa-trash trash"></i></a>
+            <a href="archives.php"><i class="fas fa-trash trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>
@@ -143,171 +131,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-            <div class="round-box">
-                <p>APPOINTMENT TODAY:</p>
-                <?php
-                include("../dbcon.php");
-
-                // Set the default time zone to Hong Kong
-                date_default_timezone_set('Asia/Hong_Kong');
-
-                // Check database connection
-                if (!$con) {
-                    die("Connection failed: " . mysqli_connect_error());
-                }
-
-                // Get current date
-                $today = date('Y-m-d');
-
-                // Query to count appointments for today
-                $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM tbl_appointments 
-                              WHERE (
-                                (modified_date IS NOT NULL AND 
-                                DATE(modified_date) = CURDATE()) 
-                                OR (modified_date IS NULL AND 
-                                DATE(date) = CURDATE())
-                                ) AND status = '3'";
-
-
-                $result_today = mysqli_query($con, $sql_today);
-
-                // Check for SQL errors
-                if (!$result_today) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_today = mysqli_fetch_assoc($result_today);
-                $appointments_today = $row_today['total_appointments_today'];
-
-                if ($appointments_today) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM tbl_appointments 
-                                WHERE status = '1'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                if ($pending_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$pending_appointments</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>APPOINTMENT FOR THIS WEEK:</p>
-                <?php
-                // Get the start and end date of the current week
-                $start_of_week = date('Y-m-d', strtotime('monday this week'));
-                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-                // Query to count appointments for the current week
-                $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                 FROM tbl_appointments 
-                 WHERE (
-                    (modified_date IS NOT NULL AND 
-                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
-                    OR 
-                    (date IS NOT NULL AND 
-                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
-                        )
-                 AND status = '3'";
-
-                $result_week = mysqli_query($con, $sql_week);
-
-                // Check for SQL errors
-                if (!$result_week) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_week = mysqli_fetch_assoc($result_week);
-                $appointments_for_week = $row_week['total_appointments_week'];
-
-                if ($appointments_for_week) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>APPOINTMENT FOR NEXT WEEK:</p>
-                <?php
-                // Get the start and end date of the current week
-                $start_of_week = date('Y-m-d', strtotime('monday this week'));
-                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-                // Query to count appointments for the current week
-                $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                 FROM tbl_appointments 
-                 WHERE (
-                    (modified_date IS NOT NULL AND 
-                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
-                    OR 
-                    (date IS NOT NULL AND 
-                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
-                    )
-                    AND status = '3'";
-
-                $result_week = mysqli_query($con, $sql_week);
-
-                // Check for SQL errors
-                if (!$result_week) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_week = mysqli_fetch_assoc($result_week);
-                $appointments_for_week = $row_week['total_appointments_week'];
-
-                if ($appointments_for_week) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>DECLINED APPOINTMENTS:</p>
-                <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '2'";
-                $result_finished = mysqli_query($con, $sql_finished);
-
-                // Check for SQL errors
-                if (!$result_finished) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
-
-                if ($finished_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
+            <?php
+            // Include the appointments summary
+            include("appointments_status.php");
+            ?>
 
             <?php
-            // Set the number of results per page
             $resultsPerPage = 7;
 
             // Get the current page number from query parameters, default to 1
@@ -316,158 +145,429 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Calculate the starting row for the SQL query
             $startRow = ($currentPage - 1) * $resultsPerPage;
 
-            // SQL query to count total records
-            $countQuery = "SELECT COUNT(*) as total FROM tbl_archives WHERE completion = 1";
-            $countResult = mysqli_query($con, $countQuery);
-            $totalCount = mysqli_fetch_assoc($countResult)['total'];
-            $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
-            
-            $query = "SELECT a.*, 
-            s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name  
-        FROM tbl_archives a
-        JOIN tbl_service_type s ON a.service_type = s.id
-        JOIN tbl_patient p ON a.name = p.id 
-        WHERE a.completion = 1
-        ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
-        LIMIT $resultsPerPage OFFSET $startRow";
+            // Get today's date
+            $today = date('Y-m-d');
 
-            $result = mysqli_query($con, $query);
+            // Count total records for Day (One-Time Payment Tab)
+            $countQueryOnetimepayment = "SELECT COUNT(*) as total FROM tbl_archives 
+                WHERE completion = 1 AND service_type != 9"; // Exclude service_type = 9
+            $countResultOnetimepayment = mysqli_query($con, $countQueryOnetimepayment);
+
+            // Check for query errors
+            if (!$countResultOnetimepayment) {
+                die("Query failed: " . mysqli_error($con)); // Debugging message
+            }
+            $totalCountOnetimepayment = mysqli_fetch_assoc($countResultOnetimepayment)['total'];
+            $totalPagesOnetimepayment = ceil($totalCountOnetimepayment / $resultsPerPage); // Calculate total pages for One-Time Payment
+            
+            // Count total records for Week (Packages Tab)
+            $countQueryPackages = "SELECT COUNT(*) as total FROM tbl_archives 
+                WHERE completion = 1 AND service_type = 9"; // Only service_type = 9
+            $countResultPackages = mysqli_query($con, $countQueryPackages);
+
+            // Check for query errors
+            if (!$countResultPackages) {
+                die("Query failed: " . mysqli_error($con)); // Debugging message
+            }
+            $totalCountPackages = mysqli_fetch_assoc($countResultPackages)['total'];
+            $totalPagesPackages = ceil($totalCountPackages / $resultsPerPage); // Calculate total pages for Packages
+            
+            // SQL query for One-Time Payment with JOIN to fetch the limited number of records with OFFSET
+            $queryOnetimepayment = "SELECT a.*, 
+                s.service_type AS service_name, 
+                p.first_name, p.middle_name, p.last_name  
+                FROM tbl_archives a
+                JOIN tbl_service_type s ON a.service_type = s.id
+                JOIN tbl_patient p ON a.name = p.id 
+                WHERE a.completion = 1 AND a.service_type != 9  -- Exclude service_type = 9
+                ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+                LIMIT $resultsPerPage OFFSET $startRow";
+
+            // SQL query for Packages with JOIN to fetch the limited number of records with OFFSET
+            $queryPackages = "SELECT a.*, 
+                s.service_type AS service_name, 
+                p.first_name, p.middle_name, p.last_name  
+                FROM tbl_archives a
+                JOIN tbl_service_type s ON a.service_type = s.id
+                JOIN tbl_patient p ON a.name = p.id 
+                WHERE a.completion = 1 AND a.service_type = 9  -- Only service_type = 9
+                ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+                LIMIT $resultsPerPage OFFSET $startRow";
+
+            $resultOnetimepayment = mysqli_query($con, $queryOnetimepayment);
+            $resultPackages = mysqli_query($con, $queryPackages);
+
+            // Check for query errors
+            if (!$resultOnetimepayment) {
+                die("Query failed: " . mysqli_error($con)); // Debugging message
+            }
+            if (!$resultPackages) {
+                die("Query failed: " . mysqli_error($con)); // Debugging message
+            }
+
+            // Default tab is 'Day'
+            $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'Onetimepayment';
             ?>
 
-            <!-- HTML Table -->
-
-            <div class="pagination-container">
-                <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
-                        < </a>
-                        <?php endif; ?>
-
-                        <?php if ($currentPage < $totalPages): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn"> > </a>
-                        <?php endif; ?>
-
-                        <?php if ($totalCount > 15): ?>
-                        <?php endif; ?>
+            <!-- Tab structure -->
+            <div class="tab">
+                <button class="tablinks" onclick="switchTab('Onetimepayment')">One Time</button>
+                <button class="tablinks" onclick="switchTab('Packages')">This Packages</button>
             </div>
-            <!-- Table -->
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Contact</th>
-                        <th>Date</th>
-                        <th>Time</th>
-                        <th style="font-size: 15px;">Rescheduled Date</th>
-                        <th style="font-size: 15px;">Rescheduled Time</th>
-                        <th>Service</th>
-                        <th>Price</th>
-                        <th>Note</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    if (mysqli_num_rows($result) > 0) {
-                        while ($row = mysqli_fetch_assoc($result)) {
-                            // Validate modified_date and modified_time
-                            $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
-                            $modified_time = (!empty($row['modified_time']) && $row['modified_time'] !== '00:00:00') ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+            <!-- Tab content for onetimepayment -->
+            <div id="Onetimepayment" class="tabcontent"
+                style="display: <?php echo $activeTab == 'Onetimepayment' ? 'block' : 'none'; ?>;">
+                <br>
+                <h3>One Time</h3>
 
-                            // Validate date and time
-                            $dateToDisplay = (!empty($row['date']) && $row['date'] !== '0000-00-00') ? $row['date'] : 'N/A';
-                            $timeToDisplay = (!empty($row['time']) && $row['time'] !== '00:00:00') ? date("h:i A", strtotime($row['time'])) : 'N/A';
+                <!-- Pagination for onetimepayment -->
+                <div class="pagination-container">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?page=<?php echo $currentPage - 1; ?>&tab=Onetimepayment" class="pagination-btn">&lt;</a>
+                    <?php endif; ?>
+                    <?php if ($currentPage < $totalPagesOnetimepayment): ?>
+                        <a href="?page=<?php echo $currentPage + 1; ?>&tab=Onetimepayment" class="pagination-btn">&gt;</a>
+                    <?php endif; ?>
+                </div>
 
-                            $priceToDisplay = isset($row['price']) ? number_format($row['price']) : 'N/A';
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                            <th>Price</th>
+                            <th>Note</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (mysqli_num_rows($resultOnetimepayment) > 0) {
+                            while ($row = mysqli_fetch_assoc($resultOnetimepayment)) {
+                                // Validate modified_date and modified_time
+                                $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
+                                $modified_time = (!empty($row['modified_time']) && $row['modified_time'] !== '00:00:00') ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
-                            // Translate ENUM values for completion
-                            $completionStatus = 'Unknown';
-                            if (isset($row['completion'])) {
-                                switch ($row['completion']) {
-                                    case '1':
-                                        $completionStatus = 'Pending';
-                                        break;
-                                    case '2':
-                                        $completionStatus = 'One-time Payment';
-                                        break;
-                                    case '3':
-                                        $completionStatus = 'Package Payment';
-                                        break;
+                                // Validate date and time
+                                $dateToDisplay = (!empty($row['date']) && $row['date'] !== '0000-00-00') ? $row['date'] : 'N/A';
+                                $timeToDisplay = (!empty($row['time']) && $row['time'] !== '00:00:00') ? date("h:i A", strtotime($row['time'])) : 'N/A';
+
+                                $priceToDisplay = isset($row['price']) ? number_format($row['price']) : 'N/A';
+
+                                // Translate ENUM values for completion
+                                $completionStatus = 'Unknown';
+                                if (isset($row['completion'])) {
+                                    switch ($row['completion']) {
+                                        case '1':
+                                            $completionStatus = 'Pending';
+                                            break;
+                                        case '2':
+                                            $completionStatus = 'One-time Payment';
+                                            break;
+                                        case '3':
+                                            $completionStatus = 'Package Payment';
+                                            break;
+                                    }
                                 }
-                            }
 
-                            echo "<tr>
-                    <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                    <td >{$row['contact']}</td>
-                    <td style='width: 110px'>{$dateToDisplay}</td>
-                    <td style='width: 110px'>{$timeToDisplay}</td>
-                    <td style='width: 110px'>{$modified_date}</td>
-                    <td style='width: 110px'>{$modified_time}</td>
-                    <td style='font-size: 15px;'>{$row['service_name']}</td>
-                    <td>{$priceToDisplay}</td>
-                    <td>
-                        <button type='button' onclick='openModal(\"{$row['note']}\")'
-                            style='background-color:#083690; color:white; border:none; padding:10px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
-                            View
-                        </button>
-                    </td>
-                    <td>
-                        <form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                        </form>";
-
-                            if ($completionStatus != 'Approve') {
-                                echo "<form method='POST' action='' style='display:inline;'>
+                                // Check if the record can be approved
+                                $canApprove = ($row['completion'] != 2); // Can approve only if not already marked as 'complete' (status = 2)
+                        
+                                echo "<tr>
+                        <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td style='width: 100px'>{$dateToDisplay}</td>
+                        <td style='width: 100px'>{$timeToDisplay}</td>
+                        <td style='width: 100px'>{$modified_date}</td>
+                        <td style='width: 100px'>{$modified_time}</td>
+                        <td style='font-size: 15px;'>{$row['service_name']}</td>
+                        <td>{$completionStatus}</td>
+                        <td>{$priceToDisplay}</td>
+                        <td style='width: 10px'>
+                            <button type='button' onclick='openViewModal(\"{$row['note']}\")'
+                                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                                View
+                            </button>
+                        </td>
+                        <td>";
+                                if ($completionStatus != '1') {
+                                    echo "<form method='POST' action='billing.php' style='display:inline;'>
                         <input type='hidden' name='id' value='{$row['id']}'>
-                        <input type='submit' name='approve' value='Approve'
-                            style='background-color:green; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                        <input type='submit' name='Approve' value='Approve' 
+                        style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>
                     </form>";
+                                }
+                                echo "</td>
+                </tr>";
                             }
-
-                            echo "</td></tr>";
+                        } else {
+                            echo "<tr><td colspan='11'>No records found</td></tr>";
                         }
-                    } else {
-                        echo "<tr><td colspan='11'>No records found</td></tr>";
-                    }
-                    ?>
-                </tbody>
-            </table>
+                        ?>
+                    </tbody>
+                </table>
+            </div>
 
-            <!-- Modal Structure -->
-            <div id="myModal" class="modal">
+            <!-- Tab content for Packages -->
+            <div id="Packages" class="tabcontent"
+                style="display: <?php echo $activeTab == 'Packages' ? 'block' : 'none'; ?>;">
+                <br>
+                <h3>Packages</h3>
+                <!-- Pagination for Packages -->
+                <div class="pagination-container">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?page=<?php echo $currentPage - 1; ?>&tab=Packages" class="pagination-btn">&lt;</a>
+                    <?php endif; ?>
+                    <?php if ($currentPage < $totalPagesPackages): ?>
+                        <a href="?page=<?php echo $currentPage + 1; ?>&tab=Packages" class="pagination-btn">&gt;</a>
+                    <?php endif; ?>
+                </div>
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Contact</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                            <th>Price</th>
+                            <th>Note</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                        if (mysqli_num_rows($resultPackages) > 0) {
+                            while ($row = mysqli_fetch_assoc($resultPackages)) {
+                                // Validate modified_date and modified_time
+                                $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
+                                $modified_time = (!empty($row['modified_time']) && $row['modified_time'] !== '00:00:00') ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+
+                                // Validate date and time
+                                $dateToDisplay = (!empty($row['date']) && $row['date'] !== '0000-00-00') ? $row['date'] : 'N/A';
+                                $timeToDisplay = (!empty($row['time']) && $row['time'] !== '00:00:00') ? date("h:i A", strtotime($row['time'])) : 'N/A';
+
+                                $priceToDisplay = isset($row['price']) ? number_format($row['price']) : 'N/A';
+
+                                // Translate ENUM values for completion
+                                $completionStatus = 'Unknown';
+                                if (isset($row['completion'])) {
+                                    switch ($row['completion']) {
+                                        case '1':
+                                            $completionStatus = 'Pending';
+                                            break;
+                                        case '2':
+                                            $completionStatus = 'One-time Payment';
+                                            break;
+                                        case '3':
+                                            $completionStatus = 'Package Payment';
+                                            break;
+                                    }
+                                }
+
+                                echo "<tr>
+                        <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td style='width: 100px'>{$dateToDisplay}</td>
+                        <td style='width: 100px'>{$timeToDisplay}</td>
+                        <td style='width: 100px'>{$modified_date}</td>
+                        <td style='width: 100px'>{$modified_time}</td>
+                        <td style='font-size: 15px;'>{$row['service_name']}</td>
+                        <td>{$completionStatus}</td>
+                        <td>{$priceToDisplay}</td>
+                        <td style='width: 10px'>
+                            <button type='button' onclick='openViewModal(\"{$row['note']}\")'
+                                style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                                View
+                            </button>
+                        </td>
+                        <td>
+                            <!-- Approve Button -->
+                            <button type='button' onclick='openApproveModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\", \"{$row['price']}\")' 
+                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Approve</button>
+                        </td>
+                    </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='11'>No records found</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <script>
+                function switchTab(tabName) {
+                    // Switch between tabs
+                    window.location.href = '?tab=' + tabName + '&page=1';
+                }
+            </script>
+
+            <div id="approveModal" class="modal" style="display: none;">
                 <div class="modal-content">
-                <span class="close">&times;</span>
+                    <button style="background-color: transparent;" class="close">&times;</button>
+                    <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
+                    <hr>
+                    <div id="modalDetails">
+                        <p><strong>Name:</strong> <span id="modalName"></span></p>
+                        <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
+                        <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
+                        <p><strong>Current Service:</strong> <span id="modalService"></span></p>
+                        <p><strong>Price:</strong> <span id="modalPrice"></span></p>
+                    </div>
+                    <hr>
+                    <form id="newServiceForm" method="POST" action="">
+                        <input type="hidden" name="id" value="">
+                        <br>
+                        <label style="font-size: 20px; font-weight: bold;" for="paid">Paid(₱):</label>
+                        <br>
+                        <input type="number" id="paid" name="paid"
+                            style="width: 100%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                        <br>
+                        <label style="font-size: 20px; font-weight: bold;" for="outstanding_balance">Outstanding
+                            Balance(₱):</label>
+                        <br>
+                        <input type="number" id="outstanding_balance" name="outstanding_balance"
+                            style="width: 100%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                        <br>
+                        <br>
+                        <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
+                    </form>
+                </div>
+            </div>
+            <div id="notification" class="notification" style="display: none;">
+                <p>Successfully Submitted!</p>
+            </div>
+            <script>
+                function openApproveModal(id, firstName, middleName, lastName, contact, date, time, service, price) {
+                    // Set modal details dynamically
+                    document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
+                    document.getElementById('modalContact').innerText = contact;
+                    document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
+                    document.getElementById('modalService').innerText = service;
+                    document.getElementById('modalPrice').innerText = price;
+
+                    // Set the hidden ID field in the form
+                    document.querySelector("#newServiceForm input[name='id']").value = id;
+
+                    // Display the modal
+                    document.getElementById('approveModal').style.display = 'block';
+                }
+
+                // Event listener to close the modal when the close button is clicked
+                document.querySelector('.close').addEventListener('click', () => {
+                    document.getElementById('approveModal').style.display = 'none';
+                });
+
+                // Event listener to close the modal when clicking outside of it
+                window.addEventListener('click', (event) => {
+                    if (event.target == document.getElementById('approveModal')) {
+                        document.getElementById('approveModal').style.display = 'none';
+                    }
+                });
+
+                // Event listener for the proceed button to trigger a notification
+                document.getElementById('proceed').addEventListener('click', function () {
+                    showNotification();
+                });
+
+                // Function to show a notification message
+                function showNotification() {
+                    const notification = document.getElementById('notification, declined');
+                    if (notification) {
+                        notification.style.display = 'block';
+
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 3000);
+
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
+                }
+            </script>
+
+            <!-- Modal for Viewing Notes -->
+            <div id="viewModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close-view">&times;</span>
                     <h2 style="color: #0a0a0a;">NOTES FROM THE DOCTOR:</h2>
                     <br>
                     <div class="body">
-                    <p id="modalText">note text</p>
+                        <p id="viewModalText">note text</p>
                     </div>
                 </div>
             </div>
 
             <script>
-                // Get modal elements
-                const modal = document.getElementById("myModal");
-                const closeModalSpan = document.querySelector(".close");
-                const modalText = document.getElementById("modalText");
-
-                // Open modal function
-                function openModal(note) {
-                    modalText.textContent = note;
-                    modal.style.display = "block";
+                // Function to open the view modal
+                function openViewModal(note) {
+                    document.getElementById('viewModalText').textContent = note;
+                    document.getElementById('viewModal').style.display = "block";
                 }
 
-                // Close modal on 'X' click
-                closeModalSpan.addEventListener("click", () => {
-                    modal.style.display = "none";
+                // Close modals when the close button is clicked
+                document.querySelector(".close-view").addEventListener("click", function () {
+                    document.getElementById('viewModal').style.display = "none";
                 });
 
-                // Close modal if clicked outside content
-                window.addEventListener("click", (event) => {
-                    if (event.target === modal) {
-                        modal.style.display = "none";
+                // Close modals if clicked outside of the modal content
+                window.addEventListener("click", function (event) {
+                    const viewModal = document.getElementById('viewModal');
+                    if (event.target === viewModal) {
+                        viewModal.style.display = "none";
                     }
                 });
+                // Switch between tabs
+                function openTab(evt, tabName) {
+                    var i, tabcontent, tablinks;
+
+                    // Hide all tab content
+                    tabcontent = document.getElementsByClassName("tabcontent");
+                    for (i = 0; i < tabcontent.length; i++) {
+                        tabcontent[i].style.display = "none";
+                    }
+
+                    // Remove 'active' class from all tab links
+                    tablinks = document.getElementsByClassName("tablinks");
+                    for (i = 0; i < tablinks.length; i++) {
+                        tablinks[i].classList.remove("active");
+                    }
+
+                    // Display the clicked tab's content and add 'active' class to the clicked tab
+                    document.getElementById(tabName).style.display = "block";
+                    evt.currentTarget.classList.add("active");
+                }
+
+                function switchTab(tabName) {
+                    // Update the URL to reflect the selected tab without reloading
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('tab', tabName);
+                    window.history.pushState({}, '', url);
+                    // Call openTab to display the selected tab content
+                    openTab(event, tabName);
+                }
+
+                // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
+                window.onload = function () {
+                    const params = new URLSearchParams(window.location.search);
+                    const activeTab = params.get('tab') || 'Onetimepayment';
+                    openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+                };
             </script>
         </div>
     </div>

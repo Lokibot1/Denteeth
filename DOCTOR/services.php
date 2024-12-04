@@ -352,6 +352,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
                             <label for="serviceDescriptionBraces">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionBraces" required></textarea><br>
 
                             <label for="priceBraces">Start at:</label>
@@ -453,6 +455,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
                             <label for="serviceDescriptionCleaning">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionCleaning"
                                 required></textarea><br>
 
@@ -555,6 +559,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
                             <label for="serviceDescriptionWhitening">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionWhitening"
                                 required></textarea><br>
 
@@ -656,6 +662,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
                             <label for="serviceDescriptionImplants">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionImplants"
                                 required></textarea><br>
 
@@ -758,6 +766,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
                             <label for="serviceDescriptionRestoration">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionRestoration"
                                 required></textarea><br>
 
@@ -860,6 +870,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
                             <label for="serviceDescriptionExtraction">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionExtraction"
                                 required></textarea><br>
 
@@ -962,7 +974,9 @@ $con->close();
                             <img id="imagePreviewVeneers" src="" alt="Image Preview"
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
-                            <label for="serviceDescriptionVeneers">Description:</label>
+                            <label for="serviceDescriptionVeneers">Description:</label><br>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionVeneers" required></textarea><br>
 
                             <label for="priceVeneers">Per Unit:</label>
@@ -1063,6 +1077,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;" />
 
                             <label for="serviceDescriptionExam">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionExam" required></textarea><br>
 
                             <label for="priceExam">Price:</label>
@@ -1164,6 +1180,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;">
 
                             <label for="serviceDescriptionRootCanal">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionRootCanal"
                                 required></textarea><br>
 
@@ -1264,6 +1282,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;">
 
                             <label for="serviceDescriptionDentures">Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionDentures"
                                 required></textarea><br>
 
@@ -1364,6 +1384,8 @@ $con->close();
                                 style="display: none; width: 200px; margin-top: 10px;">
 
                             <label>Description:</label>
+                            <br>
+                            <br>
                             <textarea name="service_description" id="serviceDescriptionCrownBridge"
                                 required></textarea><br>
 

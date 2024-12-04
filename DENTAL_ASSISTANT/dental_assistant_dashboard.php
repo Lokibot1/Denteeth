@@ -41,7 +41,7 @@ if (!$con) {
             </div>
         </a>
         <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="archives.php"><i class="fas fa-trash trash"></i></a>
+            <a href="dental_archives.php"><i class="fas fa-trash trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>
@@ -305,8 +305,8 @@ if (!$con) {
                         echo "<tr>
             <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
             <td>{$row['contact']}</td>
-            <td style='width: 90px'>{$dateToDisplay}</td>
-            <td style='width: 90px'>{$timeToDisplay}</td>
+            <td style='width: 110px'>{$dateToDisplay}</td>
+            <td style='width: 110px'>{$timeToDisplay}</td>
             <td style='width: 110px'>{$modified_date}</td>
             <td style='width: 110px'>{$modified_time}</td>
             <td style='font-size: 15px'>{$row['service_name']}</td>

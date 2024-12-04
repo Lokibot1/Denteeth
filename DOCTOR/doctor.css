@@ -207,7 +207,7 @@ textarea {
     border-radius: 5px;
     width: 70%;
     height: 77%;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .close {
@@ -267,7 +267,9 @@ textarea {
 .modal-content button[type="submit"]:hover {
     background-color: #0abb48;
 }
-
+textarea{
+    font-size: 20px;
+}
 .img-box {
     border-radius: 20px 20px;
     margin: 30px auto;
@@ -324,7 +326,7 @@ textarea {
 }
 
 .pagination-btn {
-    display: inline-block;
+    display: inline-end;
     padding: 10px 15px;
     margin: 5px;
     border: none;
@@ -409,4 +411,10 @@ div h3{
     padding: 10px 20px;
     z-index: 9999; 
     opacity: 1;
+  }
+  .price{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 49%;
   }

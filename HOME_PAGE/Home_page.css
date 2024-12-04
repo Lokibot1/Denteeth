@@ -1317,7 +1317,6 @@ select:focus {
 }
 
 /*meet our team*/
-
 .body {
     display: flex;
     flex-wrap: wrap;
@@ -1388,103 +1387,131 @@ select:focus {
   .person a{
     font-size:16px;
     color: #6e6e6e;
-    margin-left: 10px;
   }
-  .info{
+  .info {
     text-align: center;
-    width: 900px;
   }
-  /* hover */
+  
+  .info h1 {
+    font-size: 20px;
+    margin: 10px 0;
+  }
+  
+  .info p {
+    font-size: 14px;
+    margin: 5px 0 15px;
+  }
+  
+  .info a {
+    display: inline-block;
+    margin: 0 10px;
+    font-size: 18px;
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .info a:hover {
+    color: #0A2C16; 
+  }
   .p-container:hover {
     transform: scale(0.54);
   } 
   .p-container:hover img {
     transform: translateY(0) scale(1.3);
   }
+
   @media screen and (max-width: 768px) {
     .body {
       flex-direction: column;
-      gap: 20px; /* Reduce the gap between elements */
+      gap: 20px; 
       margin-bottom: 10px;
     }
   
     .person {
-      width: 90%; /* Adjust the width for better fit */
+      width: 90%;
     }
   
     .p-container {
-      width: 100%; /* Ensure it takes the full width of the container */
+      width: 100%; 
       height: auto;
-      transform: scale(0.6); /* Slightly adjust the scale for better visibility */
+      transform: scale(0.6);
     }
   
     .circle {
-      height: 300px; /* Resize the circle */
-      width: 300px;
-      top: 150px;
-      left: 0; /* Center align */
-    }
+        height: 350px;
+        width: 350px; 
+        top: 150px;    
+        left: 20px; 
+      }
   
     .person img {
-      width: 250px; /* Adjust image size */
+      width: 250px; 
       top: 100px;
-      left: 10px; /* Align to the center */
-      transform: translateY(10px) scale(1.1); /* Slightly smaller scale for better fit */
+      left: 10px;
+      transform: translateY(10px) scale(1.1); 
     }
   
     .container-inner {
-      top: -150px; /* Adjust position to align with the smaller circle */
+      top: -150px;
     }
   
     .person h1 {
-      font-size: 20px; /* Reduce font size for better fit */
+      font-size: 20px; 
     }
   
     .person p {
-      font-size: 14px; /* Adjust text size */
+      font-size: 14px;
       margin-top: 5px;
     }
   
     .divider {
-      width: 100px; /* Adjust the width of the divider */
+      width: 100px; 
     }
   
     .info {
-      width: 100%; /* Make it full-width */
-      padding: 10px; /* Add padding for better alignment */
+      width: 100%; 
+      padding: 10px;
     }
   
     /* Hover adjustments for mobile */
     .p-container:hover {
-      transform: scale(0.6); /* Keep hover scale reasonable for mobile */
+      transform: scale(0.6); 
     }
     .p-container:hover img {
-      transform: translateY(0) scale(1.2); /* Slightly smaller hover effect */
+      transform: translateY(0) scale(1.2); 
     }
   }
   
   @media screen and (max-width: 480px) {
+    .conianer-inner {
+        position: relative;
+        clip-path: path("M 390,400 C 390,504.9341 304.9341,590 200,590 95.065898,590 10,504.9341 10,400 V 10 H 200 390 Z");
+        top: -150px; 
+        left: 50px;  
+        width: 100%; 
+        height: 400px;
+      }
     .circle {
-      height: 250px; /* Further resize the circle */
-      width: 250px;
-      top: 100px;
-    }
+        height: 300px; 
+        width: 300px;  
+        top: 100px;    
+        left: 15px;    
+      }
   
     .person img {
-      width: 200px; /* Further adjust image size */
-      top: 80px;
+        width: 75%;
     }
   
     .person h1 {
-      font-size: 18px; /* Further reduce font size */
+      font-size: 18px;
     }
   
     .person p {
-      font-size: 12px; /* Adjust text size for small screens */
+      font-size: 12px; 
     }
   
     .divider {
-      width: 80px; /* Reduce divider size */
+      width: 80px; 
     }
   }
   
