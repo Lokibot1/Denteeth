@@ -206,122 +206,10 @@ $con->close();
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-            <div class="round-box">
-                <p>APPOINTMENT TODAY:</p>
-                <?php
-                include("../dbcon.php");
-
-                // Set the default time zone to Hong Kong
-                date_default_timezone_set('Asia/Hong_Kong');
-
-                // Check database connection
-                if (!$con) {
-                    die("Connection failed: " . mysqli_connect_error());
-                }
-
-                // Get current date
-                $today = date('Y-m-d');
-
-                // Query to count appointments for today
-                $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM tbl_appointments 
-                              WHERE (
-                                (modified_date IS NOT NULL AND 
-                                DATE(modified_date) = CURDATE()) 
-                                OR (modified_date IS NULL AND 
-                                DATE(date) = CURDATE())
-                                ) AND status = '3'";
-
-
-                $result_today = mysqli_query($con, $sql_today);
-
-                // Check for SQL errors
-                if (!$result_today) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_today = mysqli_fetch_assoc($result_today);
-                $appointments_today = $row_today['total_appointments_today'];
-
-                if ($appointments_today) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>APPOINTMENT FOR THIS WEEK:</p>
-                <?php
-                // Get the start and end date of the current week
-                $start_of_week = date('Y-m-d', strtotime('monday this week'));
-                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-                // Query to count appointments for the current week
-                $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                 FROM tbl_appointments 
-                 WHERE (
-                    (modified_date IS NOT NULL AND 
-                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
-                    OR 
-                    (date IS NOT NULL AND 
-                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
-                        )
-                 AND status = '3'";
-
-                $result_week = mysqli_query($con, $sql_week);
-
-                // Check for SQL errors
-                if (!$result_week) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_week = mysqli_fetch_assoc($result_week);
-                $appointments_for_week = $row_week['total_appointments_week'];
-
-                if ($appointments_for_week) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>APPOINTMENT FOR NEXT WEEK:</p>
-                <?php
-                // Get the start and end date of the current week
-                $start_of_week = date('Y-m-d', strtotime('monday this week'));
-                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-                // Query to count appointments for the current week
-                $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                 FROM tbl_appointments 
-                 WHERE (
-                    (modified_date IS NOT NULL AND 
-                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
-                    OR 
-                    (date IS NOT NULL AND 
-                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
-                    )
-                    AND status = '3'";
-                    
-                $result_week = mysqli_query($con, $sql_week);
-
-                // Check for SQL errors
-                if (!$result_week) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_week = mysqli_fetch_assoc($result_week);
-                $appointments_for_week = $row_week['total_appointments_week'];
-
-                if ($appointments_for_week) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
+            <?php
+            // Include the appointments summary
+            include("appointments_status.php");
+            ?>
 
             <h1>Services</h1>
             <div id="crvs-container">
@@ -359,7 +247,7 @@ $con->close();
                             <label for="priceBraces">Start at:</label>
                             <input type="number" name="price" id="priceBraces" placeholder="Enter Price" required><br>
 
-                            <button type="submit"id="s9">Save Changes</button>
+                            <button type="submit" id="s9">Save Changes</button>
                         </form>
                     </div>
                 </div>
@@ -407,24 +295,24 @@ $con->close();
                         openBracesModal(bracesData);
                     };
                     document.getElementById('s9').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Dental Cleaning -->
@@ -511,24 +399,24 @@ $con->close();
                         openServiceModalCleaning(cleaningData);
                     };
                     document.getElementById('s10').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Dental Whitening -->
@@ -567,7 +455,7 @@ $con->close();
                             <label for="priceWhitening">Per Cycle(3):</label>
                             <input type="number" name="price" id="priceWhitening" placeholder="Enter Price"
                                 required><br>
-                            <button type="submit"id="s11">Save Changes</button>
+                            <button type="submit" id="s11">Save Changes</button>
                         </form>
                     </div>
                 </div>
@@ -613,25 +501,25 @@ $con->close();
                     document.getElementById("openModalBtnWhitening").onclick = () => {
                         const whiteningData = <?php echo json_encode($whiteningData); ?>;
                         openServiceModal(whiteningData);
-                    };document.getElementById('s11').addEventListener('click', function () {
-                    showNotification();
+                    }; document.getElementById('s11').addEventListener('click', function () {
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Dental Implants -->
@@ -716,26 +604,26 @@ $con->close();
                         openServiceModalImplants(implantsData);
                     };
 
-                    
+
                     document.getElementById('s1').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Restoration -->
@@ -774,7 +662,7 @@ $con->close();
                             <label for="priceRestoration">Start at:</label>
                             <input type="number" name="price" id="priceRestoration" placeholder="Enter Price"
                                 required><br>
-                                <button type="submit" id="s2">Save Changes</button>
+                            <button type="submit" id="s2">Save Changes</button>
                         </form>
                     </div>
                 </div>
@@ -822,24 +710,24 @@ $con->close();
                     };
 
                     document.getElementById('s2').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Extraction -->
@@ -927,24 +815,24 @@ $con->close();
                         openServiceModalExtraction(extractionData);
                     };
                     document.getElementById('s3').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Veneers -->
@@ -1030,24 +918,24 @@ $con->close();
                         openServiceModalVeneers(veneersData);
                     };
                     document.getElementById('s4').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Full Exam & X-Ray -->
@@ -1132,24 +1020,24 @@ $con->close();
                         openServiceModalExam(examData);
                     };
                     document.getElementById('s5').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Root Canal Treatment -->
@@ -1236,24 +1124,24 @@ $con->close();
                         openServiceModalRootCanal(rootData);
                     };
                     document.getElementById('s6').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Dentures -->
@@ -1336,25 +1224,25 @@ $con->close();
                     document.getElementById("openModalBtnDentures").onclick = () => {
                         const dentureData = <?php echo json_encode($dentureData); ?>;
                         openServiceModalDentures(dentureData);
-                    };document.getElementById('s7').addEventListener('click', function () {
-                    showNotification();
+                    }; document.getElementById('s7').addEventListener('click', function () {
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <!-- Img-box and Modal for Crown & Bridge -->
@@ -1441,24 +1329,24 @@ $con->close();
                         openServiceModalCrownBridge(crownBridgeData);
                     };
                     document.getElementById('s8').addEventListener('click', function () {
-                    showNotification();
+                        showNotification();
                     });
 
                     function showNotification() {
-                    const notification = document.getElementById('notification');
-                    notification.style.display = 'block';
+                        const notification = document.getElementById('notification');
+                        notification.style.display = 'block';
 
-                    // Start fading out after 3 seconds
-                    setTimeout(() => {
-                        notification.style.opacity = '0';
-                    }, 5000);
+                        // Start fading out after 3 seconds
+                        setTimeout(() => {
+                            notification.style.opacity = '0';
+                        }, 5000);
 
-                    // Hide completely after fading
-                    setTimeout(() => {
-                        notification.style.display = 'none';
-                        notification.style.opacity = '1'; // Reset for next use
-                    }, 3500);
-                }
+                        // Hide completely after fading
+                        setTimeout(() => {
+                            notification.style.display = 'none';
+                            notification.style.opacity = '1'; // Reset for next use
+                        }, 3500);
+                    }
                 </script>
 
                 <script>
