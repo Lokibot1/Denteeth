@@ -108,7 +108,7 @@ if (isset($_POST['submit'])) {
             </div>
         </a>
         <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="archives.php"><i class="fas fa-trash trash"></i></a>
+            <a href="DENTAL_ASSISTANT_ARCHIVES/archives.php"><i class="fas fa-trash trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>
@@ -137,7 +137,7 @@ if (isset($_POST['submit'])) {
             ?>
 
             <?php
-            $resultsPerPage = 7;
+            $resultsPerPage = 4;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
