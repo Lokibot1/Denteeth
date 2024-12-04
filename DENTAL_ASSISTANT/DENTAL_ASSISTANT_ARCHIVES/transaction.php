@@ -95,7 +95,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
         </a>
-        <form method="POST" class="s-buttons" action="../../ogout.php">
+        <form method="POST" class="s-buttons" action="../../logout.php">
             <a href="../dental_assistant_dashboard.php"><i class="fa fa-arrow-left trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
@@ -158,12 +158,17 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
             
             // SQL query with JOIN to fetch the filtered records with OFFSET
             $query = "SELECT a.*, 
-                         s.service_type AS service_name, 
-                         p.first_name, p.middle_name, p.last_name
-                  FROM tbl_transaction_history a
-                  JOIN tbl_service_type s ON a.service_type = s.id
-                  JOIN tbl_patient p ON a.name = p.id 
-                  WHERE a.service_type ='9'";
+                 s.service_type AS service_name, 
+                 p.first_name, p.middle_name, p.last_name
+          FROM tbl_transaction_history a
+          JOIN tbl_service_type s ON a.service_type = s.id
+          JOIN tbl_patient p ON a.name = p.id 
+          WHERE a.service_type = '9'
+          ORDER BY 
+              CASE 
+                  WHEN a.modified_date IS NOT NULL THEN a.modified_date
+                  ELSE a.date
+              END DESC";
 
             // Add name filter if specified
             if ($filterName) {
@@ -228,7 +233,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                             $bill = "₱" . number_format($row['bill'], 2);
                             $outstanding_balance = "₱" . number_format($row['outstanding_balance'], 2);
 
-                             // Validate modified_date and modified_time
+                            // Validate modified_date and modified_time
                             $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
 
                             // Validate date and time

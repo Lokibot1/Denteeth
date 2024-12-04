@@ -54,7 +54,7 @@ if (isset($_POST['update'])) {
                                      WHERE id=$id"; // Assuming patient_id is used as foreign key in tbl_appointments
 
         // Execute both queries
-         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
+        if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
             // Redirect to the same page after updating
             header("Location: pending.php");
             exit();
@@ -72,7 +72,7 @@ if (isset($_POST['decline'])) {
 
     // Redirect to refresh the page and show updated records
     header("Location: pending.php");
-    
+
 }
 
 
@@ -231,7 +231,12 @@ $result = mysqli_query($con, $query);
         JOIN tbl_service_type s ON a.service_type = s.id
         JOIN tbl_patient p ON a.name = p.id
         JOIN tbl_status t ON a.status = t.id
-        WHERE a.status IN ('1', '2', '3', '4')";
+        WHERE a.status IN ('1', '2', '3', '4')
+        ORDER BY 
+              CASE 
+                  WHEN a.modified_date IS NOT NULL THEN a.modified_date
+                  ELSE a.date
+              END DESC";
 
             // Add name filter if specified
             if ($filterName) {
@@ -247,11 +252,12 @@ $result = mysqli_query($con, $query);
             
             $result = mysqli_query($con, $query);
             ?><br><br><br>
-<div class="managehead">
-                 <!-- Search Form Container -->
+            <div class="managehead">
+                <!-- Search Form Container -->
                 <div class="f-search">
                     <form method="GET" action="" class="search-form">
-                        <input type="text" name="name" placeholder="Search by name" value="<?php echo htmlspecialchars($filterName); ?>" />
+                        <input type="text" name="name" placeholder="Search by name"
+                            value="<?php echo htmlspecialchars($filterName); ?>" />
                         <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
                         <button class="material-symbols-outlined" type="submit">search</button>
                     </form>
@@ -283,15 +289,15 @@ $result = mysqli_query($con, $query);
                 </thead>
                 <tbody>
                     <?php
-                if (mysqli_num_rows($result) > 0) {
-                    while ($row = mysqli_fetch_assoc($result)) {
-                        // Check if modified_date and modified_time are valid
-                        $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
-                        $modified_time = (!empty($row['modified_time']) && $row['modified_time'] !== '00:00:00') ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
+                    if (mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            // Check if modified_date and modified_time are valid
+                            $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
+                            $modified_time = (!empty($row['modified_time']) && $row['modified_time'] !== '00:00:00') ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
-                        // Check if date and time are valid
-                        $dateToDisplay = (!empty($row['date']) && $row['date'] !== '0000-00-00') ? $row['date'] : 'N/A';
-                        $timeToDisplay = (!empty($row['time']) && $row['time'] !== '00:00:00') ? date("h:i A", strtotime($row['time'])) : 'N/A';
+                            // Check if date and time are valid
+                            $dateToDisplay = (!empty($row['date']) && $row['date'] !== '0000-00-00') ? $row['date'] : 'N/A';
+                            $timeToDisplay = (!empty($row['time']) && $row['time'] !== '00:00:00') ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                             echo "<tr>
                         <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>

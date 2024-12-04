@@ -129,7 +129,11 @@ if (isset($_POST['update'])) {
             JOIN tbl_service_type s ON a.service_type = s.id
             JOIN tbl_patient p ON a.name = p.id
             WHERE a.completion = '2'
-        ";
+            ORDER BY 
+              CASE 
+                  WHEN a.modified_date IS NOT NULL THEN a.modified_date
+                  ELSE a.date
+              END DESC";
 
             // Add name filter if specified
             if ($filterName) {
