@@ -7,16 +7,17 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1'])) {
     exit();
 }
 
+// Include the database connection file
 include("../dbcon.php");
 
-// Check database connection
+// Check the database connection and terminate if it fails
 if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle update request
+// Handle the form submission for updating a record
 if (isset($_POST['update'])) {
-    // Get form data from modal
+    // Retrieve and sanitize form data to prevent SQL injection
     $id = $_POST['id'];
     $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
     $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
@@ -26,126 +27,48 @@ if (isset($_POST['update'])) {
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Check for conflicts in both original date/time and modified date/time
-    $conflict_query = "SELECT id 
+    // Check if the new date and time conflict with any existing records
+    $conflict_query = "
+        SELECT id 
         FROM tbl_appointments 
         WHERE 
             (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
             (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
-        AND id != $id"; // Exclude the current appointment being updated
+        AND id != $id";
 
+    // Execute the conflict check query
     $conflict_result = mysqli_query($con, $conflict_query);
 
+    // If a conflict is found, display an alert message
     if (mysqli_num_rows($conflict_result) > 0) {
-        // Conflict found
         echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
     } else {
-        // No conflict - proceed with the update
+        // If no conflict, proceed with updating the records
 
-        // Update query for tbl_patient
+        // Query to update the tbl_patient table
         $update_patient_query = "UPDATE tbl_patient 
                                  SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
                                  WHERE id=$id";
 
-        // Update query for tbl_appointments
+        // Query to update the tbl_appointments table
         $update_appointment_query = "UPDATE tbl_appointments 
                                      SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '1', service_type='$service_type' 
-                                     WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
+                                     WHERE id=$id";
 
-        // Execute both queries
+        // Execute both update queries
         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-            // Redirect to the same page after updating
-            header("Location: appointments.php");
+            // If both updates are successful, display a success message and redirect
+            echo "<script>
+                alert('Record updated successfully!');
+                window.location.href = 'appointments.php';
+            </script>";
             exit();
         } else {
-            echo "Error updating record: " . mysqli_error($con);
+            // If an update fails, display an error message
+            echo "<script>alert('Error updating record: " . mysqli_error($con) . "');</script>";
         }
     }
 }
-
-
-if (isset($_POST['submit'])) {
-    // Get and sanitize the posted data
-    $id = intval($_POST['id']); // Appointment ID
-    $note = mysqli_real_escape_string($con, $_POST['note']);
-    $price = floatval($_POST['price']); // Price
-
-    // Fetch appointment details
-    $stmt = $con->prepare("SELECT * FROM tbl_appointments WHERE id = ?");
-    $stmt->bind_param("i", $id);
-
-    if ($stmt->execute()) {
-        $result = $stmt->get_result();
-        if ($result && $result->num_rows > 0) {
-            $appointment = $result->fetch_assoc();
-
-            // Archive appointment data
-            $archive_stmt = $con->prepare("INSERT INTO tbl_archives 
-                (name, contact, date, time, modified_date, modified_time, service_type, note, price, completion) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '1')");
-            $archive_stmt->bind_param(
-                "ssssssssd",
-                $appointment['name'],
-                $appointment['contact'],
-                $appointment['date'],
-                $appointment['time'],
-                $appointment['modified_date'],
-                $appointment['modified_time'],
-                $appointment['service_type'],
-                $note,
-                $price
-            );
-
-            if (!$archive_stmt->execute()) {
-                die("Error inserting into tbl_archives: " . $archive_stmt->error);
-            }
-
-            // Remove the appointment from tbl_appointments
-            $delete_stmt = $con->prepare("DELETE FROM tbl_appointments WHERE id = ?");
-            $delete_stmt->bind_param("i", $id);
-
-            if (!$delete_stmt->execute()) {
-                die("Error deleting appointment: " . $delete_stmt->error);
-            }
-
-            // Redirect to appointments page
-            header("Location: appointments.php");
-            exit();
-        } else {
-            die("Error: Appointment not found.");
-        }
-    } else {
-        die("Error executing fetch query: " . $stmt->error);
-    }
-}
-
-
-if (isset($_POST['decline'])) {
-    $id = $_POST['id'];
-    $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
-    mysqli_query($con, $deleteQuery);
-
-    // Redirect to refresh the page and show updated records
-    header("Location: appointments.php");
-}
-
-// SQL query to count total records
-$countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '1'";
-$countResult = mysqli_query($con, $countQuery);
-$totalCount = mysqli_fetch_assoc($countResult)['total'];
-
-// SQL query with JOIN to fetch the limited number of records
-$query = "SELECT a.*, 
-            s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name
-          FROM tbl_appointments a
-          JOIN tbl_service_type s ON a.service_type = s.id
-          JOIN tbl_patient p ON a.id = p.id
-          WHERE a.status = '3'
-          LIMIT 15";  // Limit to 15 rows
-
-$result = mysqli_query($con, $query);
-
 ?>
 
 <!DOCTYPE html>
@@ -199,171 +122,14 @@ $result = mysqli_query($con, $query);
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
-            <div class="round-box">
-                <p>APPOINTMENT TODAY:</p>
-                <?php
-                include("../dbcon.php");
+            <?php
+            // Include the appointments summary
+            include("appointments_status.php");
+            ?>
 
-                // Set the default time zone to Hong Kong
-                date_default_timezone_set('Asia/Hong_Kong');
-
-                // Check database connection
-                if (!$con) {
-                    die("Connection failed: " . mysqli_connect_error());
-                }
-
-                // Get current date
-                $today = date('Y-m-d');
-
-                // Query to count appointments for today
-                $sql_today = "SELECT COUNT(*) as total_appointments_today 
-                              FROM tbl_appointments 
-                              WHERE (
-                                (modified_date IS NOT NULL AND 
-                                DATE(modified_date) = CURDATE()) 
-                                OR (modified_date IS NULL AND 
-                                DATE(date) = CURDATE())
-                                ) AND status = '3'";
-
-
-                $result_today = mysqli_query($con, $sql_today);
-
-                // Check for SQL errors
-                if (!$result_today) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_today = mysqli_fetch_assoc($result_today);
-                $appointments_today = $row_today['total_appointments_today'];
-
-                if ($appointments_today) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>PENDING APPOINTMENTS:</p>
-                <?php
-                // Query to count pending appointments
-                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
-                                FROM tbl_appointments 
-                                WHERE status = '1'";
-                $result_pending = mysqli_query($con, $sql_pending);
-
-                // Check for SQL errors
-                if (!$result_pending) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_pending = mysqli_fetch_assoc($result_pending);
-                $pending_appointments = $row_pending['total_pending_appointments'];
-
-                if ($pending_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$pending_appointments</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>APPOINTMENT FOR THIS WEEK:</p>
-                <?php
-                // Get the start and end date of the current week
-                $start_of_week = date('Y-m-d', strtotime('monday this week'));
-                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-                // Query to count appointments for the current week
-                $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                 FROM tbl_appointments 
-                 WHERE (
-                    (modified_date IS NOT NULL AND 
-                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
-                    OR 
-                    (date IS NOT NULL AND 
-                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
-                        )
-                 AND status = '3'";
-
-                $result_week = mysqli_query($con, $sql_week);
-
-                // Check for SQL errors
-                if (!$result_week) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_week = mysqli_fetch_assoc($result_week);
-                $appointments_for_week = $row_week['total_appointments_week'];
-
-                if ($appointments_for_week) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>APPOINTMENT FOR NEXT WEEK:</p>
-                <?php
-                // Get the start and end date of the current week
-                $start_of_week = date('Y-m-d', strtotime('monday this week'));
-                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
-
-                // Query to count appointments for the current week
-                $sql_week = "SELECT COUNT(*) as total_appointments_week 
-                 FROM tbl_appointments 
-                 WHERE (
-                    (modified_date IS NOT NULL AND 
-                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
-                    OR 
-                    (date IS NOT NULL AND 
-                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
-                    )
-                    AND status = '3'";
-
-                $result_week = mysqli_query($con, $sql_week);
-
-                // Check for SQL errors
-                if (!$result_week) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_week = mysqli_fetch_assoc($result_week);
-                $appointments_for_week = $row_week['total_appointments_week'];
-
-                if ($appointments_for_week) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
-            <div class="round-box">
-                <p>DECLINED APPOINTMENTS:</p>
-                <?php
-                // Query to count finished appointments
-                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '2'";
-                $result_finished = mysqli_query($con, $sql_finished);
-
-                // Check for SQL errors
-                if (!$result_finished) {
-                    die("Query failed: " . mysqli_error($con));
-                }
-
-                $row_finished = mysqli_fetch_assoc($result_finished);
-                $finished_appointments = $row_finished['total_finished_appointments'];
-
-                if ($finished_appointments) {
-                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
-                } else {
-                    echo "<span style='color: red;'>No data available</span>";
-                }
-                ?>
-            </div>
             <?php
             // Set the number of results per page
-            $resultsPerPage = 6;
+            $resultsPerPage = 4;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -433,7 +199,15 @@ $result = mysqli_query($con, $query);
                     DATE(a.date) = CURDATE())
             )
             AND a.status = '3'
-            ORDER BY  a.time DESC, a.modified_time DESC
+            ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
             LIMIT $resultsPerPage OFFSET $startRow";
 
             // SQL query for Week with JOIN to fetch the limited number of records with OFFSET
@@ -451,7 +225,15 @@ $result = mysqli_query($con, $query);
                      WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) AND DATE(a.date) > CURDATE())
               )
               AND a.status = '3'
-              ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+              ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
               LIMIT $resultsPerPage OFFSET $startRow";
 
             $queryNextWeek = "SELECT a.*, 
@@ -468,7 +250,15 @@ $result = mysqli_query($con, $query);
                 WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(a.date) > CURDATE())
                 )
               AND a.status = '3'
-              ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
+              ORDER BY 
+            CASE 
+            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+            ELSE a.date
+            END DESC,
+            CASE 
+            WHEN a.modified_time IS NOT NULL THEN a.modified_time
+            ELSE a.time
+            END ASC
               LIMIT $resultsPerPage OFFSET $startRow";
 
 
@@ -479,18 +269,16 @@ $result = mysqli_query($con, $query);
             // Default tab is 'Day'
             $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'Day';
             ?>
-
             <!-- Tab structure -->
             <div class="tab">
                 <button class="tablinks" onclick="switchTab('Day')">Today</button>
                 <button class="tablinks" onclick="switchTab('Week')">This Week</button>
                 <button class="tablinks" onclick="switchTab('NextWeek')">Next Week</button>
             </div>
-
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3 style="color: #fff;">Today</h3>
+                <h3>Today</h3>
 
                 <!-- Pagination for Day -->
                 <div class="pagination-container">
@@ -509,8 +297,8 @@ $result = mysqli_query($con, $query);
                             <th>Contact</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th style="font-size:15px;">Rescheduled Date</th>
-                            <th style="font-size:15px;">Rescheduled Time</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
                             <th>Service</th>
                             <th>Actions</th>
                         </tr>
@@ -525,28 +313,18 @@ $result = mysqli_query($con, $query);
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
-                        <td  style='width:110px;''>{$dateToDisplay}</td>
-                        <td  style='width:110px;'>{$timeToDisplay}</td>
+                        <td style='width: 110px'>{$dateToDisplay}</td>
+                        <td style='width: 110px'>{$timeToDisplay}</td>
                         <td style='width: 110px'>{$modified_date}</td>
                         <td style='width: 110px'>{$modified_time}</td>
-                        <td style='fot-size: 15px'>{$row['service_name']}</td>
-                        <td style='width:180px;'>
+                        <td>{$row['service_name']}</td>
+                        <td style='width: 10px'>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                             style='background-color:#083690; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Update</button>
-                            <form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
-                            </form>";
-
-                                if ($row['status'] != 'finished') {
-                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                    style='background-color:green; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Finish</button>";
-                                }
-
-                                echo "</td></tr>";
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
+                        </td>
+                    </tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -559,7 +337,7 @@ $result = mysqli_query($con, $query);
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: <?php echo $activeTab == 'Week' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3 style="color: #fff;">This Week</h3>
+                <h3>This Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
@@ -577,8 +355,8 @@ $result = mysqli_query($con, $query);
                             <th>Contact</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th style="font-size:15px;">Rescheduled Date</th>
-                            <th style="font-size:15px;">Rescheduled Time</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
                             <th>Service</th>
                             <th>Actions</th>
                         </tr>
@@ -593,28 +371,18 @@ $result = mysqli_query($con, $query);
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td >{$row['contact']}</td>
-                        <td style='width:110px;'>{$dateToDisplay}</td>
-                        <td style='width:110px;'>{$timeToDisplay}</td>
-                        <td style='width:110px;'>{$modified_date}</td>
-                        <td style='width:110px;'>{$modified_time}</td>
-                        <td style='font-size:15px'>{$row['service_name']}</td>
-                        <td style='width:180px;'>
+                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td style='width: 110px'>{$dateToDisplay}</td>
+                        <td style='width: 110px'>{$timeToDisplay}</td>
+                        <td style='width: 110px'>{$modified_date}</td>
+                        <td style='width: 110px'>{$modified_time}</td>
+                        <td>{$row['service_name']}</td>
+                        <td style='width: 10px'>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                             style='background-color:#083690; color:white; border:none; padding:10px 5px; border-radius:10px;box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Update</button>
-                            <form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
-                            </form>";
-
-                                if ($row['status'] != 'finished') {
-                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                    style='background-color:green; color:white; border:none; padding:10px 5px;; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Finish</button>";
-                                }
-
-                                echo "</td></tr>";
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
+                        </td>
+                    </tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -629,7 +397,7 @@ $result = mysqli_query($con, $query);
             <div id="NextWeek" class="tabcontent"
                 style="display: <?php echo $activeTab == 'NextWeek' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3 style=" color: #fff;">Next Week</h3>
+                <h3>Next Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
@@ -647,8 +415,8 @@ $result = mysqli_query($con, $query);
                             <th>Contact</th>
                             <th>Date</th>
                             <th>Time</th>
-                            <th style="font-size:15px;">Rescheduled Date</th>
-                            <th style="font-size:15px;">Rescheduled Time</th>
+                            <th style="font-size: 15px;">Rescheduled Date</th>
+                            <th style="font-size: 15px;">Rescheduled Time</th>
                             <th>Service</th>
                             <th>Actions</th>
                         </tr>
@@ -663,28 +431,18 @@ $result = mysqli_query($con, $query);
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td  style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                        <td >{$row['contact']}</td>
-                        <td  style='width:110px;'>{$dateToDisplay}</td>
-                        <td  style='width:110px;'>{$timeToDisplay}</td>
-                        <td  style='width:110px;'>{$modified_date}</td>
-                        <td  style='width:110px;'>{$modified_time}</td>
-                        <td  style='font-size: 15px;'>{$row['service_name']}</td>
-                        <td  style='width:180px;'>
+                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td style='width: 110px'>{$dateToDisplay}</td>
+                        <td style='width: 110px'>{$timeToDisplay}</td>
+                        <td style='width: 110px'>{$modified_date}</td>
+                        <td style='width: 110px'>{$modified_time}</td>
+                        <td>{$row['service_name']}</td>
+                        <td style='width: 10px'>
                             <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                             style='background-color:#083690; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Update</button>
-                            <form method='POST' action='' style='display:inline;'>
-                            <input type='hidden' name='id' value='{$row['id']}'>
-                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
-                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
-                            </form>";
-
-                                if ($row['status'] != 'finished') {
-                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                    style='background-color:green; color:white; border:none; padding:10px 5px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Finish</button>";
-                                }
-
-                                echo "</td></tr>";
+                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px;  cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
+                        </td>
+                    </tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -694,80 +452,6 @@ $result = mysqli_query($con, $query);
                     </tbody>
                 </table>
             </div>
-
-            <div id="finishModal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <button class="close">&times;</button>
-                    <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
-                    <hr>
-                    <div id="modalDetails">
-                        <p><strong>Name:</strong> <span id="modalName"></span></p>
-                        <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
-                        <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
-                        <p><strong>Current Service:</strong> <span id="modalService"></span></p>
-                    </div>
-                    <hr>
-                    <form id="newServiceForm" method="POST" action="">
-                        <input type="hidden" name="id" value="">
-                        <br>
-                        <label style="font-size: 20px; font-weight: bold;" for="note">Note:</label>
-                        <br>
-                        <br>
-                        <textarea id="note" name="note"
-                            placeholder="Enter your note here..."></textarea>
-                            <br>
-                        <div id="totalPriceContainer">
-                            <p><strong>Total Price: ₱</strong><span id="totalPrice"
-                                    style="font-weight: bold; font-size: 25px;">0</span></p>
-                        </div>
-                        <br>
-                        <input type="number" id="price" name="price" style="display: none;" readonly>
-                        <button type="submit" name="submit">Proceed to Dental Assistant</button>
-                    </form>
-                </div>
-            </div>
-
-            <script>
-                const servicePrices = {
-                    1: 30000, 2: 30000, 3: 2000, 4: 100000, 5: 20000,
-                    6: 30000, 7: 1500, 8: 2000, 9: 280000, 10: 40000, 11: 40000
-                };
-
-                function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
-                    document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
-                    document.getElementById('modalContact').innerText = contact;
-                    document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
-                    document.getElementById('modalService').innerText = service;
-
-                    const servicePrice = servicePrices[getServiceIdFromName(service)] || 0;
-                    document.getElementById('price').value = servicePrice;
-                    document.getElementById('totalPrice').innerText = servicePrice;
-
-                    document.querySelector("#newServiceForm input[name='id']").value = id;
-                    document.getElementById('finishModal').style.display = 'block';
-                }
-
-                function getServiceIdFromName(serviceName) {
-                    const services = {
-                        "All Porcelain Veneers & Zirconia": 1, "Crown & Bridge": 2, "Dental Cleaning": 3,
-                        "Dental Implants": 4, "Dental Whitening": 5, "Dentures": 6,
-                        "Extraction": 7, "Full Exam & X-Ray": 8, "Orthodontic Braces": 9,
-                        "Restoration": 10, "Root Canal Treatment": 11
-                    };
-                    return services[serviceName] || null;
-                }
-
-                document.querySelector('.close').addEventListener('click', () => {
-                    document.getElementById('finishModal').style.display = 'none';
-                });
-
-                window.addEventListener('click', (event) => {
-                    if (event.target == document.getElementById('finishModal')) {
-                        document.getElementById('finishModal').style.display = 'none';
-                    }
-                });
-            </script>
-
             <!-- Edit Modal -->
             <div id="editModal" class="modal">
                 <div class="modal-content">
@@ -775,16 +459,15 @@ $result = mysqli_query($con, $query);
                     <form method="POST" action="">
                         <h1>EDIT DETAILS</h1><br>
                         <input type="hidden" name="id" id="modal-id">
-                        <br>
-                        <label for="modal-first-name">First Name:</label>
-                        <input type="text" name="first_name" id="modal-first-name" required>
-                        <br>
-                        <label for="modal-last-name">Last Name:</label>
-                        <input type="text" name="last_name" id="modal-last-name" required>
-                        <br>
-                        <label for="modal-middle-name">Middle Name:</label>
-                        <input type="text" name="middle_name" id="modal-middle-name" required>
-                        <br>
+                        <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
+                        <div class="name-fields">
+                            <input type="text" name="last_name" id="modal-last-name" maxlength="50"
+                                placeholder="Enter Last Name" required>
+                            <input type="text" name="first_name" id="modal-first-name" maxlength="50"
+                                placeholder="Enter First Name" required>
+                            <input type="text" name="middle_name" id="modal-middle-name" maxlength="2"
+                                placeholder="Enter Middle Initial">
+                        </div>
                         <label for="contact">Contact:</label>
                         <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
                             maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
@@ -801,7 +484,7 @@ $result = mysqli_query($con, $query);
                             <option value="15:00 PM">03:00 PM</option>
                             <option value="16:30 PM">04:30 PM</option>
                         </select>
-                        <label for="service_type">Type Of Service:</label>
+                        <label for="service_type">Type of Services:</label>
                         <select name="service_type" id="modal-service_type" required>
                             <option value="">--Select Service Type--</option>
                             <option value="1">All Porcelain Veneers & Zirconia</option>
@@ -878,6 +561,7 @@ $result = mysqli_query($con, $query);
                     openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
                 };
             </script>
+
         </div>
     </div>
 </body>
