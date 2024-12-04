@@ -394,7 +394,7 @@ if (isset($_POST['submit'])) {
                         <td>
                             <!-- Approve Button -->
                             <button type='button' onclick='openApproveModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\", \"{$row['price']}\")' 
-                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px; margin:11px 3px; cursor:pointer;'>Approve</button>
+                            style='background-color:green; color:white; border:none; padding:7px 9px; border-radius:10px;box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Approve</button>
                         </td>
                     </tr>";
                             }
@@ -420,9 +420,13 @@ if (isset($_POST['submit'])) {
                     <hr>
                     <div id="modalDetails">
                         <p><strong>Name:</strong> <span id="modalName"></span></p>
+                        <br>
                         <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
+                        <br>
                         <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
+                        <br>
                         <p><strong>Current Service:</strong> <span id="modalService"></span></p>
+                        <br>
                         <p><strong>Price:</strong> <span id="modalPrice"></span></p>
                     </div>
                     <hr>
@@ -436,12 +440,11 @@ if (isset($_POST['submit'])) {
                         <br>
                         <label style="font-size: 20px; font-weight: bold;" for="outstanding_balance">Outstanding
                             Balance(₱):</label>
-                        <br>
+                        <div class="price">
                         <input type="number" id="outstanding_balance" name="outstanding_balance"
-                            style="width: 100%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
-                        <br>
-                        <br>
+                            style="width: 40%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
                         <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
+                        </div>
                     </form>
                 </div>
             </div>

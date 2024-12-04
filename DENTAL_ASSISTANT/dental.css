@@ -526,3 +526,9 @@ div h3{
     z-index: 9999; 
     opacity: 1;
   }
+  .price{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 49%;
+  }

@@ -63,12 +63,14 @@ if (isset($_POST['update'])) {
   // Convert the selected time to 24-hour format
   $time_24hr = DateTime::createFromFormat('h:i A', $time)->format('H:i:s');
 
-  // Check for exact time conflicts in both `date` and `modified_date`
-  $check_time_query = "SELECT id 
+  // Check for time conflicts, prioritizing modified_date and modified_time if present
+  $check_time_query = "
+      SELECT id 
       FROM tbl_appointments 
-      WHERE 
-          (date = '$date' AND TIME(time) = TIME('$time_24hr')) OR 
-          (modified_date = '$date' AND TIME(modified_time) = TIME('$time_24hr'))
+      WHERE (
+          (modified_date IS NOT NULL AND modified_date = '$date' AND TIME(modified_time) = TIME('$time_24hr')) OR 
+          (modified_date IS NULL AND date = '$date' AND TIME(time) = TIME('$time_24hr'))
+      )
   ";
 
   $time_result = mysqli_query($con, $check_time_query);
@@ -76,89 +78,89 @@ if (isset($_POST['update'])) {
 
   if ($time_row) {
     // Conflict found
-    echo "<script>alert('The selected time conflicts with another appointment on the same date($date). Please choose a different time.');</script>";
+    echo "<script>alert('The selected time conflicts with another appointment on the same date ($date). Please choose a different time.');</script>";
   } else {
     // No conflict - proceed with inserting appointment
-    $insert_patient_query = "INSERT INTO tbl_patient (first_name, last_name, middle_name) 
-          VALUES ('$first_name', '$last_name', '$middle_name')
-      ";
+    $insert_patient_query = "
+        INSERT INTO tbl_patient (first_name, last_name, middle_name) 
+        VALUES ('$first_name', '$last_name', '$middle_name')
+    ";
 
     if (mysqli_query($con, $insert_patient_query)) {
       $patient_id = mysqli_insert_id($con);
-      $insert_appointment_query = "INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) 
-              VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time_24hr', '$service_type')
-          ";
+      $insert_appointment_query = "
+          INSERT INTO tbl_appointments (id, name, contact, date, time, service_type) 
+          VALUES ('$patient_id', '$patient_id', '$contact', '$date', '$time_24hr', '$service_type')
+      ";
 
-    if (mysqli_query($con, $insert_appointment_query)) {
-      // Display success page then redirect
-      echo "
-    <div id='success-toast' style='
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: #FF9F00;
-        padding: 20px 50px;
-        font-size: 60px;
-        font-weight: bold;
-        border-radius: 10px;
-        text-align: center;
-        z-index: 1000;
-        opacity: 0;
-        visibility: hidden; 
-        transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    '>
-        <!-- Replace PNG with GIF -->
-        <img src=\"img/teeth.gif\" alt=\"Success Animation\" style=\"
-            width: 300px; 
-            height: 300px; 
-        \">
-        <span class='success-text'>Booked Successfully!</span>
-    </div>
-
-    <style>
-        /* Font style for success text */
-        .success-text {
-            font-family: 'Montserrat', sans-serif; 
-        }
-    </style>
-
-    <script>
-        const toast = document.getElementById('success-toast');
-        // Show the toast with fade-in effect
-        setTimeout(() => {
-            toast.style.opacity = '1'; // Gradually become visible
-            toast.style.visibility = 'visible'; // Ensure it's interactable
-        }, 100); // Slight delay to ensure transition works
-
-        // Hide the toast with fade-out effect
-        setTimeout(() => {
-            toast.style.opacity = '0'; // Gradually become invisible
-            toast.style.visibility = 'hidden'; // Ensure it's not interactable
-        }, 5000); // Visible for 5 seconds before fading out
-
-        // Redirect after fade-out completes
-        setTimeout(() => {
-            window.location.href = 'Home_page.php';
-        }, 7000); // Adjust timing for fade-out duration
-    </script>
-";
-
-// Link to Google Fonts for Montserrat font
-echo "<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap' rel='stylesheet'>";
-
-exit();
+      if (mysqli_query($con, $insert_appointment_query)) {
+        echo "
+        <div id='success-toast' style='
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #FF9F00;
+            padding: 20px 50px;
+            font-size: 60px;
+            font-weight: bold;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden; 
+            transition: opacity 1.5s ease-in-out, visibility 1.5s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        '>
+            <!-- Replace PNG with GIF -->
+            <img src=\"img/teeth.gif\" alt=\"Success Animation\" style=\"
+                width: 300px; 
+                height: 300px; 
+            \">
+            <span class='success-text'>Booked Successfully!</span>
+        </div>
+    
+        <style>
+            /* Font style for success text */
+            .success-text {
+                font-family: 'Montserrat', sans-serif; 
+            }
+        </style>
+    
+        <script>
+            const toast = document.getElementById('success-toast');
+            // Show the toast with fade-in effect
+            setTimeout(() => {
+                toast.style.opacity = '1'; // Gradually become visible
+                toast.style.visibility = 'visible'; // Ensure it's interactable
+            }, 100); // Slight delay to ensure transition works
+    
+            // Hide the toast with fade-out effect
+            setTimeout(() => {
+                toast.style.opacity = '0'; // Gradually become invisible
+                toast.style.visibility = 'hidden'; // Ensure it's not interactable
+            }, 2000); // Visible for 5 seconds before fading out
+    
+            // Redirect after fade-out completes
+            setTimeout(() => {
+                window.location.href = 'Home_page.php';
+            }, 4000); // Adjust timing for fade-out duration
+        </script>
+    ";
+    
+    // Link to Google Fonts for Montserrat font
+    echo "<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap' rel='stylesheet'>";    
+        exit();
+      } else {
+        echo "Error updating appointment record: " . mysqli_error($con);
+      }
     } else {
-      echo "Error updating appointment record: " . mysqli_error($con);
+      echo "Error updating patient record: " . mysqli_error($con);
     }
-  } else {
-    echo "Error updating patient record: " . mysqli_error($con);
   }
-}
 }
 
 ?>
@@ -572,7 +574,6 @@ exit();
                         In order to schedule an appointment, we collect the following personal information:
                         <br>Full Name:
                         <br>Contact Number:
-                        <br>Email Address:
                       </p>
                       <p>
                         <strong>6. Payment Terms</strong><br>

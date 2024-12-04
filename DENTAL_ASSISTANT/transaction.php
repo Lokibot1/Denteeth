@@ -212,9 +212,10 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                         <th>Contact</th>
                         <th>Service</th>
                         <th>Date</th>
+                        <th style="font-size: 15px;">Rescheduled Date</th>
                         <th>Bill</th>
-                        <th>Amount Paid</th>
-                        <th>Outstanding Balance</th>
+                        <th style="font-size: 15px;">Amount Paid</th>
+                        <th style="font-size: 15px;">Outstanding Balance</th>
                         <th>Note</th>
                     </tr>
                 </thead>
@@ -236,12 +237,12 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                             echo "<tr>
                             <td style='width: 230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                             <td>{$row['contact']}</td>
-                            <td>{$row['service_name']}</td>
-                            <td>{$row['date']}</td>
-                            <td>{$modified_date}</td>
-                            <td>{$bill}</td>
-                            <td>{$paid}</td>
-                            <td>{$outstanding_balance}</td>
+                            <td style='width: 110px;'>{$row['service_name']}</td>
+                            <td style='width: 110px;'>{$row['date']}</td>
+                            <td style='width: 110px;'>{$modified_date}</td>
+                            <td style='width: 110px;'>{$bill}</td>
+                            <td style='width: 110px;'>{$paid}</td>
+                            <td style='width: 110px;'>{$outstanding_balance}</td>
                             <td>
                         <button type='button' onclick='openModal(\"{$row['note']}\")'
                             style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
