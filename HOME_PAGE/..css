@@ -1483,24 +1483,26 @@ select:focus {
   }
   
   @media screen and (max-width: 480px) {
+
     .conianer-inner {
         position: relative;
-        clip-path: path("M 390,400 C 390,504.9341 304.9341,590 200,590 95.065898,590 10,504.9341 10,400 V 10 H 200 390 Z");
-        top: -150px; 
-        left: 50px;  
+        margin-bottom: -100px;
+        top: -150px;  
+
         width: 100%; 
         height: 400px;
       }
     .circle {
-        height: 500px; 
-        width: 500px;  
-        top: 100px;    
-        left: 15px;    
+        height: 370px; 
+        width: 370px;  
+        top: 100px;       
       }
   
     .person img {
-        height: 10%;
-        width: 75%;
+        top: 120px;
+        left: 60px;
+        border-radius: 50%;
+        width: 70%;
     }
   
     .person h1 {

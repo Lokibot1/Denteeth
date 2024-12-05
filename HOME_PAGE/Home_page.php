@@ -172,7 +172,7 @@ if (isset($_POST['update'])) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="Home_page.css">
+  <link rel="stylesheet" href="..css">
   <link rel="stylesheet" href="../animation.css">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
@@ -797,7 +797,7 @@ if (isset($_POST['update'])) {
     <div class="p-container">
       <div class="conianer-inner">
         <div class="circle"></div>
-        <img src="img/ali1.png">
+        <img src="imgs/ali1.png">
       </div>
     </div>
     <div class="divider"></div>
@@ -820,7 +820,7 @@ if (isset($_POST['update'])) {
     <div class="p-container">
       <div class="conianer-inner">
         <div class="circle"></div>
-        <img src="img\kiki1.png">
+        <img src="imgs\kiki1.png">
       </div>
     </div>
     <div class="divider"></div>
@@ -843,7 +843,7 @@ if (isset($_POST['update'])) {
     <div class="p-container">
       <div class="conianer-inner">
         <div class="circle"></div>
-        <img src="img/sarah.png">
+        <img src="imgs/sarah.png">
       </div>
     </div>
     <div class="divider"></div>
@@ -889,7 +889,7 @@ if (isset($_POST['update'])) {
     <div class="p-container">
       <div class="conianer-inner">
         <div class="circle"></div>
-        <img src="img\loki2.png">
+        <img src="imgs\loki2.png">
       </div>
     </div>
     <div class="divider"></div>
