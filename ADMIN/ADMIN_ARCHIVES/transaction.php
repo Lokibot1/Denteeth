@@ -41,8 +41,8 @@ if (!$con) {
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
         </a>
-        <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="admin_dashboard.php"><i class="fa fa-arrow-left trash"></i></a>
+        <form method="POST" class="s-buttons" action="../../logout.php">
+            <a href="../admin_dashboard.php"><i class="fa fa-arrow-left trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>
