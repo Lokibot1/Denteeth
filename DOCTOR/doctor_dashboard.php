@@ -82,6 +82,7 @@ $countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '3'
 $countResult = mysqli_query($con, $countQuery);
 $totalCount = mysqli_fetch_assoc($countResult)['total'];
 
+
 // SQL query with JOIN to fetch the limited number of records
 $query = "SELECT a.*, 
             s.service_type AS service_name, 
@@ -184,21 +185,21 @@ $result = mysqli_query($con, $query);
           LIMIT $resultsPerPage OFFSET $startRow";  // Limit to 15 rows
             
             $result = mysqli_query($con, $query);
-            ?><br>
+            ?>
 
             <!-- HTML Table -->
 
-            <div class="pagination-container">
+             <!-- Pagination Controls -->
+             <div class="pagination-container">
                 <?php if ($currentPage > 1): ?>
+                    <!-- Link to the previous page -->
                     <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
                         < </a>
                         <?php endif; ?>
 
                         <?php if ($currentPage < $totalPages): ?>
+                            <!-- Link to the next page -->
                             <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn"> > </a>
-                        <?php endif; ?>
-
-                        <?php if ($totalCount > 15): ?>
                         <?php endif; ?>
             </div>
         </div>

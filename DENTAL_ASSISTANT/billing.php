@@ -416,7 +416,7 @@ if (isset($_POST['submit'])) {
             <div id="approveModal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <button style="background-color: transparent;" class="close">&times;</button>
-                    <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
+                    <h3 style="text-align: center; color: black; font-size: 30px;">Service Completion</h3>
                     <hr>
                     <div id="modalDetails">
                         <p><strong>Name:</strong> <span id="modalName"></span></p>
@@ -436,11 +436,11 @@ if (isset($_POST['submit'])) {
                         <label style="font-size: 20px; font-weight: bold;" for="paid">Paid(₱):</label>
                         <br>
                         <input type="number" id="paid" name="paid"
-                            style="width: 100%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                            style="width: 40%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
                         <br>
                         <label style="font-size: 20px; font-weight: bold;" for="outstanding_balance">Outstanding
                             Balance(₱):</label>
-                        <div class="price">
+                        <div class="price" style="gap: 35%;">
                         <input type="number" id="outstanding_balance" name="outstanding_balance"
                             style="width: 40%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
                         <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>

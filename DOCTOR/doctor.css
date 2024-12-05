@@ -325,27 +325,33 @@ textarea{
     grid-template-columns: repeat(3, 1fr);
 }
 
+.pagination-container {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* Aligns buttons in the center */
+    align-items: center; /* Vertically aligns buttons */
+    text-align: center;
+    gap: 10px; /* Adds spacing between buttons */
+}
+
 .pagination-btn {
     display: inline-end;
     padding: 10px 15px;
-    margin: 5px;
+    margin: 10px 5px;
     border: none;
     border-radius: 5px;
     background-color: #0A2C16;
-    /* Bootstrap primary color */
     color: white;
     text-decoration: none;
     transition: background-color 0.3s;
 }
 
 .pagination-btn:hover {
-    background-color: #0A2C16;
-    /* Darker shade for hover */
+    background-color: #FF9F00;
 }
 
-.pagination-container {
-    text-align: right;
-}
 
 div h3{
     margin-left: 5px;

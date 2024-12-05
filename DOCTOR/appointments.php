@@ -369,7 +369,7 @@ $result = mysqli_query($con, $query);
                         <td style='width: 110px;'>{$modified_date}</td>
                         <td style='width: 110px;'>{$modified_time}</td>
                         <td style='font-size: 15px;'>{$row['service_name']}</td>
-                        <td>
+                        <td style='width: 130px'>
                             <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
@@ -435,7 +435,7 @@ $result = mysqli_query($con, $query);
                         <td style='width: 110px;'>{$modified_date}</td>
                         <td style='width: 110px;'>{$modified_time}</td>
                         <td style='font-size: 15px;'>{$row['service_name']}</td>
-                        <td>
+                        <td style='width: 130px'>
                             <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
@@ -503,7 +503,7 @@ $result = mysqli_query($con, $query);
                         <td style='width: 110px;'>{$modified_date}</td>
                         <td style='width: 110px;'>{$modified_time}</td>
                         <td style='widtfont-size: 15px;'>{$row['service_name']}</td>
-                        <td>
+                        <td style='width: 130px'>
                             <form method='POST' action='' style='display:inline;'>
                             <input type='hidden' name='id' value='{$row['id']}'>
                             <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
