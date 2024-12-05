@@ -149,7 +149,7 @@ if (isset($_POST['decline'])) {
             </div>
         </a>
         <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="archives.php"><i class="fas fa-trash trash"></i></a>
+            <a href="ADMIN_ARCHIVES/archives.php"><i class="fas fa-trash trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>

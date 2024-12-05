@@ -16,9 +16,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = isset($_POST['username']) ? $_POST['username'] : '';
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     $role = isset($_POST['role']) ? $_POST['role'] : '';
-    $firstName = isset($_POST['firstname']) ? $_POST['firstname'] : ''; 
-    $lastName = isset($_POST['lastname']) ? $_POST['lastname'] : '';     
-    $middleName = isset($_POST['middlename']) ? $_POST['middlename'] : ''; 
+    $firstName = isset($_POST['firstname']) ? $_POST['firstname'] : '';
+    $lastName = isset($_POST['lastname']) ? $_POST['lastname'] : '';
+    $middleName = isset($_POST['middlename']) ? $_POST['middlename'] : '';
 
     // Hash password if it's provided
     $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
@@ -113,7 +113,7 @@ if (isset($_POST['delete'])) {
             </div>
         </a>
         <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="archives.php"><i class="fas fa-trash trash"></i></a>
+            <a href="ADMIN_ARCHIVES/archives.php"><i class="fas fa-trash trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>
@@ -329,22 +329,22 @@ if (isset($_POST['delete'])) {
             ?>
 
             <div class="managehead">
-            <div class="manage">
-            <!-- Users Management Section -->
-            <h2>Manage Users</h2>
-            <button id="openModalBtn" class="add-user-btn">Add New User</button>
-            </div>
-            <!-- Pagination Navigation -->
-            <div class="pagination-container">
-                <?php if ($currentPage > 1): ?>
-                    <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
-                        < </a>
-                        <?php endif; ?>
+                <div class="manage">
+                    <!-- Users Management Section -->
+                    <h2>Manage Users</h2>
+                    <button id="openModalBtn" class="add-user-btn">Add New User</button>
+                </div>
+                <!-- Pagination Navigation -->
+                <div class="pagination-container">
+                    <?php if ($currentPage > 1): ?>
+                        <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">
+                            < </a>
+                            <?php endif; ?>
 
-                        <?php if ($currentPage < $totalPages): ?>
-                            <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">></a>
-                        <?php endif; ?>
-            </div>
+                            <?php if ($currentPage < $totalPages): ?>
+                                <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">></a>
+                            <?php endif; ?>
+                </div>
 
             </div>
             <!-- Modal for Adding and Editing Users -->
@@ -353,31 +353,31 @@ if (isset($_POST['delete'])) {
                     <span class="close">&times;</span>
                     <h2 id="modalTitle">Add New User</h2>
                     <form id="userForm" method="POST" action="">
-                    <input type="hidden" name="id" id="userId">
-                    <label>First Name:</label>
-                    <input type="text" name="firstname" id="firstname" required><br>
-                    <label>Middle Name:</label>
-                    <input type="text" name="middlename" id="middlename"><br>
-                    <label>Last Name:</label>
-                    <input type="text" name="lastname" id="lastname" required><br>
-                    <label>Username:</label>
-                    <input type="text" name="username" id="username" required><br>
-                    <label>Password:</label>
-                    <input type="password" name="password" id="password" required><br>
-                    <label for="role">Select Role:</label>
-                    <select id="role" name="role">
-                        <option value="">--Select Role--</option>
-                        <option value="1">Admin</option>
-                        <option value="2">Doctor</option>
-                        <option value="3">Dental Assistant</option>
-                   </select>
-                          <button type="submit" id="submitBtn">Add User</button>
-                   </form>
+                        <input type="hidden" name="id" id="userId">
+                        <label>First Name:</label>
+                        <input type="text" name="firstname" id="firstname" required><br>
+                        <label>Middle Name:</label>
+                        <input type="text" name="middlename" id="middlename"><br>
+                        <label>Last Name:</label>
+                        <input type="text" name="lastname" id="lastname" required><br>
+                        <label>Username:</label>
+                        <input type="text" name="username" id="username" required><br>
+                        <label>Password:</label>
+                        <input type="password" name="password" id="password" required><br>
+                        <label for="role">Select Role:</label>
+                        <select id="role" name="role">
+                            <option value="">--Select Role--</option>
+                            <option value="1">Admin</option>
+                            <option value="2">Doctor</option>
+                            <option value="3">Dental Assistant</option>
+                        </select>
+                        <button type="submit" id="submitBtn">Add User</button>
+                    </form>
                 </div>
             </div>
             <div id="notification" class="notification" style="display: none;">
-                    <p>Successfully Added!</p>
-                </div>
+                <p>Successfully Added!</p>
+            </div>
 
 
             <!-- Display Table -->
@@ -445,9 +445,9 @@ if (isset($_POST['delete'])) {
                 }
                 document.getElementById('submitBtn').addEventListener('click', function () {
                     showNotification();
-                    });
+                });
 
-                    function showNotification() {
+                function showNotification() {
                     const notification = document.getElementById('notification');
                     notification.style.display = 'block';
 

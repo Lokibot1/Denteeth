@@ -7,30 +7,12 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1'])) {
     exit();
 }
 
-include("../dbcon.php");
+include("../../dbcon.php");
 
 // Check database connection
 if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
-
-// Handle update request
-if (isset($_POST['update'])) {
-    // Get form data from modal
-    $id = $_POST['id'];
-    $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
-    $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
-    $middle_name = mysqli_real_escape_string($con, $_POST['middle_name']);
-    $contact = mysqli_real_escape_string($con, $_POST['contact']);
-    $modified_date = mysqli_real_escape_string($con, $_POST['modified_date']);
-    $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
-    $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
-    $note = mysqli_real_escape_string($con, $_POST['note']);
-    $price = mysqli_real_escape_string($con, $_POST['price']);
-
-
-}
-
 
 ?>
 
@@ -41,7 +23,7 @@ if (isset($_POST['update'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="ad.css">
+    <link rel="stylesheet" href="../ad.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -82,7 +64,8 @@ if (isset($_POST['update'])) {
             </ul>
         </aside>
     </div>
-    <!-- Main Content/Crud -->
+
+    <!-- Main Content -->
     <div class="top">
         <div class="content-box">
             <?php
@@ -95,56 +78,55 @@ if (isset($_POST['update'])) {
             // Calculate the starting row for the SQL query
             $startRow = ($currentPage - 1) * $resultsPerPage;
 
-            // Capture filter values from GET parameters
-            $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
+            // Capture and sanitize filter values from GET parameters
+            $filterName = isset($_GET['name']) ? mysqli_real_escape_string($con, $_GET['name']) : '';
+            $filterDate = isset($_GET['date']) ? mysqli_real_escape_string($con, $_GET['date']) : '';
 
             // SQL query to count total records with filtering
             $countQuery = "SELECT COUNT(*) as total 
-            FROM tbl_archives a
-            JOIN tbl_service_type s ON a.service_type = s.id
-            JOIN tbl_patient p ON a.name = p.id
-            WHERE a.completion = '2'
-        ";
+                           FROM tbl_archives a
+                           JOIN tbl_service_type s ON a.service_type = s.id
+                           JOIN tbl_patient p ON a.name = p.id
+                           WHERE a.completion = '2'";
 
-            // Add name filter if specified
             if ($filterName) {
                 $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
             }
-
-            // Add date filter if specified
             if ($filterDate) {
                 $countQuery .= " AND a.date = '$filterDate'";
             }
 
             $countResult = mysqli_query($con, $countQuery);
             $totalCount = mysqli_fetch_assoc($countResult)['total'];
-            $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
-            
-            // SQL query with JOIN to fetch the filtered records with OFFSET
-            $query = "SELECT a.*, 
-                   s.service_type AS service_name, 
-                   p.first_name, p.middle_name, p.last_name
-            FROM tbl_archives a
-            JOIN tbl_service_type s ON a.service_type = s.id
-            JOIN tbl_patient p ON a.name = p.id
-            WHERE a.completion = '2'
-        ";
+            $totalPages = ceil($totalCount / $resultsPerPage);
 
-            // Add name filter if specified
+            // SQL query to fetch filtered and paginated records
+            $query = "SELECT a.*, 
+                             s.service_type AS service_name, 
+                             p.first_name, p.middle_name, p.last_name
+                      FROM tbl_archives a
+                      JOIN tbl_service_type s ON a.service_type = s.id
+                      JOIN tbl_patient p ON a.name = p.id
+                      WHERE a.completion = '2'";
+
             if ($filterName) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
             }
-
-            // Add date filter if specified
             if ($filterDate) {
                 $query .= " AND a.date = '$filterDate'";
             }
 
-            $query .= " LIMIT $resultsPerPage OFFSET $startRow";
+            $query .= " ORDER BY 
+                        CASE 
+                            WHEN a.modified_date IS NOT NULL THEN a.modified_date
+                            ELSE a.date
+                        END DESC 
+                        LIMIT $resultsPerPage OFFSET $startRow";
 
             $result = mysqli_query($con, $query);
-            ?><br><br><br>
+            ?>
+
+            <br><br><br>
             <div class="managehead">
                 <!-- Search Form Container -->
                 <div class="f-search">
@@ -184,39 +166,42 @@ if (isset($_POST['update'])) {
                 </thead>
                 <tbody>
                     <?php
+                    // Check if there are records in the result set
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
+                            // Set default values for modified date and time
                             $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : 'N/A';
                             $modified_time = !empty($row['modified_time']) ? date("h:i A", strtotime($row['modified_time'])) : 'N/A';
 
+                            // Set default values for original date and time
                             $dateToDisplay = !empty($row['date']) ? $row['date'] : 'N/A';
                             $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
+                            // Format additional details
                             $note = !empty($row['note']) ? $row['note'] : 'N/A';
                             $price = isset($row['price']) ? number_format($row['price'], 2) : 'N/A';
 
-                            // Check completion status and replace 2 with 'Completed'
-                            $completion_status = ($row['completion'] == 2) ? 'Completed' : (!empty($row['completion']) ? ucfirst($row['completion']) : 'N/A');
-
+                            // Generate the row for the table
                             echo "<tr>
-                <td style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                <td>{$row['contact']}</td>
-                <td style='width:110px;'>{$dateToDisplay}</td>
-                <td style='width:110px;'>{$timeToDisplay}</td>
-                <td style='width:110px;'>{$modified_date}</td>
-                <td style='width:110px;'>{$modified_time}</td>
-                <td style='font-size: 15px'>{$row['service_name']}</td>
-                <td>₱{$price}</td>
-                <td>
+                    <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td>{$row['contact']}</td>
+                    <td style='width: 90px'>{$dateToDisplay}</td>
+                    <td style='width: 90px'>{$timeToDisplay}</td>
+                    <td>{$modified_date}</td>
+                    <td>{$modified_time}</td>
+                    <td>{$row['service_name']}</td>
+                    <td>₱{$price}</td>
+                    <td>
                         <button type='button' onclick='openModal(\"{$row['note']}\")'
                             style='background-color:#083690; color:white; border:none; padding:10px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
                             View
                         </button>
                     </td>
-            </tr>";
+                </tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='11'>No records found</td></tr>";
+                        // Display a message if no records are found
+                        echo "<tr><td colspan='9'>No records found</td></tr>";
                     }
                     ?>
                 </tbody>

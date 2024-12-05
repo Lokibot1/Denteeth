@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1'])) {
     exit();
 }
 
-include("../dbcon.php");
+include("../../dbcon.php");
 
 // Check database connection
 if (!$con) {
@@ -22,13 +22,13 @@ if (!$con) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="ad.css">
+    <link rel="stylesheet" href="../ad.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
         integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
         rel="stylesheet">
-        <link rel="stylesheet"
+    <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=search" />
     <title>Admin Dashboard</title>
 </head>
@@ -63,12 +63,13 @@ if (!$con) {
             </ul>
         </aside>
     </div>
+
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
             <?php
             // Set the number of results per page
-            $resultsPerPage = 18;
+            $resultsPerPage = 5;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -76,61 +77,66 @@ if (!$con) {
             // Calculate the starting row for the SQL query
             $startRow = ($currentPage - 1) * $resultsPerPage;
 
-            // Capture filter values from GET parameters
-            $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
+            // Capture filter values from GET parameters (sanitize inputs)
+            $filterName = isset($_GET['name']) ? mysqli_real_escape_string($con, $_GET['name']) : '';
+            $filterDate = isset($_GET['date']) ? mysqli_real_escape_string($con, $_GET['date']) : '';
 
             // SQL query to count total records with filtering
-            $countQuery = "SELECT COUNT(*) as total FROM tbl_archives a
-                JOIN tbl_service_type s ON a.service_type = s.id
-                JOIN tbl_patient p ON a.name = p.id
-                JOIN tbl_status t ON a.completion = t.id
-                WHERE a.completion IN ('1', '2', '3')";
-
-            // Add name filter if specified
-            if ($filterName) {
-                $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
-            }
-
-            // Add date filter if specified
-            if ($filterDate) {
-                $countQuery .= " AND a.date = '$filterDate'";
-            }
-
-            $countResult = mysqli_query($con, $countQuery);
-            $totalCount = mysqli_fetch_assoc($countResult)['total'];
-            $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
-            
-            // SQL query with JOIN to fetch the filtered records with OFFSET
-            $query = "SELECT a.*, 
-                s.service_type AS service_name, 
-                p.first_name, p.middle_name, p.last_name, 
-                t.status     
+            $countQuery = "SELECT COUNT(*) AS total 
                 FROM tbl_archives a
                 JOIN tbl_service_type s ON a.service_type = s.id
                 JOIN tbl_patient p ON a.name = p.id
                 JOIN tbl_status t ON a.completion = t.id
                 WHERE a.completion IN ('1', '2', '3')";
 
-            // Add name filter if specified
+            // Add filters
+            if ($filterName) {
+                $countQuery .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
+            }
+            if ($filterDate) {
+                $countQuery .= " AND a.date = '$filterDate'";
+            }
+
+            $countResult = mysqli_query($con, $countQuery);
+            $totalCount = mysqli_fetch_assoc($countResult)['total'];
+            $totalPages = ceil($totalCount / $resultsPerPage);
+
+            // SQL query to fetch the filtered records with OFFSET
+            $query = "SELECT a.*, 
+                s.service_type AS service_name, 
+                p.first_name, p.middle_name, p.last_name, 
+                t.status     
+            FROM tbl_archives a
+            JOIN tbl_service_type s ON a.service_type = s.id
+            JOIN tbl_patient p ON a.name = p.id
+            JOIN tbl_status t ON a.completion = t.id
+            WHERE a.completion IN ('1', '2', '3')";
+
+            // Add filters
             if ($filterName) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
             }
-
-            // Add date filter if specified
             if ($filterDate) {
                 $query .= " AND a.date = '$filterDate'";
             }
 
-            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to results per page
-            
+            // Add ordering and pagination
+            $query .= "ORDER BY CASE 
+                WHEN a.modified_date IS NOT NULL THEN a.modified_date
+                ELSE a.date
+                END DESC
+                LIMIT $resultsPerPage OFFSET $startRow";
+
             $result = mysqli_query($con, $query);
-            ?><br><br><br>
+            ?>
+
+            <br><br><br>
             <div class="managehead">
-                 <!-- Search Form Container -->
+                <!-- Search Form Container -->
                 <div class="f-search">
                     <form method="GET" action="" class="search-form">
-                        <input type="text" name="name" placeholder="Search by name" value="<?php echo htmlspecialchars($filterName); ?>" />
+                        <input type="text" name="name" placeholder="Search by name"
+                            value="<?php echo htmlspecialchars($filterName); ?>" />
                         <input type="date" name="date" value="<?php echo htmlspecialchars($filterDate); ?>" />
                         <button class="material-symbols-outlined" type="submit">search</button>
                     </form>
@@ -139,15 +145,18 @@ if (!$con) {
                 <!-- Pagination Navigation -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
-                        <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">&lt;</a>
+                        <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo urlencode($filterName); ?>&date=<?php echo urlencode($filterDate); ?>"
+                            class="pagination-btn">&lt;</a>
                     <?php endif; ?>
 
                     <?php if ($currentPage < $totalPages): ?>
-                        <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">&gt;</a>
+                        <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo urlencode($filterName); ?>&date=<?php echo urlencode($filterDate); ?>"
+                            class="pagination-btn">&gt;</a>
                     <?php endif; ?>
                 </div>
             </div>
             <br><br>
+
             <!-- Table -->
             <table class="table table-bordered">
                 <thead>
@@ -166,25 +175,22 @@ if (!$con) {
                     <?php
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
-                            // Check if modified_date and modified_time are empty
+                            // Handle modified_date and modified_time
                             $modified_date = !empty($row['modified_date']) ? $row['modified_date'] : $row['date'];
                             $modified_time = !empty($row['modified_time']) ? $row['modified_time'] : $row['time'];
 
-                            $dateToDisplay = !empty($row['date']) ? $row['date'] : $row['date'];
-                            $timeToDisplay = !empty($row['time']) ? $row['time'] : $row['time'];
-
-                            // Format time to HH:MM AM/PM
-                            $timeToDisplayFormatted = date("h:i A", strtotime($timeToDisplay));
+                            // Format time
+                            $timeToDisplayFormatted = date("h:i A", strtotime($row['time']));
                             $timeToDisplayFormattedModified = date("h:i A", strtotime($modified_time));
 
                             echo "<tr>
-                    <td style='width:230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                    <td style='width: 200px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                     <td>{$row['contact']}</td>
-                    <td style='width:110px;'>{$dateToDisplay}</td>
-                    <td style='width:110px;'>{$timeToDisplayFormatted}</td>
-                    <td style='width:110px;'>{$modified_date}</td>
-                    <td style='width:110px;'>{$timeToDisplayFormattedModified}</td>
-                    <td style='font-size: 15px'>{$row['service_name']}</td>
+                    <td style='width: 90px'>{$row['date']}</td>
+                    <td style='width: 90px'>{$timeToDisplayFormatted}</td>
+                    <td>{$modified_date}</td>
+                    <td>{$timeToDisplayFormattedModified}</td>
+                    <td>{$row['service_name']}</td>
                     <td>{$row['status']}</td>
                 </tr>";
                         }
@@ -194,8 +200,8 @@ if (!$con) {
                     ?>
                 </tbody>
             </table>
-            <br><br>
         </div>
+    </div>
 </body>
 
 </html>

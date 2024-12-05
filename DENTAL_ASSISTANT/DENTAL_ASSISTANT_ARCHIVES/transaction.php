@@ -14,60 +14,6 @@ if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-$editMode = false; // Flag to determine if we're editing
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $patient_id = (int) $_POST['dropdown'];
-    $contact = mysqli_real_escape_string($con, trim($_POST['contact'])); // The contact is now passed from the hidden input // The contact is now passed from the form
-    $service_type = 9; // Orthodontic Braces ID
-    $date = mysqli_real_escape_string($con, trim($_POST['date']));
-    $paid = (float) $_POST['paid'];
-    $bill = (float) $_POST['bill'];
-    $outstanding_balance = (float) $_POST['outstanding_balance'];
-
-    if (isset($_POST['id']) && !empty($_POST['id'])) {
-        // Update logic
-        $idToEdit = (int) $_POST['id'];
-        $stmt = $con->prepare("UPDATE tbl_transaction_history SET name = ?, contact = ?, service_type = ?, date = ?, paid = ?, bill = ?, outstanding_balance = ? WHERE id = ?");
-        $stmt->bind_param("ssisdddi", $patient_id, $contact, $service_type, $date, $paid, $bill, $outstanding_balance, $idToEdit);
-    } else {
-        // Insert logic
-        $stmt = $con->prepare("INSERT INTO tbl_transaction_history (name, contact, service_type, date, paid, bill, outstanding_balance) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssisddd", $patient_id, $contact, $service_type, $date, $paid, $bill, $outstanding_balance);
-    }
-
-    // Execute the query
-    if ($stmt->execute()) {
-        header("Location: transaction.php");
-        exit();
-    } else {
-        echo "<p>Error: " . $stmt->error . "</p>";
-    }
-}
-
-// Clear the form submitted flag after page reload
-if (isset($_SESSION['form_submitted'])) {
-    unset($_SESSION['form_submitted']);
-}
-
-$sql = "SELECT 
-        p.id, 
-        CONCAT(p.last_name, ', ', p.first_name, ' ', p.middle_name) AS full_name,
-        a.contact 
-    FROM tbl_patient p
-    INNER JOIN tbl_transaction_history a ON p.id = a.name"; // Ensure this is correct
-$result_dropdown = $con->query($sql);
-
-// Prepare an array for dropdown options
-$dropdown_options = [];
-if ($result_dropdown && $result_dropdown->num_rows > 0) {
-    while ($row = $result_dropdown->fetch_assoc()) {
-        $dropdown_options[$row['id']] = [
-            'name' => htmlspecialchars($row['full_name']),
-            'contact' => htmlspecialchars($row['contact']) // Contact from tbl_appointments
-        ];
-    }
-}
 ?>
 
 <!DOCTYPE html>
@@ -118,7 +64,7 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
             </ul>
         </aside>
     </div>
-    <div></div>
+    
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
@@ -126,21 +72,22 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
             // Set the number of results per page
             $resultsPerPage = 5;
 
-            // Get the current page number from query parameters, default to 1
+            // Get current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 
-            // Calculate the starting row for the SQL query
+            // Calculate the starting row for SQL query
             $startRow = ($currentPage - 1) * $resultsPerPage;
 
-            // Capture filter values from GET parameters
-            $filterName = isset($_GET['name']) ? $_GET['name'] : '';
-            $filterDate = isset($_GET['date']) ? $_GET['date'] : '';
+            // Capture and sanitize filter values from GET parameters
+            $filterName = isset($_GET['name']) ? mysqli_real_escape_string($con, $_GET['name']) : '';
+            $filterDate = isset($_GET['date']) ? mysqli_real_escape_string($con, $_GET['date']) : '';
 
             // SQL query to count total records with filtering
-            $countQuery = "SELECT COUNT(*) as total FROM tbl_transaction_history a
-                       JOIN tbl_service_type s ON a.service_type = s.id
-                       JOIN tbl_patient p ON a.name = p.id
-                       WHERE a.service_type = '9'";
+            $countQuery = "SELECT COUNT(*) as total 
+               FROM tbl_transaction_history a
+               JOIN tbl_service_type s ON a.service_type = s.id
+               JOIN tbl_patient p ON a.name = p.id
+               WHERE a.service_type = '9'";
 
             // Add name filter if specified
             if ($filterName) {
@@ -154,36 +101,36 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
 
             $countResult = mysqli_query($con, $countQuery);
             $totalCount = mysqli_fetch_assoc($countResult)['total'];
-            $totalPages = ceil($totalCount / $resultsPerPage); // Calculate total pages
-            
-            // SQL query with JOIN to fetch the filtered records with OFFSET
+            $totalPages = ceil($totalCount / $resultsPerPage);
+
+            // SQL query to fetch filtered records with pagination
             $query = "SELECT a.*, 
                  s.service_type AS service_name, 
-                 p.first_name, p.middle_name, p.last_name
+                 p.first_name, p.middle_name, p.last_name 
           FROM tbl_transaction_history a
           JOIN tbl_service_type s ON a.service_type = s.id
           JOIN tbl_patient p ON a.name = p.id 
-          WHERE a.service_type = '9'
-          ORDER BY 
-              CASE 
-                  WHEN a.modified_date IS NOT NULL THEN a.modified_date
-                  ELSE a.date
-              END DESC";
+          WHERE a.service_type = '9'";
 
-            // Add name filter if specified
+            // Add filters to the query
             if ($filterName) {
                 $query .= " AND (p.first_name LIKE '%$filterName%' OR p.last_name LIKE '%$filterName%')";
             }
 
-            // Add date filter if specified
             if ($filterDate) {
                 $query .= " AND a.date = '$filterDate'";
             }
 
-            $query .= " LIMIT $resultsPerPage OFFSET $startRow";  // Limit to results per page
-            
+            $query .= " ORDER BY 
+            CASE 
+                WHEN a.modified_date IS NOT NULL THEN a.modified_date
+                ELSE a.date
+            END DESC
+            LIMIT $resultsPerPage OFFSET $startRow";
+
             $result = mysqli_query($con, $query);
-            ?><br><br><br>
+            ?>
+            <br><br><br>
             <div class="managehead">
                 <!-- Search Form Container -->
                 <div class="f-search">
@@ -198,18 +145,18 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                 <!-- Pagination Navigation -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
-                        <a href="?page=<?php echo $currentPage - 1; ?>" class="pagination-btn">&lt;</a>
+                        <a href="?page=<?php echo $currentPage - 1; ?>&name=<?php echo urlencode($filterName); ?>&date=<?php echo urlencode($filterDate); ?>"
+                            class="pagination-btn">&lt;</a>
                     <?php endif; ?>
 
                     <?php if ($currentPage < $totalPages): ?>
-                        <a href="?page=<?php echo $currentPage + 1; ?>" class="pagination-btn">&gt;</a>
+                        <a href="?page=<?php echo $currentPage + 1; ?>&name=<?php echo urlencode($filterName); ?>&date=<?php echo urlencode($filterDate); ?>"
+                            class="pagination-btn">&gt;</a>
                     <?php endif; ?>
                 </div>
             </div>
-            <br>
             <h2>Packages Transaction History</h2>
             <br>
-            <!-- Table -->
             <table class="table table-bordered centered-table">
                 <thead>
                     <tr>
@@ -217,10 +164,10 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                         <th>Contact</th>
                         <th>Service</th>
                         <th>Date</th>
-                        <th style="font-size: 15px;">Rescheduled Date</th>
+                        <th>Rescheduled Date</th>
                         <th>Bill</th>
-                        <th style="font-size: 15px;">Amount Paid</th>
-                        <th style="font-size: 15px;">Outstanding Balance</th>
+                        <th>Amount Paid</th>
+                        <th>Outstanding Balance</th>
                         <th>Note</th>
                     </tr>
                 </thead>
@@ -228,36 +175,31 @@ if ($result_dropdown && $result_dropdown->num_rows > 0) {
                     <?php
                     if (mysqli_num_rows($result) > 0) {
                         while ($row = mysqli_fetch_assoc($result)) {
-                            // Format prices with commas
                             $paid = "₱" . number_format($row['paid'], 2);
                             $bill = "₱" . number_format($row['bill'], 2);
                             $outstanding_balance = "₱" . number_format($row['outstanding_balance'], 2);
-
-                            // Validate modified_date and modified_time
                             $modified_date = (!empty($row['modified_date']) && $row['modified_date'] !== '0000-00-00') ? $row['modified_date'] : 'N/A';
-
-                            // Validate date and time
                             $dateToDisplay = (!empty($row['date']) && $row['date'] !== '0000-00-00') ? $row['date'] : 'N/A';
 
                             echo "<tr>
-                            <td style='width: 230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
-                            <td>{$row['contact']}</td>
-                            <td style='width: 110px;'>{$row['service_name']}</td>
-                            <td style='width: 110px;'>{$row['date']}</td>
-                            <td style='width: 110px;'>{$modified_date}</td>
-                            <td style='width: 110px;'>{$bill}</td>
-                            <td style='width: 110px;'>{$paid}</td>
-                            <td style='width: 110px;'>{$outstanding_balance}</td>
-                            <td>
-                        <button type='button' onclick='openModal(\"{$row['note']}\")'
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
-                            View
-                        </button>
-                    </td>
-            </tr>";
+                        <td>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td>{$row['contact']}</td>
+                        <td>{$row['service_name']}</td>
+                        <td>{$dateToDisplay}</td>
+                        <td>{$modified_date}</td>
+                        <td>{$bill}</td>
+                        <td>{$paid}</td>
+                        <td>{$outstanding_balance}</td>
+                        <td>
+                            <button type='button' onclick='openModal(\"{$row['note']}\")' 
+                                    style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                                View
+                            </button>
+                        </td>
+                      </tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='7'>No records found</td></tr>";
+                        echo "<tr><td colspan='9'>No records found</td></tr>";
                     }
                     ?>
                 </tbody>
