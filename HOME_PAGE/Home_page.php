@@ -124,11 +124,36 @@ if (isset($_POST['update'])) {
         </div>
     
         <style>
-            /* Font style for success text */
-            .success-text {
-                font-family: 'Montserrat', sans-serif; 
-            }
-        </style>
+    /* Font style for success text */
+    .success-text {
+        font-family: 'Montserrat', sans-serif; 
+    }
+
+    /* Mobile styles */
+    @media (max-width: 768px) {
+        #success-toast {
+            padding: 15px 30px;
+            font-size: 30px;
+        }
+
+        #success-toast img {
+            width: 150px;
+            height: 150px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        #success-toast {
+            padding: 10px 20px;
+            font-size: 20px;
+        }
+
+        #success-toast img {
+            width: 100px;
+            height: 100px;
+        }
+    }
+</style>
     
         <script>
             const toast = document.getElementById('success-toast');

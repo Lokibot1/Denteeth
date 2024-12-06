@@ -212,7 +212,6 @@ $result = mysqli_query($con, $query);
                     <th>Date</th>
                     <th>Time</th>
                     <th>Service</th>
-                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -230,19 +229,6 @@ $result = mysqli_query($con, $query);
                         <td style='width:110px;'>{$dateToDisplay}</td>
                         <td style='width:110px;'>{$timeToDisplayFormatted}</td>
                         <td>{$row['service_name']}</td>
-                        <td style='width:130px;'>
-
-                            <!-- Decline Button -->
-                            <form method='POST' id='declined' action='' style='display:inline;'>
-                                <input type='hidden' name='id' value='{$row['id']}'>
-                                <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
-                                style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:10px 9px; border-radius:10px;box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
-                            </form>
-
-                            <!-- Finish Button -->
-                            <button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:green; color:white; border:none; padding:10px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Finish</button>
-                        </td>
                     </tr>";
                     }
                 } else {
@@ -378,7 +364,6 @@ $result = mysqli_query($con, $query);
                         // Add the active class to the matching link
                         link.classList.add("active");
 
-                        // If it's inside a <li>, add a class to <li> as well
                         if (link.parentElement.tagName === "LI") {
                             link.parentElement.classList.add("active");
                         }
