@@ -1,24 +1,22 @@
 <?php
 session_start();
 
-// Check if the user is logged in and has the role of dental assistant (role '3')
-// Redirect to login page if not authenticated or authorized
+// Check if the user is logged in and is an admin
 if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['3'])) {
     header("Location: ../login.php");
     exit();
 }
 
-// Include the database connection file
 include("../dbcon.php");
 
-// Verify if the database connection is successful
+// Check database connection
 if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle update request when the update button is clicked
+// Handle update request
 if (isset($_POST['update'])) {
-    // Retrieve and sanitize input data from the update modal form
+    // Get form data from modal
     $id = $_POST['id'];
     $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
     $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
@@ -28,7 +26,7 @@ if (isset($_POST['update'])) {
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Check if the modified date and time conflict with other appointments
+    // Check for conflicts in both original date/time and modified date/time
     $conflict_query = "
         SELECT id 
         FROM tbl_appointments 
@@ -37,53 +35,55 @@ if (isset($_POST['update'])) {
             (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
         AND id != $id"; // Exclude the current appointment being updated
 
-    // Execute the conflict check query
     $conflict_result = mysqli_query($con, $conflict_query);
 
-    // Alert the user if a scheduling conflict is found
     if (mysqli_num_rows($conflict_result) > 0) {
+        // Conflict found
         echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
     } else {
-        // No conflicts - update the records in the database
+        // No conflict - proceed with the update
 
-        // Update the tbl_patient table with new patient information
+        // Update query for tbl_patient
         $update_patient_query = "UPDATE tbl_patient 
                                  SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
                                  WHERE id=$id";
 
-        // Update the tbl_appointments table with modified appointment details
+        // Update query for tbl_appointments
         $update_appointment_query = "UPDATE tbl_appointments 
                                      SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '3', service_type='$service_type' 
                                      WHERE id=$id";
 
-        // Execute both update queries
+        // Execute both queries
         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-            // Display a success message and redirect to the pending page
+            // Display success message and redirect using JavaScript
             echo "<script>
                 alert('Record updated successfully!');
                 window.location.href = 'pending.php';
             </script>";
             exit();
         } else {
-            // Display an error message if the update fails
+            // Display error if the query fails
             echo "<script>alert('Error updating record: " . mysqli_error($con) . "');</script>";
         }
     }
 }
-
-// Set the default timezone to Hong Kong
 date_default_timezone_set('Asia/Hong_Kong');
 
-// Handle delete request when the delete button is clicked
 if (isset($_POST['delete'])) {
-    // Retrieve the ID of the record to be deleted
+    // Get the ID from the form data
     $id = $_POST['id'];
 
-    // Fetch the appointment data to archive it before deletion
+    // Echo a confirmation alert using JavaScript
+    echo "<script>
+        if (confirm('Are you sure you want to delete this record?')) {
+            // Continue processing in PHP if confirmed
+    ";
+
+    // Fetch the appointment data to transfer to the bin
     $appointment_query = "SELECT * FROM tbl_appointments WHERE id=$id";
+
     $appointment_result = mysqli_query($con, $appointment_query);
 
-    // If the appointment exists, prepare to archive and delete it
     if ($appointment_row = mysqli_fetch_assoc($appointment_result)) {
         $name = mysqli_real_escape_string($con, $appointment_row['name']);
         $contact = mysqli_real_escape_string($con, $appointment_row['contact']);
@@ -93,58 +93,78 @@ if (isset($_POST['delete'])) {
         $modified_time = mysqli_real_escape_string($con, $appointment_row['modified_time']);
         $service_type = mysqli_real_escape_string($con, $appointment_row['service_type']);
         $status = mysqli_real_escape_string($con, $appointment_row['status']);
-        $deleted_at = date('Y-m-d H:i:s'); // Record deletion timestamp
 
-        // Insert the appointment data into the archive table (tbl_bin)
+        // Set the current date and time for deleted_at
+        $deleted_at = date('Y-m-d H:i:s');
+
+        // Insert into tbl_bin including the deleted_at field
         $insert_archives_query = "INSERT INTO tbl_bin (id, name, contact, date, time, modified_date, modified_time, service_type, status, deleted_at)
-                                  VALUES ('$id', '$name', '$contact', '$date', '$time', '$modified_date', '$modified_time', '$service_type', '$status', '$deleted_at')";
+                             VALUES ('$id', '$name', '$contact', '$date', '$time', '$modified_date', '$modified_time', '$service_type', '$status', '$deleted_at')";
 
-        // If archiving is successful, delete the record from tbl_appointments
+        // Execute the insert query
         if (mysqli_query($con, $insert_archives_query)) {
+            // Delete the appointment from tbl_appointments
             $delete_appointment_query = "DELETE FROM tbl_appointments WHERE id=$id";
+
+            // Execute the delete query
             if (mysqli_query($con, $delete_appointment_query)) {
-                // Display a success message and redirect to the declined page
-                echo "<script>
+                // Display a success message and redirect
+                echo "
                     alert('Successfully deleted the record.');
                     window.location.href = 'declined.php';
-                </script>";
+                ";
             } else {
-                // Display an error if deletion fails
-                echo "<script>alert('Error deleting appointment record: " . mysqli_error($con) . "');</script>";
+                echo "alert('Error deleting appointment record: " . mysqli_error($con) . "');";
             }
         } else {
-            // Display an error if archiving fails
-            echo "<script>alert('Error transferring appointment record to archives: " . mysqli_error($con) . "');</script>";
+            echo "alert('Error transferring appointment record to Archives: " . mysqli_error($con) . "');";
         }
     } else {
-        // Alert if the appointment record is not found
-        echo "<script>alert('No appointment found with this ID.');</script>";
+        echo "alert('No appointment found with this ID.');";
     }
+
+    echo "}
+    </script>";
 }
 
-// Handle restore request when the restore button is clicked
 if (isset($_POST['restore'])) {
-    // Retrieve the ID of the record to be restored
     $id = $_POST['id'];
 
-    // Update the status of the record to '1' (restored)
+    // Update the record to set status to '1' (restored)
     $restoreQuery = "UPDATE tbl_appointments SET status = '1' WHERE id = $id";
-
-    // Execute the restore query
     if (mysqli_query($con, $restoreQuery)) {
-        // Display a success message and redirect to the declined page
+        // Display success alert and redirect
         echo "<script>
-            alert('Record successfully restored.');
+            alert('Appointment successfully restored.');
             window.location.href = 'declined.php';
         </script>";
     } else {
-        // Display an error message if the restore fails
+        // Display error alert if the query fails
         echo "<script>
             alert('Error restoring record: " . mysqli_error($con) . "');
             window.location.href = 'declined.php';
         </script>";
     }
 }
+
+// SQL query to count total records
+$countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '1'";
+$countResult = mysqli_query($con, $countQuery);
+$totalCount = mysqli_fetch_assoc($countResult)['total'];
+
+// SQL query with JOIN to fetch the limited number of records
+$query = "SELECT a.*, 
+            s.service_type AS service_name, 
+            p.first_name, p.middle_name, p.last_name
+          FROM tbl_appointments a
+          JOIN tbl_service_type s ON a.service_type = s.id
+          JOIN tbl_patient p ON a.id = p.id
+          WHERE a.status = '3'
+          LIMIT 15";  // Limit to 15 rows
+
+$result = mysqli_query($con, $query);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -171,7 +191,7 @@ if (isset($_POST['restore'])) {
             </div>
         </a>
         <form method="POST" class="s-buttons" action="../logout.php">
-            <a href="DENTAL_ASSISTANT_ARCHIVES/archives.php"><i class="fas fa-trash trash"></i></a>
+            <a href="archives.php"><i class="fas fa-trash trash"></i></a>
             <button type="submit" class="logout-button">Logout</button>
         </form>
     </nav>
@@ -195,16 +215,172 @@ if (isset($_POST['restore'])) {
     <!-- Main Content/Crud -->
     <div class="top">
         <div class="content-box">
+            <div class="round-box">
+                <p>APPOINTMENT TODAY:</p>
+                <?php
+                include("../dbcon.php");
 
-            <?php
-            // Include the appointments summary
-            include("appointments_status.php");
-            ?>
+                // Set the default time zone to Hong Kong
+                date_default_timezone_set('Asia/Hong_Kong');
 
+                // Check database connection
+                if (!$con) {
+                    die("Connection failed: " . mysqli_connect_error());
+                }
+
+                // Get current date
+                $today = date('Y-m-d');
+
+                // Query to count appointments for today
+                $sql_today = "SELECT COUNT(*) as total_appointments_today 
+                              FROM tbl_appointments 
+                              WHERE (
+                                (modified_date IS NOT NULL AND 
+                                DATE(modified_date) = CURDATE()) 
+                                OR (modified_date IS NULL AND 
+                                DATE(date) = CURDATE())
+                                ) AND status = '3'";
+
+
+                $result_today = mysqli_query($con, $sql_today);
+
+                // Check for SQL errors
+                if (!$result_today) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_today = mysqli_fetch_assoc($result_today);
+                $appointments_today = $row_today['total_appointments_today'];
+
+                if ($appointments_today) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_today</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
+                ?>
+            </div>
+            <div class="round-box">
+                <p>PENDING APPOINTMENTS:</p>
+                <?php
+                // Query to count pending appointments
+                $sql_pending = "SELECT COUNT(*) as total_pending_appointments 
+                                FROM tbl_appointments 
+                                WHERE status = '1'";
+                $result_pending = mysqli_query($con, $sql_pending);
+
+                // Check for SQL errors
+                if (!$result_pending) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_pending = mysqli_fetch_assoc($result_pending);
+                $pending_appointments = $row_pending['total_pending_appointments'];
+
+                if ($pending_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$pending_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
+                ?>
+            </div>
+            <div class="round-box">
+                <p>APPOINTMENT FOR THIS WEEK:</p>
+                <?php
+                // Get the start and end date of the current week
+                $start_of_week = date('Y-m-d', strtotime('monday this week'));
+                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
+
+                // Query to count appointments for the current week
+                $sql_week = "SELECT COUNT(*) as total_appointments_week 
+                 FROM tbl_appointments 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                     WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                     WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) AND DATE(date) > CURDATE())
+                        )
+                 AND status = '3'";
+
+                $result_week = mysqli_query($con, $sql_week);
+
+                // Check for SQL errors
+                if (!$result_week) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_week = mysqli_fetch_assoc($result_week);
+                $appointments_for_week = $row_week['total_appointments_week'];
+
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
+                ?>
+            </div>
+            <div class="round-box">
+                <p>APPOINTMENT FOR NEXT WEEK:</p>
+                <?php
+                // Get the start and end date of the current week
+                $start_of_week = date('Y-m-d', strtotime('monday this week'));
+                $end_of_week = date('Y-m-d', strtotime('sunday this week'));
+
+                // Query to count appointments for the current week
+                $sql_week = "SELECT COUNT(*) as total_appointments_week 
+                 FROM tbl_appointments 
+                 WHERE (
+                    (modified_date IS NOT NULL AND 
+                    WEEK(DATE(modified_date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(modified_date) != CURDATE())
+                    OR 
+                    (date IS NOT NULL AND 
+                    WEEK(DATE(date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(date) > CURDATE())
+                    )
+                    AND status = '3'";
+
+                $result_week = mysqli_query($con, $sql_week);
+
+                // Check for SQL errors
+                if (!$result_week) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_week = mysqli_fetch_assoc($result_week);
+                $appointments_for_week = $row_week['total_appointments_week'];
+
+                if ($appointments_for_week) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$appointments_for_week</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
+                ?>
+            </div>
+            <div class="round-box">
+                <p>DECLINED APPOINTMENTS:</p>
+                <?php
+                // Query to count finished appointments
+                $sql_finished = "SELECT COUNT(*) as total_finished_appointments FROM tbl_appointments WHERE status = '2'";
+                $result_finished = mysqli_query($con, $sql_finished);
+
+                // Check for SQL errors
+                if (!$result_finished) {
+                    die("Query failed: " . mysqli_error($con));
+                }
+
+                $row_finished = mysqli_fetch_assoc($result_finished);
+                $finished_appointments = $row_finished['total_finished_appointments'];
+
+                if ($finished_appointments) {
+                    echo "<span style='color: #FF9F00; font-weight: bold; font-size: 25px;'>$finished_appointments</span>";
+                } else {
+                    echo "<span style='color: red;'>No data available</span>";
+                }
+                ?>
+            </div>
 
             <?php
             // Set the number of results per page
-            $resultsPerPage = 5;
+            $resultsPerPage = 6;
 
             // Get the current page number from query parameters, default to 1
             $currentPage = isset($_GET['page']) ? (int) $_GET['page'] : 1;
@@ -326,14 +502,11 @@ if (isset($_POST['restore'])) {
                     <h1>EDIT DETAILS</h1><br>
                     <input type="hidden" name="id" id="modal-id">
                     <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
-                    <div class="name-fields">
-                        <input type="text" name="last_name" id="modal-last-name" maxlength="50"
-                            placeholder="Enter Last Name" required>
-                        <input type="text" name="first_name" id="modal-first-name" maxlength="50"
-                            placeholder="Enter First Name" required>
-                        <input type="text" name="middle_name" id="modal-middle-name" maxlength="2"
-                            placeholder="Enter Middle Initial">
-                    </div>
+                <div class="name-fields">
+                  <input type="text" name="last_name" id="modal-last-name" maxlength="50" placeholder="Enter Last Name" required>
+                  <input type="text" name="first_name" id="modal-first-name" maxlength="50" placeholder="Enter First Name" required>
+                  <input type="text" name="middle_name" id="modal-middle-name" maxlength="2" placeholder="Enter Middle Initial">
+                </div>
                     <label for="contact">Contact:</label>
                     <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
                         maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
@@ -430,6 +603,29 @@ if (isset($_POST['restore'])) {
                         closeModal();
                     }
                 }
+                document.addEventListener("DOMContentLoaded", function () {
+    // Get the current URL path
+    const currentPath = window.location.pathname.split("/").pop();
+
+    // Select all sidebar links
+    const sidebarLinks = document.querySelectorAll(".sidebar a");
+
+    // Loop through each link to find a match
+    sidebarLinks.forEach(link => {
+        if (link.getAttribute("href") === currentPath) {
+            // Remove the active class from all links first
+            sidebarLinks.forEach(l => l.classList.remove("active"));
+            // Add the active class to the matching link
+            link.classList.add("active");
+
+            // If it's inside a <li>, add a class to <li> as well
+            if (link.parentElement.tagName === "LI") {
+                link.parentElement.classList.add("active");
+            }
+        }
+    });
+});
+
             </script>
         </div>
     </div>

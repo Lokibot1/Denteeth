@@ -432,6 +432,28 @@ if (isset($_POST['restore'])) {
                         closeModal();
                     }
                 }
+                document.addEventListener("DOMContentLoaded", function () {
+                // Get the current URL path
+                const currentPath = window.location.pathname.split("/").pop();
+
+                // Select all sidebar links
+                const sidebarLinks = document.querySelectorAll(".sidebar a");
+
+                // Loop through each link to find a match
+                sidebarLinks.forEach(link => {
+                    if (link.getAttribute("href") === currentPath) {
+                        // Remove the active class from all links first
+                        sidebarLinks.forEach(l => l.classList.remove("active"));
+                        // Add the active class to the matching link
+                        link.classList.add("active");
+
+                        // If it's inside a <li>, add a class to <li> as well
+                        if (link.parentElement.tagName === "LI") {
+                            link.parentElement.classList.add("active");
+                        }
+                    }
+                });
+            });
             </script>
         </div>
     </div>
