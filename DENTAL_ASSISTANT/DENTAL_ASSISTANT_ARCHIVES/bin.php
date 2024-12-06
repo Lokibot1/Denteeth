@@ -185,8 +185,8 @@ WHERE a.status IN ('1', '2', '3', '4')";
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th style="font-size: 15px;">Rescheduled Date</th>
-                        <th style="font-size: 15px;">Rescheduled Time</th>
+                        <th style="font-size: 18px;">Rescheduled Date</th>
+                        <th style="font-size: 18px;">Rescheduled Time</th>
                         <th>Service</th>
                     </tr>
                 </thead>
@@ -203,10 +203,10 @@ WHERE a.status IN ('1', '2', '3', '4')";
                             echo "<tr>
                     <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                     <td>{$row['contact']}</td>
-                    <td>{$dateToDisplay}</td>
-                    <td>{$timeToDisplay}</td>
-                    <td>{$modified_date}</td>
-                    <td>{$modified_time}</td>
+                    <td style='width: 110px'>{$dateToDisplay}</td>
+                    <td style='width: 110px'>{$timeToDisplay}</td>
+                    <td style='width: 120px'>{$modified_date}</td>
+                    <td style='width: 120px'>{$modified_time}</td>
                     <td>{$row['service_name']}</td>
                 </tr>";
                         }

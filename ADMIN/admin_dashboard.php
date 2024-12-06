@@ -34,7 +34,7 @@ if (!$con) {
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <a href="../HOME_PAGE/Home_page.php">
+        <a >
             <div class="logo">
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
@@ -137,8 +137,8 @@ if (!$con) {
                     <th>Time</th>
                     <th style="font-size: 15px;">Rescheduled Date</th>
                     <th style="font-size: 15px;">Rescheduled Time</th>
-                    <th>Modified_by</th>
-                    <th>Type Of Service</th>
+                    <th style="font-size: 15px;">Reschedule By</th>
+                    <th>Service</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -170,7 +170,7 @@ if (!$con) {
                     <td style='width: 90px'>{$timeToDisplay}</td>
                     <td style='width: 110px'>{$modified_date}</td>
                     <td style='width: 110px'>{$modified_time}</td>
-                    <td>{$modified_by_role}</td>
+                    <td style='width: 110px'>{$modified_by_role}</td>
                     <td style='font-size: 15px;'>{$row['service_name']}</td>
                     <td>{$row['status']}</td>
                 </tr>";

@@ -89,7 +89,7 @@ if (isset($_POST['update'])) {
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <a href="../HOME_PAGE/Home_page.php">
+        <a >
             <div class="logo">
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
@@ -278,7 +278,7 @@ if (isset($_POST['update'])) {
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>Today</h3>
+                <h3 style="color: #094514;">Today</h3>
 
                 <!-- Pagination for Day -->
                 <div class="pagination-container">
@@ -337,7 +337,7 @@ if (isset($_POST['update'])) {
             <!-- Tab content for Week -->
             <div id="Week" class="tabcontent" style="display: <?php echo $activeTab == 'Week' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>This Week</h3>
+                <h3 style="color: #094514;">This Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
@@ -397,7 +397,7 @@ if (isset($_POST['update'])) {
             <div id="NextWeek" class="tabcontent"
                 style="display: <?php echo $activeTab == 'NextWeek' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>Next Week</h3>
+                <h3 style="color: #094514;">Next Week</h3>
                 <!-- Pagination for Week -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>

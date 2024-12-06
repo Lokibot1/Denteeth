@@ -107,7 +107,7 @@ if (isset($_POST['delete'])) {
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <a href="../HOME_PAGE/Home_page.php">
+        <a >
             <div class="logo">
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>

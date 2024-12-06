@@ -36,7 +36,7 @@ if (!$con) {
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <a href="../HOME_PAGE/Home_page.php">
+        <a >
             <div class="logo">
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
@@ -163,10 +163,10 @@ if (!$con) {
                         <th>Contact</th>
                         <th>Service</th>
                         <th>Date</th>
-                        <th>Rescheduled Date</th>
+                        <th style="font-size: 15px;">Rescheduled Date</th>
                         <th>Bill</th>
                         <th>Amount Paid</th>
-                        <th>Outstanding Balance</th>
+                        <th style="font-size: 15px;">Outstanding Balance</th>
                         <th>Note</th>
                     </tr>
                 </thead>

@@ -36,7 +36,7 @@ if (!$con) {
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <a href="../HOME_PAGE/Home_page.php">
+        <a >
             <div class="logo">
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
@@ -185,8 +185,8 @@ WHERE a.status IN ('1', '2', '3', '4')";
                         <th>Contact</th>
                         <th>Date</th>
                         <th>Time</th>
-                        <th style="font-size: 15px;">Rescheduled Date</th>
-                        <th style="font-size: 15px;">Rescheduled Time</th>
+                        <th style="font-size: 18px;">Rescheduled Date</th>
+                        <th style="font-size: 18px;">Rescheduled Time</th>
                         <th>Service</th>
                     </tr>
                 </thead>

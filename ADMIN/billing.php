@@ -103,7 +103,7 @@ if (isset($_POST['submit'])) {
 <body>
     <!-- Navigation/Sidebar -->
     <nav>
-        <a href="../HOME_PAGE/Home_page.php">
+        <a >
             <div class="logo">
                 <h1><span>EHM</span> Dental Clinic</h1>
             </div>
@@ -223,7 +223,7 @@ if (isset($_POST['submit'])) {
             <div id="Onetimepayment" class="tabcontent"
                 style="display: <?php echo $activeTab == 'Onetimepayment' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>One Time</h3>
+                <h3 style="color: #094514;">One Time</h3>
 
                 <!-- Pagination for onetimepayment -->
                 <div class="pagination-container">
@@ -323,7 +323,7 @@ if (isset($_POST['submit'])) {
             <div id="Packages" class="tabcontent"
                 style="display: <?php echo $activeTab == 'Packages' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>Packages</h3>
+                <h3 style="color: #094514;">Packages</h3>
                 <!-- Pagination for Packages -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>

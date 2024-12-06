@@ -218,7 +218,7 @@ if (isset($_POST['submit'])) {
             <div id="Onetimepayment" class="tabcontent"
                 style="display: <?php echo $activeTab == 'Onetimepayment' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>One Time</h3>
+                <h3 style="color:#094514;">One Time</h3>
 
                 <!-- Pagination for onetimepayment -->
                 <div class="pagination-container">
@@ -318,7 +318,7 @@ if (isset($_POST['submit'])) {
             <div id="Packages" class="tabcontent"
                 style="display: <?php echo $activeTab == 'Packages' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3>Packages</h3>
+                <h3 style="color: #094514;">Packages</h3>
                 <!-- Pagination for Packages -->
                 <div class="pagination-container">
                     <?php if ($currentPage > 1): ?>
@@ -415,7 +415,7 @@ if (isset($_POST['submit'])) {
 
             <div id="approveModal" class="modal" style="display: none;">
                 <div class="modal-content">
-                    <button style="background-color: transparent;" class="close">&times;</button>
+                <span class="close">&times;</span>
                     <h3 style="text-align: center; color: black; font-size: 30px;">Service Completion</h3>
                     <hr>
                     <div id="modalDetails">
@@ -505,9 +505,9 @@ if (isset($_POST['submit'])) {
             </script>
 
             <!-- Modal for Viewing Notes -->
-            <div id="viewModal" class="modal" style="display: none;">
+            <div id="viewModal" class="modal">
                 <div class="modal-content">
-                    <span class="close-view">&times;</span>
+                <span class="close-view" style="float: right; font-weight: bold; font-size:25px">&times;</span>
                     <h2 style="color: #0a0a0a;">NOTES FROM THE DOCTOR:</h2>
                     <br>
                     <div class="body">
@@ -572,27 +572,27 @@ if (isset($_POST['submit'])) {
                     openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
                 };
                 document.addEventListener("DOMContentLoaded", function () {
-    // Get the current URL path
-    const currentPath = window.location.pathname.split("/").pop();
+                // Get the current URL path
+                const currentPath = window.location.pathname.split("/").pop();
 
-    // Select all sidebar links
-    const sidebarLinks = document.querySelectorAll(".sidebar a");
+                // Select all sidebar links
+                const sidebarLinks = document.querySelectorAll(".sidebar a");
 
-    // Loop through each link to find a match
-    sidebarLinks.forEach(link => {
-        if (link.getAttribute("href") === currentPath) {
-            // Remove the active class from all links first
-            sidebarLinks.forEach(l => l.classList.remove("active"));
-            // Add the active class to the matching link
-            link.classList.add("active");
+                // Loop through each link to find a match
+                sidebarLinks.forEach(link => {
+                    if (link.getAttribute("href") === currentPath) {
+                        // Remove the active class from all links first
+                        sidebarLinks.forEach(l => l.classList.remove("active"));
+                        // Add the active class to the matching link
+                        link.classList.add("active");
 
-            // If it's inside a <li>, add a class to <li> as well
-            if (link.parentElement.tagName === "LI") {
-                link.parentElement.classList.add("active");
-            }
-        }
-    });
-});
+                        // If it's inside a <li>, add a class to <li> as well
+                        if (link.parentElement.tagName === "LI") {
+                            link.parentElement.classList.add("active");
+                        }
+                    }
+                });
+            });
 
             </script>
         </div>
