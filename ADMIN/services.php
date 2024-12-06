@@ -1352,6 +1352,28 @@ $con->close();
                             notification.style.opacity = '1'; // Reset for next use
                         }, 3500);
                     }
+                    document.addEventListener("DOMContentLoaded", function () {
+                        // Get the current URL path
+                        const currentPath = window.location.pathname.split("/").pop();
+
+                        // Select all sidebar links
+                        const sidebarLinks = document.querySelectorAll(".sidebar a");
+
+                        // Loop through each link to find a match
+                        sidebarLinks.forEach(link => {
+                            if (link.getAttribute("href") === currentPath) {
+                                // Remove the active class from all links first
+                                sidebarLinks.forEach(l => l.classList.remove("active"));
+                                // Add the active class to the matching link
+                                link.classList.add("active");
+
+                                // If it's inside a <li>, add a class to <li> as well
+                                if (link.parentElement.tagName === "LI") {
+                                    link.parentElement.classList.add("active");
+                                }
+                            }
+                        });
+                    });
                 </script>
 
                 <script>
@@ -1387,28 +1409,6 @@ $con->close();
                         imagePreview.style.display = "none"; // Hide the image preview
                         imagePreview.src = ""; // Clear the image preview source
                     }
-                    document.addEventListener("DOMContentLoaded", function () {
-                // Get the current URL path
-                const currentPath = window.location.pathname.split("/").pop();
-
-                // Select all sidebar links
-                const sidebarLinks = document.querySelectorAll(".sidebar a");
-
-                // Loop through each link to find a match
-                sidebarLinks.forEach(link => {
-                    if (link.getAttribute("href") === currentPath) {
-                        // Remove the active class from all links first
-                        sidebarLinks.forEach(l => l.classList.remove("active"));
-                        // Add the active class to the matching link
-                        link.classList.add("active");
-
-                        // If it's inside a <li>, add a class to <li> as well
-                        if (link.parentElement.tagName === "LI") {
-                            link.parentElement.classList.add("active");
-                        }
-                    }
-                });
-            });
                 </script>
             </div>
         </div>

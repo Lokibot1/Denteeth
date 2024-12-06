@@ -176,8 +176,7 @@ if (!$con) {
                 ?>
             </tbody>
         </table>
-        <br><br>
-        <script>
+        <br><br>        <script>
             document.addEventListener("DOMContentLoaded", function () {
             // Get the current URL path
             const currentPath = window.location.pathname.split("/").pop();
@@ -200,7 +199,6 @@ if (!$con) {
                 }
             });
         });
-
         </script>
     </div>
 </body>
