@@ -141,7 +141,7 @@ if (isset($_POST['submit'])) {
             include("appointments_status.php");
             ?>
 
-            <?php
+<?php
             $resultsPerPage = 4;
 
             // Get the current page number from query parameters, default to 1
@@ -223,7 +223,7 @@ if (isset($_POST['submit'])) {
             <div id="Onetimepayment" class="tabcontent"
                 style="display: <?php echo $activeTab == 'Onetimepayment' ? 'block' : 'none'; ?>;">
                 <br>
-                <h3 style="color: #094514;">One Time</h3>
+                <h3 style="color:#094514;">One Time</h3>
 
                 <!-- Pagination for onetimepayment -->
                 <div class="pagination-container">
@@ -420,8 +420,8 @@ if (isset($_POST['submit'])) {
 
             <div id="approveModal" class="modal" style="display: none;">
                 <div class="modal-content">
-                    <button style="background-color: transparent;" class="close">&times;</button>
-                    <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
+                    <span class="close">&times;</span>
+                    <h3 style="text-align: center; color: black; font-size: 30px;">Service Completion</h3>
                     <hr>
                     <div id="modalDetails">
                         <p><strong>Name:</strong> <span id="modalName"></span></p>
@@ -438,18 +438,22 @@ if (isset($_POST['submit'])) {
                     <form id="newServiceForm" method="POST" action="">
                         <input type="hidden" name="id" value="">
                         <br>
-                        <label style="font-size: 20px; font-weight: bold;" for="paid">Paid(₱):</label>
+                        <label style="font-size: 20px; font-weight: bold;" for="paid">Paid (₱):</label>
                         <br>
                         <input type="number" id="paid" name="paid"
-                            style="width: 100%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                            style="width: 40%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required
+                            oninput="validateLength(this, 7)">
                         <br>
-                        <label style="font-size: 20px; font-weight: bold;" for="outstanding_balance">Outstanding
-                            Balance(₱):</label>
-                        <div class="price">
+                        <label style="font-size: 20px; font-weight: bold;" for="outstanding_balance">Outstanding Balance
+                            (₱):</label>
+                        <div class="price" style="gap: 35%;">
                             <input type="number" id="outstanding_balance" name="outstanding_balance"
-                                style="width: 40%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                                style="width: 40%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required
+                                oninput="validateLength(this, 7)">
                             <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
                         </div>
+                        <p id="error-message" style="color: red; display: none;">Input exceeds maximum allowed length.
+                        </p>
                     </form>
                 </div>
             </div>
@@ -457,6 +461,18 @@ if (isset($_POST['submit'])) {
                 <p>Successfully Submitted!</p>
             </div>
             <script>
+                function validateLength(input, maxLength) {
+                    const errorMessage = document.getElementById('error-message');
+
+                    // Prevent user from entering more than `maxLength` characters
+                    if (input.value.length > maxLength) {
+                        input.value = input.value.slice(0, maxLength); // Truncate extra characters
+                        errorMessage.style.display = 'block';
+                    } else {
+                        errorMessage.style.display = 'none';
+                    }
+                }
+
                 function openApproveModal(id, firstName, middleName, lastName, contact, date, time, service, price) {
                     // Set modal details dynamically
                     document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
@@ -510,9 +526,10 @@ if (isset($_POST['submit'])) {
             </script>
 
             <!-- Modal for Viewing Notes -->
-            <div id="viewModal" class="modal" style="display: none;">
+            <div id="viewModal" class="modal">
                 <div class="modal-content">
-                    <span class="close-view">&times;</span>
+                    <span class="close-view"
+                        style="float: right; font-weight: bold; font-size:25px; cursor: pointer;">&times;</span>
                     <h2 style="color: #0a0a0a;">NOTES FROM THE DOCTOR:</h2>
                     <br>
                     <div class="body">
@@ -577,27 +594,28 @@ if (isset($_POST['submit'])) {
                     openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
                 };
                 document.addEventListener("DOMContentLoaded", function () {
-                // Get the current URL path
-                const currentPath = window.location.pathname.split("/").pop();
+                    // Get the current URL path
+                    const currentPath = window.location.pathname.split("/").pop();
 
-                // Select all sidebar links
-                const sidebarLinks = document.querySelectorAll(".sidebar a");
+                    // Select all sidebar links
+                    const sidebarLinks = document.querySelectorAll(".sidebar a");
 
-                // Loop through each link to find a match
-                sidebarLinks.forEach(link => {
-                    if (link.getAttribute("href") === currentPath) {
-                        // Remove the active class from all links first
-                        sidebarLinks.forEach(l => l.classList.remove("active"));
-                        // Add the active class to the matching link
-                        link.classList.add("active");
+                    // Loop through each link to find a match
+                    sidebarLinks.forEach(link => {
+                        if (link.getAttribute("href") === currentPath) {
+                            // Remove the active class from all links first
+                            sidebarLinks.forEach(l => l.classList.remove("active"));
+                            // Add the active class to the matching link
+                            link.classList.add("active");
 
-                        // If it's inside a <li>, add a class to <li> as well
-                        if (link.parentElement.tagName === "LI") {
-                            link.parentElement.classList.add("active");
+                            // If it's inside a <li>, add a class to <li> as well
+                            if (link.parentElement.tagName === "LI") {
+                                link.parentElement.classList.add("active");
+                            }
                         }
-                    }
+                    });
                 });
-            });
+
             </script>
         </div>
     </div>

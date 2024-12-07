@@ -266,6 +266,13 @@ textarea {
     float: right;
 }
 
+.body{
+    height: 80%;
+    padding: 20px 20px;
+    background-color: #FDF3D6;
+    border: 1px solid #000000;
+}
+
 .modal-content input[type="text"],
 .modal-content input[type="time"],
 .modal-content input[type="date"],

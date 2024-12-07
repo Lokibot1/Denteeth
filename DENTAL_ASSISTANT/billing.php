@@ -77,6 +77,8 @@ if (isset($_POST['submit'])) {
             $delete_stmt = $con->prepare("DELETE FROM tbl_archives WHERE id = ?");
             $delete_stmt->bind_param("i", $id);
 
+            $_SESSION['notification'] = 'Record successfully approved and marked as complete.';
+
             if (!$delete_stmt->execute()) {
                 die("Error deleting appointment: " . $delete_stmt->error);
             }
@@ -531,7 +533,8 @@ if (isset($_POST['submit'])) {
             <!-- Modal for Viewing Notes -->
             <div id="viewModal" class="modal">
                 <div class="modal-content">
-                    <span class="close-view" style="float: right; font-weight: bold; font-size:25px; cursor: pointer;">&times;</span>
+                    <span class="close-view"
+                        style="float: right; font-weight: bold; font-size:25px; cursor: pointer;">&times;</span>
                     <h2 style="color: #0a0a0a;">NOTES FROM THE DOCTOR:</h2>
                     <br>
                     <div class="body">

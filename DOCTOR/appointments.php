@@ -126,24 +126,6 @@ if (isset($_POST['decline'])) {
     // Redirect to refresh the page and show updated records
     header("Location: appointments.php");
 }
-
-// SQL query to count total records
-$countQuery = "SELECT COUNT(*) as total FROM tbl_appointments WHERE status = '1'";
-$countResult = mysqli_query($con, $countQuery);
-$totalCount = mysqli_fetch_assoc($countResult)['total'];
-
-// SQL query with JOIN to fetch the limited number of records
-$query = "SELECT a.*, 
-            s.service_type AS service_name, 
-            p.first_name, p.middle_name, p.last_name
-          FROM tbl_appointments a
-          JOIN tbl_service_type s ON a.service_type = s.id
-          JOIN tbl_patient p ON a.id = p.id
-          WHERE a.status = '3'
-          LIMIT 15";  // Limit to 15 rows
-
-$result = mysqli_query($con, $query);
-
 ?>
 
 <!DOCTYPE html>

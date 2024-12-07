@@ -7,17 +7,16 @@ if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['1'])) {
     exit();
 }
 
-// Include the database connection file
 include("../dbcon.php");
 
-// Check the database connection and terminate if it fails
+// Check database connection
 if (!$con) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-// Handle the form submission for updating a record
+// Handle update request
 if (isset($_POST['update'])) {
-    // Retrieve and sanitize form data to prevent SQL injection
+    // Get form data from modal
     $id = $_POST['id'];
     $first_name = mysqli_real_escape_string($con, $_POST['first_name']);
     $last_name = mysqli_real_escape_string($con, $_POST['last_name']);
@@ -27,47 +26,105 @@ if (isset($_POST['update'])) {
     $modified_time = mysqli_real_escape_string($con, $_POST['modified_time']);
     $service_type = mysqli_real_escape_string($con, $_POST['service_type']);
 
-    // Check if the new date and time conflict with any existing records
-    $conflict_query = "
-        SELECT id 
+    // Check for conflicts in both original date/time and modified date/time
+    $conflict_query = "SELECT id 
         FROM tbl_appointments 
         WHERE 
             (date = '$modified_date' AND TIME(time) = TIME('$modified_time')) OR 
             (modified_date = '$modified_date' AND TIME(modified_time) = TIME('$modified_time'))
-        AND id != $id";
+        AND id != $id"; // Exclude the current appointment being updated
 
-    // Execute the conflict check query
     $conflict_result = mysqli_query($con, $conflict_query);
 
-    // If a conflict is found, display an alert message
     if (mysqli_num_rows($conflict_result) > 0) {
+        // Conflict found
         echo "<script>alert('The selected date and time are already booked. Please choose a different time.');</script>";
     } else {
-        // If no conflict, proceed with updating the records
+        // No conflict - proceed with the update
 
-        // Query to update the tbl_patient table
+        // Update query for tbl_patient
         $update_patient_query = "UPDATE tbl_patient 
                                  SET first_name='$first_name', middle_name='$middle_name', last_name='$last_name'
                                  WHERE id=$id";
 
-        // Query to update the tbl_appointments table
+        // Update query for tbl_appointments
         $update_appointment_query = "UPDATE tbl_appointments 
-                                     SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '1', service_type='$service_type' 
-                                     WHERE id=$id";
+                                     SET contact='$contact', modified_date='$modified_date', modified_time='$modified_time', modified_by = '2', service_type='$service_type' 
+                                     WHERE id=$id";  // Assuming patient_id is used as foreign key in tbl_appointments
 
-        // Execute both update queries
+        // Execute both queries
         if (mysqli_query($con, $update_patient_query) && mysqli_query($con, $update_appointment_query)) {
-            // If both updates are successful, display a success message and redirect
-            echo "<script>
-                alert('Record updated successfully!');
-                window.location.href = 'appointments.php';
-            </script>";
+            // Redirect to the same page after updating
+            header("Location: appointments.php");
             exit();
         } else {
-            // If an update fails, display an error message
-            echo "<script>alert('Error updating record: " . mysqli_error($con) . "');</script>";
+            echo "Error updating record: " . mysqli_error($con);
         }
     }
+}
+
+if (isset($_POST['submit'])) {
+    // Get and sanitize the posted data
+    $id = intval($_POST['id']); // Appointment ID
+    $note = mysqli_real_escape_string($con, $_POST['note']);
+    $price = floatval($_POST['price']); // Price
+
+    // Fetch appointment details
+    $stmt = $con->prepare("SELECT * FROM tbl_appointments WHERE id = ?");
+    $stmt->bind_param("i", $id);
+
+    if ($stmt->execute()) {
+        $result = $stmt->get_result();
+        if ($result && $result->num_rows > 0) {
+            $appointment = $result->fetch_assoc();
+
+            // Archive appointment data
+            $archive_stmt = $con->prepare("INSERT INTO tbl_archives 
+                (name, contact, date, time, modified_date, modified_time, service_type, note, price, completion) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, '1')");
+            $archive_stmt->bind_param(
+                "ssssssssd",
+                $appointment['name'],
+                $appointment['contact'],
+                $appointment['date'],
+                $appointment['time'],
+                $appointment['modified_date'],
+                $appointment['modified_time'],
+                $appointment['service_type'],
+                $note,
+                $price
+            );
+
+            if (!$archive_stmt->execute()) {
+                die("Error inserting into tbl_archives: " . $archive_stmt->error);
+            }
+
+            // Remove the appointment from tbl_appointments
+            $delete_stmt = $con->prepare("DELETE FROM tbl_appointments WHERE id = ?");
+            $delete_stmt->bind_param("i", $id);
+
+            if (!$delete_stmt->execute()) {
+                die("Error deleting appointment: " . $delete_stmt->error);
+            }
+
+            // Redirect to appointments page
+            header("Location: appointments.php");
+            exit();
+        } else {
+            die("Error: Appointment not found.");
+        }
+    } else {
+        die("Error executing fetch query: " . $stmt->error);
+    }
+}
+
+if (isset($_POST['decline'])) {
+    $id = $_POST['id'];
+    $deleteQuery = "UPDATE tbl_appointments SET status = '2' WHERE id = $id";
+    mysqli_query($con, $deleteQuery);
+
+    // Redirect to refresh the page and show updated records
+    header("Location: appointments.php");
 }
 ?>
 
@@ -127,7 +184,7 @@ if (isset($_POST['update'])) {
             include("appointments_status.php");
             ?>
 
-            <?php
+<?php
             // Set the number of results per page
             $resultsPerPage = 4;
 
@@ -199,15 +256,7 @@ if (isset($_POST['update'])) {
                     DATE(a.date) = CURDATE())
             )
             AND a.status = '3'
-            ORDER BY 
-            CASE 
-            WHEN a.modified_date IS NOT NULL THEN a.modified_date
-            ELSE a.date
-            END DESC,
-            CASE 
-            WHEN a.modified_time IS NOT NULL THEN a.modified_time
-            ELSE a.time
-            END ASC
+            ORDER BY  a.time DESC, a.modified_time DESC
             LIMIT $resultsPerPage OFFSET $startRow";
 
             // SQL query for Week with JOIN to fetch the limited number of records with OFFSET
@@ -225,15 +274,7 @@ if (isset($_POST['update'])) {
                      WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) AND DATE(a.date) > CURDATE())
               )
               AND a.status = '3'
-              ORDER BY 
-            CASE 
-            WHEN a.modified_date IS NOT NULL THEN a.modified_date
-            ELSE a.date
-            END DESC,
-            CASE 
-            WHEN a.modified_time IS NOT NULL THEN a.modified_time
-            ELSE a.time
-            END ASC
+              ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
               LIMIT $resultsPerPage OFFSET $startRow";
 
             $queryNextWeek = "SELECT a.*, 
@@ -250,15 +291,7 @@ if (isset($_POST['update'])) {
                 WEEK(DATE(a.date), 1) = WEEK(CURDATE(), 1) + 1 AND DATE(a.date) > CURDATE())
                 )
               AND a.status = '3'
-              ORDER BY 
-            CASE 
-            WHEN a.modified_date IS NOT NULL THEN a.modified_date
-            ELSE a.date
-            END DESC,
-            CASE 
-            WHEN a.modified_time IS NOT NULL THEN a.modified_time
-            ELSE a.time
-            END ASC
+              ORDER BY a.date DESC, a.time DESC, a.modified_date DESC, a.modified_time DESC
               LIMIT $resultsPerPage OFFSET $startRow";
 
 
@@ -269,12 +302,14 @@ if (isset($_POST['update'])) {
             // Default tab is 'Day'
             $activeTab = isset($_GET['tab']) ? $_GET['tab'] : 'Day';
             ?>
+
             <!-- Tab structure -->
             <div class="tab">
                 <button class="tablinks" onclick="switchTab('Day')">Today</button>
                 <button class="tablinks" onclick="switchTab('Week')">This Week</button>
                 <button class="tablinks" onclick="switchTab('NextWeek')">Next Week</button>
             </div>
+
             <!-- Tab content for Day -->
             <div id="Day" class="tabcontent" style="display: <?php echo $activeTab == 'Day' ? 'block' : 'none'; ?>;">
                 <br>
@@ -313,18 +348,26 @@ if (isset($_POST['update'])) {
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width: 230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
-                        <td style='width: 110px'>{$dateToDisplay}</td>
-                        <td style='width: 110px'>{$timeToDisplay}</td>
-                        <td style='width: 110px'>{$modified_date}</td>
-                        <td style='width: 110px'>{$modified_time}</td>
-                        <td>{$row['service_name']}</td>
-                        <td style='width: 10px'>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
-                        </td>
-                    </tr>";
+                        <td style='width: 110px;'>{$dateToDisplay}</td>
+                        <td style='width: 110px;'>{$timeToDisplay}</td>
+                        <td style='width: 110px;'>{$modified_date}</td>
+                        <td style='width: 110px;'>{$modified_time}</td>
+                        <td style='font-size: 15px;'>{$row['service_name']}</td>
+                        <td style='width: 130px'>
+                            <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:10px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                            </form>";
+
+                                if ($row['status'] != 'finished') {
+                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                    style='background-color:green; color:white; border:none; padding:10px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Finish</button>";
+                                }
+
+                                echo "</td></tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -371,18 +414,26 @@ if (isset($_POST['update'])) {
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width: 230px;'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
-                        <td style='width: 110px'>{$dateToDisplay}</td>
-                        <td style='width: 110px'>{$timeToDisplay}</td>
-                        <td style='width: 110px'>{$modified_date}</td>
-                        <td style='width: 110px'>{$modified_time}</td>
-                        <td>{$row['service_name']}</td>
-                        <td style='width: 10px'>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px; cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
-                        </td>
-                    </tr>";
+                        <td style='width: 110px;'>{$dateToDisplay}</td>
+                        <td style='width: 110px;'>{$timeToDisplay}</td>
+                        <td style='width: 110px;'>{$modified_date}</td>
+                        <td style='width: 110px;'>{$modified_time}</td>
+                        <td style='font-size: 15px;'>{$row['service_name']}</td>
+                        <td style='width: 130px'>
+                            <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:10px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                            </form>";
+
+                                if ($row['status'] != 'finished') {
+                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                    style='background-color:green; color:white; border:none; padding:10px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Finish</button>";
+                                }
+
+                                echo "</td></tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -431,18 +482,26 @@ if (isset($_POST['update'])) {
                                 $timeToDisplay = !empty($row['time']) ? date("h:i A", strtotime($row['time'])) : 'N/A';
 
                                 echo "<tr>
-                        <td style='width: 230px'>{$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
+                        <td style='width: 230px;'> {$row['last_name']}, {$row['first_name']} {$row['middle_name']}</td>
                         <td>{$row['contact']}</td>
-                        <td style='width: 110px'>{$dateToDisplay}</td>
-                        <td style='width: 110px'>{$timeToDisplay}</td>
-                        <td style='width: 110px'>{$modified_date}</td>
-                        <td style='width: 110px'>{$modified_time}</td>
-                        <td>{$row['service_name']}</td>
-                        <td style='width: 10px'>
-                            <button type='button' onclick='openModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
-                            style='background-color:#083690; color:white; border:none; padding:7px 9px; border-radius:10px;  cursor:pointer; box-shadow: 1px 2px 5px 0px #414141;'>Update</button>
-                        </td>
-                    </tr>";
+                        <td style='width: 110px;'>{$dateToDisplay}</td>
+                        <td style='width: 110px;'>{$timeToDisplay}</td>
+                        <td style='width: 110px;'>{$modified_date}</td>
+                        <td style='width: 110px;'>{$modified_time}</td>
+                        <td style='widtfont-size: 15px;'>{$row['service_name']}</td>
+                        <td style='width: 130px'>
+                            <form method='POST' action='' style='display:inline;'>
+                            <input type='hidden' name='id' value='{$row['id']}'>
+                            <input type='submit' name='decline' value='Decline' onclick=\"return confirm('Are you sure you want to remove this record?');\" 
+                            style='background-color: rgb(196, 0, 0); color:white; border:none;  padding:10px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>
+                            </form>";
+
+                                if ($row['status'] != 'finished') {
+                                    echo "<button type='button' onclick='openFinishModal({$row['id']}, \"{$row['first_name']}\", \"{$row['middle_name']}\", \"{$row['last_name']}\", \"{$row['contact']}\", \"{$dateToDisplay}\", \"{$timeToDisplay}\", \"{$row['service_name']}\")' 
+                    style='background-color:green; color:white; border:none; padding:10px 9px; border-radius:10px; box-shadow: 1px 2px 5px 0px #414141; cursor:pointer;'>Finish</button>";
+                                }
+
+                                echo "</td></tr>";
                             }
                         } else {
                             echo "<tr><td colspan='8'>No records found</td></tr>";
@@ -452,115 +511,149 @@ if (isset($_POST['update'])) {
                     </tbody>
                 </table>
             </div>
-            <!-- Edit Modal -->
-            <div id="editModal" class="modal">
+
+            <div id="finishModal" class="modal" style="display: none;">
                 <div class="modal-content">
-                    <span class="close" onclick="closeModal()">&times;</span>
-                    <form method="POST" action="">
-                        <h1>EDIT DETAILS</h1><br>
-                        <input type="hidden" name="id" id="modal-id">
-                        <label for="modal-name">Full Name: <br> (Last Name, First Name, Middle Initial)</label>
-                        <div class="name-fields">
-                            <input type="text" name="last_name" id="modal-last-name" maxlength="50"
-                                placeholder="Enter Last Name" required>
-                            <input type="text" name="first_name" id="modal-first-name" maxlength="50"
-                                placeholder="Enter First Name" required>
-                            <input type="text" name="middle_name" id="modal-middle-name" maxlength="2"
-                                placeholder="Enter Middle Initial">
+                    <button style="background-color: transparent;" class="close">&times;</button>
+                    <h3 style="text-align: center; font-size: 30px;">Service Completion</h3>
+                    <hr>
+                    <div id="modalDetails">
+                        <p><strong>Name:</strong> <span id="modalName"></span></p>
+                        <br>
+                        <p><strong>Contact Number:</strong> <span id="modalContact"></span></p>
+                        <br>
+                        <p><strong>Date & Time:</strong> <span id="modalDateTime"></span></p>
+                        <br>
+                        <p><strong>Current Service:</strong> <span id="modalService"></span></p>
+                    </div>
+                    <hr>
+                    <form id="newServiceForm" method="POST" action="">
+                        <input type="hidden" name="id" value="">
+                        <br>
+                        <label style="font-size: 20px; font-weight: bold;" for="note">Note:</label>
+                        <br>
+                        <br>
+                        <textarea id="note" name="note" placeholder="Enter your note here..."></textarea>
+                        <br>
+
+                        <label style="font-size: 20px; font-weight: bold;" for="price">Total Price (₱):</label>
+                        <div class="price">
+                            <input type="number" id="price" name="price"
+                                style="width: 30%; font-size: 25px; font-weight: bold;" min="0" max="1000000"
+                                step="0.01" required oninput="validateLength(this, 7)">
+                            <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
                         </div>
-                        <label for="contact">Contact:</label>
-                        <input type="text" name="contact" id="modal-contact" placeholder="Enter your contact number"
-                            maxlength="11" required pattern="\d{11}" title="Please enter exactly 11 digits"><br>
-                        <label for="date">Date:</label>
-                        <input type="date" name="modified_date" id="modal-modified_date" required>
-                        <br>
-                        <label for="time">Time: <br> (Will only accept appointments from 9:00 a.m to 6:00 p.m)</label>
-                        <select name="modified_time" id="modal-modified_time" required>
-                            <option value="09:00 AM">09:00 AM</option>
-                            <option value="10:30 AM">10:30 AM</option>
-                            <option value="12:00 PM" disabled>12:00 AM (Lunch Break)</option>
-                            <option value="12:30 PM">12:30 PM</option>
-                            <option value="13:30 PM">01:30 PM</option>
-                            <option value="15:00 PM">03:00 PM</option>
-                            <option value="16:30 PM">04:30 PM</option>
-                        </select>
-                        <label for="service_type">Type of Services:</label>
-                        <select name="service_type" id="modal-service_type" required>
-                            <option value="">--Select Service Type--</option>
-                            <option value="1">All Porcelain Veneers & Zirconia</option>
-                            <option value="2">Crown & Bridge</option>
-                            <option value="3">Dental Cleaning</option>
-                            <option value="4">Dental Implants</option>
-                            <option value="5">Dental Whitening</option>
-                            <option value="6">Dentures</option>
-                            <option value="7">Extraction</option>
-                            <option value="8">Full Exam & X-Ray</option>
-                            <option value="9">Orthodontic Braces</option>
-                            <option value="10">Restoration</option>
-                            <option value="11">Root Canal Treatment</option>
-                        </select>
-                        <br>
-                        <input type="submit" name="update" value="Save">
-                    </form>
+                        <p id="error-message" style="color: red; display: none;">Input exceeds maximum allowed length.
+                        </p>
                 </div>
+                </form>
             </div>
+        </div>
+        <div id="notification" class="notification" style="display: none;">
+            <p>Successfully Submitted!</p>
+        </div>
+        <script>
+            function validateLength(input, maxLength) {
+                const errorMessage = document.getElementById('error-message');
 
-            <script>
-                // Open the modal and populate it with data
-                function openModal(id, first_name, middle_name, last_name, contact, modified_date, modified_time, service_type) {
-                    document.getElementById('modal-id').value = id;
-                    document.getElementById('modal-first-name').value = first_name;
-                    document.getElementById('modal-middle-name').value = middle_name;
-                    document.getElementById('modal-last-name').value = last_name;
-                    document.getElementById('modal-contact').value = contact;
-                    document.getElementById('modal-modified_date').value = modified_date;
-                    document.getElementById('modal-modified_time').value = modified_time;
-                    document.getElementById('modal-service_type').value = service_type;
-                    document.getElementById('editModal').style.display = 'block';
+                // Prevent user from entering more than `maxLength` characters
+                if (input.value.length > maxLength) {
+                    input.value = input.value.slice(0, maxLength); // Truncate extra characters
+                    errorMessage.style.display = 'block';
+                } else {
+                    errorMessage.style.display = 'none';
+                }
+            }
+
+            function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
+                // Set modal details dynamically
+                document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
+                document.getElementById('modalContact').innerText = contact;
+                document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
+                document.getElementById('modalService').innerText = service;
+
+                // Clear the price input field when opening the modal
+                document.getElementById('price').value = '';
+
+                // Set the hidden ID field in the form
+                document.querySelector("#newServiceForm input[name='id']").value = id;
+
+                // Display the modal
+                document.getElementById('finishModal').style.display = 'block';
+            }
+
+            // Event listener to close the modal when the close button is clicked
+            document.querySelector('.close').addEventListener('click', () => {
+                document.getElementById('finishModal').style.display = 'none';
+            });
+
+            // Event listener to close the modal when clicking outside of it
+            window.addEventListener('click', (event) => {
+                if (event.target == document.getElementById('finishModal')) {
+                    document.getElementById('finishModal').style.display = 'none';
+                }
+            });
+
+            // Event listener for the proceed button to trigger a notification
+            document.getElementById('proceed').addEventListener('click', function () {
+                showNotification();
+            });
+
+            // Function to show a notification message
+            function showNotification() {
+                const notification = document.getElementById('notification, declined');
+                if (notification) {
+                    notification.style.display = 'block';
+
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 3000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
+            }
+            // Switch between tabs
+            function openTab(evt, tabName) {
+                var i, tabcontent, tablinks;
+
+                // Hide all tab content
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
                 }
 
-                // Close the modal
-                function closeModal() {
-                    document.getElementById('editModal').style.display = 'none';
+                // Remove 'active' class from all tab links
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].classList.remove("active");
                 }
 
-                // Switch between tabs
-                function openTab(evt, tabName) {
-                    var i, tabcontent, tablinks;
+                // Display the clicked tab's content and add 'active' class to the clicked tab
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.classList.add("active");
+            }
 
-                    // Hide all tab content
-                    tabcontent = document.getElementsByClassName("tabcontent");
-                    for (i = 0; i < tabcontent.length; i++) {
-                        tabcontent[i].style.display = "none";
-                    }
+            function switchTab(tabName) {
+                // Update the URL to reflect the selected tab without reloading
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabName);
+                window.history.pushState({}, '', url);
+                // Call openTab to display the selected tab content
+                openTab(event, tabName);
+            }
 
-                    // Remove 'active' class from all tab links
-                    tablinks = document.getElementsByClassName("tablinks");
-                    for (i = 0; i < tablinks.length; i++) {
-                        tablinks[i].classList.remove("active");
-                    }
-
-                    // Display the clicked tab's content and add 'active' class to the clicked tab
-                    document.getElementById(tabName).style.display = "block";
-                    evt.currentTarget.classList.add("active");
-                }
-
-                function switchTab(tabName) {
-                    // Update the URL to reflect the selected tab without reloading
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', tabName);
-                    window.history.pushState({}, '', url);
-                    // Call openTab to display the selected tab content
-                    openTab(event, tabName);
-                }
-
-                // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
-                window.onload = function () {
-                    const params = new URLSearchParams(window.location.search);
-                    const activeTab = params.get('tab') || 'Day';
-                    openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
-                };
-                document.addEventListener("DOMContentLoaded", function () {
+            // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
+            window.onload = function () {
+                const params = new URLSearchParams(window.location.search);
+                const activeTab = params.get('tab') || 'Day';
+                openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+            };
+            document.addEventListener("DOMContentLoaded", function () {
                 // Get the current URL path
                 const currentPath = window.location.pathname.split("/").pop();
 
@@ -582,9 +675,8 @@ if (isset($_POST['update'])) {
                     }
                 });
             });
-            </script>
-
-        </div>
+        </script>
+    </div>
     </div>
 </body>
 
