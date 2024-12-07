@@ -553,105 +553,123 @@ $result = mysqli_query($con, $query);
                         <label style="font-size: 20px; font-weight: bold;" for="price">Total Price (₱):</label>
                         <div class="price">
                             <input type="number" id="price" name="price"
-                                style="width: 30%; font-size: 25px; font-weight: bold;" min="0" step="0.01" required>
+                                style="width: 30%; font-size: 25px; font-weight: bold;" min="0" max="1000000"
+                                step="0.01" required oninput="validateLength(this, 7)">
                             <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
                         </div>
-                    </form>
+                        <p id="error-message" style="color: red; display: none;">Input exceeds maximum allowed length.
+                        </p>
+
+                        <button type="submit" name="submit" id="proceed">Proceed to Dental Assistant</button>
                 </div>
+                </form>
             </div>
-            <div id="notification" class="notification" style="display: none;">
-                <p>Successfully Submitted!</p>
-            </div>
-            <script>
-                function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
-                    // Set modal details dynamically
-                    document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
-                    document.getElementById('modalContact').innerText = contact;
-                    document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
-                    document.getElementById('modalService').innerText = service;
+        </div>
+        <div id="notification" class="notification" style="display: none;">
+            <p>Successfully Submitted!</p>
+        </div>
+        <script>
+            function validateLength(input, maxLength) {
+                const errorMessage = document.getElementById('error-message');
 
-                    // Clear the price input field when opening the modal
-                    document.getElementById('price').value = '';
-
-                    // Set the hidden ID field in the form
-                    document.querySelector("#newServiceForm input[name='id']").value = id;
-
-                    // Display the modal
-                    document.getElementById('finishModal').style.display = 'block';
+                // Prevent user from entering more than `maxLength` characters
+                if (input.value.length > maxLength) {
+                    input.value = input.value.slice(0, maxLength); // Truncate extra characters
+                    errorMessage.style.display = 'block';
+                } else {
+                    errorMessage.style.display = 'none';
                 }
+            }
 
-                // Event listener to close the modal when the close button is clicked
-                document.querySelector('.close').addEventListener('click', () => {
+            function openFinishModal(id, firstName, middleName, lastName, contact, date, time, service) {
+                // Set modal details dynamically
+                document.getElementById('modalName').innerText = `${lastName}, ${firstName} ${middleName}`;
+                document.getElementById('modalContact').innerText = contact;
+                document.getElementById('modalDateTime').innerText = `${date} at ${time}`;
+                document.getElementById('modalService').innerText = service;
+
+                // Clear the price input field when opening the modal
+                document.getElementById('price').value = '';
+
+                // Set the hidden ID field in the form
+                document.querySelector("#newServiceForm input[name='id']").value = id;
+
+                // Display the modal
+                document.getElementById('finishModal').style.display = 'block';
+            }
+
+            // Event listener to close the modal when the close button is clicked
+            document.querySelector('.close').addEventListener('click', () => {
+                document.getElementById('finishModal').style.display = 'none';
+            });
+
+            // Event listener to close the modal when clicking outside of it
+            window.addEventListener('click', (event) => {
+                if (event.target == document.getElementById('finishModal')) {
                     document.getElementById('finishModal').style.display = 'none';
-                });
-
-                // Event listener to close the modal when clicking outside of it
-                window.addEventListener('click', (event) => {
-                    if (event.target == document.getElementById('finishModal')) {
-                        document.getElementById('finishModal').style.display = 'none';
-                    }
-                });
-
-                // Event listener for the proceed button to trigger a notification
-                document.getElementById('proceed').addEventListener('click', function () {
-                    showNotification();
-                });
-
-                // Function to show a notification message
-                function showNotification() {
-                    const notification = document.getElementById('notification, declined');
-                    if (notification) {
-                        notification.style.display = 'block';
-
-                        // Start fading out after 3 seconds
-                        setTimeout(() => {
-                            notification.style.opacity = '0';
-                        }, 3000);
-
-                        // Hide completely after fading
-                        setTimeout(() => {
-                            notification.style.display = 'none';
-                            notification.style.opacity = '1'; // Reset for next use
-                        }, 3500);
-                    }
                 }
-                // Switch between tabs
-                function openTab(evt, tabName) {
-                    var i, tabcontent, tablinks;
+            });
 
-                    // Hide all tab content
-                    tabcontent = document.getElementsByClassName("tabcontent");
-                    for (i = 0; i < tabcontent.length; i++) {
-                        tabcontent[i].style.display = "none";
-                    }
+            // Event listener for the proceed button to trigger a notification
+            document.getElementById('proceed').addEventListener('click', function () {
+                showNotification();
+            });
 
-                    // Remove 'active' class from all tab links
-                    tablinks = document.getElementsByClassName("tablinks");
-                    for (i = 0; i < tablinks.length; i++) {
-                        tablinks[i].classList.remove("active");
-                    }
+            // Function to show a notification message
+            function showNotification() {
+                const notification = document.getElementById('notification, declined');
+                if (notification) {
+                    notification.style.display = 'block';
 
-                    // Display the clicked tab's content and add 'active' class to the clicked tab
-                    document.getElementById(tabName).style.display = "block";
-                    evt.currentTarget.classList.add("active");
+                    // Start fading out after 3 seconds
+                    setTimeout(() => {
+                        notification.style.opacity = '0';
+                    }, 3000);
+
+                    // Hide completely after fading
+                    setTimeout(() => {
+                        notification.style.display = 'none';
+                        notification.style.opacity = '1'; // Reset for next use
+                    }, 3500);
+                }
+            }
+            // Switch between tabs
+            function openTab(evt, tabName) {
+                var i, tabcontent, tablinks;
+
+                // Hide all tab content
+                tabcontent = document.getElementsByClassName("tabcontent");
+                for (i = 0; i < tabcontent.length; i++) {
+                    tabcontent[i].style.display = "none";
                 }
 
-                function switchTab(tabName) {
-                    // Update the URL to reflect the selected tab without reloading
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('tab', tabName);
-                    window.history.pushState({}, '', url);
-                    // Call openTab to display the selected tab content
-                    openTab(event, tabName);
+                // Remove 'active' class from all tab links
+                tablinks = document.getElementsByClassName("tablinks");
+                for (i = 0; i < tablinks.length; i++) {
+                    tablinks[i].classList.remove("active");
                 }
 
-                // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
-                window.onload = function () {
-                    const params = new URLSearchParams(window.location.search);
-                    const activeTab = params.get('tab') || 'Day';
-                    openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
-                };
-        document.addEventListener("DOMContentLoaded", function () {
+                // Display the clicked tab's content and add 'active' class to the clicked tab
+                document.getElementById(tabName).style.display = "block";
+                evt.currentTarget.classList.add("active");
+            }
+
+            function switchTab(tabName) {
+                // Update the URL to reflect the selected tab without reloading
+                const url = new URL(window.location.href);
+                url.searchParams.set('tab', tabName);
+                window.history.pushState({}, '', url);
+                // Call openTab to display the selected tab content
+                openTab(event, tabName);
+            }
+
+            // This runs when the page is loaded, ensuring the correct tab is shown based on the URL
+            window.onload = function () {
+                const params = new URLSearchParams(window.location.search);
+                const activeTab = params.get('tab') || 'Day';
+                openTab({ currentTarget: document.querySelector(`[onclick="switchTab('${activeTab}')"]`) }, activeTab);
+            };
+            document.addEventListener("DOMContentLoaded", function () {
                 // Get the current URL path
                 const currentPath = window.location.pathname.split("/").pop();
 
@@ -673,8 +691,8 @@ $result = mysqli_query($con, $query);
                     }
                 });
             });
-            </script>
-        </div>
+        </script>
+    </div>
     </div>
 </body>
 
