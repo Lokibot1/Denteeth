@@ -26,11 +26,19 @@ if (isset($_POST['Approve'])) {
 
 // On the billing.php or any page you want to show the notification
 if (isset($_SESSION['notification'])) {
-    echo "<div class='notification' style='background-color: green; color: white; padding: 10px; border-radius: 5px;'>
+    echo "<div id='notification' class='notification' style='background-color: green; color: white; padding: 10px; border-radius: 5px;'>
             {$_SESSION['notification']}
           </div>";
     // Unset the session variable after displaying the message
     unset($_SESSION['notification']);
+    echo "<script>
+            setTimeout(() => {
+                const notification = document.getElementById('notification');
+                if (notification) {
+                    notification.style.display = 'none';
+                }
+            }, 3000); // Adjust time in milliseconds (3000ms = 3   seconds)
+          </script>";
 }
 
 if (isset($_POST['submit'])) {
@@ -523,7 +531,7 @@ if (isset($_POST['submit'])) {
             <!-- Modal for Viewing Notes -->
             <div id="viewModal" class="modal">
                 <div class="modal-content">
-                    <span class="close-view" style="float: right; font-weight: bold; font-size:25px">&times;</span>
+                    <span class="close-view" style="float: right; font-weight: bold; font-size:25px; cursor: pointer;">&times;</span>
                     <h2 style="color: #0a0a0a;">NOTES FROM THE DOCTOR:</h2>
                     <br>
                     <div class="body">
