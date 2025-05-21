@@ -6,43 +6,29 @@ Originally developed with https://github.com/xionnnnn as our full-stack dev and 
 
 **Denteeth** is a web-based Dental Management System designed to streamline the operations of dental clinics. The system provides an all-in-one solution for managing patient records, dental services, appointments, and scheduling. It allows both administrators and patients to interact with the system through an intuitive interface, improving efficiency and user experience in dental healthcare services.
 
-## Key Features
+## 🧩 Key Features
+- 📅 **Online Appointment Booking**
+- 👤 **Patient Registration and Management**
+- 🦷 **Dental Service Records**
+- 📁 **Patient History and Dental Charts**
+- 📆 **Calendar View for Appointments**
+- 🔔 **Automated Appointment Reminders**
+- 📊 **Admin Dashboard and Reports**
+- 🛡️ **Secure Login System (Admin, Dentist, and Patient Roles)**
 
-- **Online Appointment Booking**  
-  Patients can view available slots and book appointments conveniently.
+## 👥 User Roles
+Admin: Manage users, appointments, and reports.
+Dentist: View and manage patient history and appointments.
+Patient: Book appointments, view treatment history.
 
-- **Patient Records Management**  
-  Dentists and clinic staff can view, add, and update patient information securely.
-
-- **Service Management**  
-  Administrators can manage and update available dental services.
-
-- **Appointment Calendar**  
-  Visual calendar for staff to manage daily schedules and avoid booking conflicts.
-
-- **Notifications & Reminders**  
-  Email or in-system reminders for upcoming appointments.
-
-- **User Roles & Access Control**  
-  Admins, dentists, and patients have role-specific access to features.
-
-## 🛠️ Technologies Used
-
-- **Frontend:** HTML, CSS, JavaScript  
-- **Backend:** PHP  
-- **Database:** MySQL  
-- **Development Model:** Rapid Application Development (RAD)
-
-
-
-## Tech Stack
+## ⚙️ Technologies Used
 ```bash
-- PHP (native / no frameworks)
-- HTML
-- CSS
-- Javascript
-- Bootstrap
-Database:
-- MySQL
+- Frontend: HTML5, CSS3, JavaScript
+- Backend: PHP
+- Database: MySQL
+- Tools: Visual Studio Code, XAMPP, phpMyAdmin
 ```
+
+
+
 
